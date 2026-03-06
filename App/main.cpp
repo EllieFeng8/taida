@@ -5,11 +5,15 @@
 #include <QQmlApplicationEngine>
 
 #include "autogen/environment.h"
-
+#include "Core/TdProxy.h"
 int main(int argc, char *argv[])
 {
     set_qt_environment();
     QApplication app(argc, argv);
+
+    TdProxy *Td = new TdProxy();
+    qmlRegisterSingletonInstance<TdProxy>("Core", 1, 0, "Td", Td);
+
 
     QQmlApplicationEngine engine;
     const QUrl url(mainQmlFile);

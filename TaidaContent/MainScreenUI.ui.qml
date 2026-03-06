@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import Core 1.0
 
 Rectangle {
     id: body
@@ -55,21 +56,30 @@ Rectangle {
     property alias waterValveSetMouseArea: waterValveSetMouseArea
     property alias waterValveSwitch: waterValveSwitch
     property alias waterValveSwitchMouseArea: waterValveSwitchMouseArea
-    property bool waterValveIsOn: true
+    property bool waterValveIsOn: Td.outValvePidOn
     property bool waterValveSetBtn: true
-    property bool motorFreqIsOn: true
-    property bool allFansIsOn: true
-    property bool fansPIDIsOn: true
-    property bool fans1IsOn: true
-    property bool fans2IsOn: true
-    property bool fans3IsOn: true
-    property bool fans4IsOn: true
-    property bool fans5IsOn: true
-    property bool fans6IsOn: true
-    property bool fans7IsOn: true
-    property bool fans8IsOn: true
-    property bool fans9IsOn: true
+    property bool motorFreqIsOn: Td.motorFrequencySwitchOn
+    property bool allFansIsOn: Td.fanAllOn
+    property bool fansPIDIsOn: Td.fanPidMonitorOn
+    property bool fans1IsOn: Td.fan1SwitchOn
+    property bool fans2IsOn: Td.fan2SwitchOn
+    property bool fans3IsOn: Td.fan3SwitchOn
+    property bool fans4IsOn: Td.fan4SwitchOn
+    property bool fans5IsOn: Td.fan5SwitchOn
+    property bool fans6IsOn: Td.fan6SwitchOn
+    property bool fans7IsOn: Td.fan7SwitchOn
+    property bool fans8IsOn: Td.fan8SwitchOn
+    property bool fans9IsOn: Td.fan9SwitchOn
 
+    property alias background_fan1 : background_fan1
+    property alias background_fan2 : background_fan2
+    property alias background_fan3 : background_fan3
+    property alias background_fan4 : background_fan4
+    property alias background_fan5 : background_fan5
+    property alias background_fan6 : background_fan6
+    property alias background_fan7 : background_fan7
+    property alias background_fan8 : background_fan8
+    property alias background_fan9 : background_fan9
     Rectangle {
         id: background
 
@@ -205,6 +215,7 @@ Rectangle {
 
                             height: 16
                             width: 145.02
+
 
                             color: "#64748b"
                             font.family: "Noto Sans TC"
@@ -426,7 +437,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.inWaterTemp
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -502,7 +513,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.inWaterPressure
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -623,7 +634,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.outWaterTemp
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -700,7 +711,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.returnWaterPressure
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -821,7 +832,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.returnWaterTemp
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -898,7 +909,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.returnWaterPressure
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1008,14 +1019,6 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
-                                // Item {
-                                //     id: container_11
-
-                                //     x: 106.28
-
-                                //     height: 20
-                                //     width: 56
                                 Text {
 
                                     height: 28
@@ -1028,7 +1031,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: "10 "
+                                    text: Td.condenserLeft1Temp
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1083,13 +1086,6 @@ Rectangle {
                                     verticalAlignment: Text.AlignVCenter
                                 }
 
-                                // Item {
-                                //     id: container_12
-
-                                //     x: 107.28
-
-                                //     height: 20
-                                //     width: 55
                                 Text {
 
                                     height: 28
@@ -1102,7 +1098,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: "10 "
+                                    text: Td.condenserLeft2Temp
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1176,7 +1172,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: "10 "
+                                    text: Td.condenserRight1Temp
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1241,7 +1237,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: "10 "
+                                    text: Td.condenserRight1Temp
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1360,7 +1356,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.inletAirTemp
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1436,7 +1432,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.inletAirHumidity
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1555,7 +1551,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: "10 "
+                                text: Td.outletAirTemp
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1762,7 +1758,7 @@ Rectangle {
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
 
-                                    text: "1.0"
+                                    text: Number(Td.outValveOpening)
                                     verticalAlignment: Text.AlignVCenter
                                     validator: DoubleValidator {}
                                 }
@@ -1816,7 +1812,7 @@ Rectangle {
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
                                     validator: DoubleValidator {}
-                                    text: "1.5"
+                                    text: Number(Td.outValveP)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
@@ -1880,7 +1876,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignRight
                                     selectByMouse: true
                                     validator: DoubleValidator {}
-                                    // text: "0.8"
+                                     text: Number(Td.outValveI)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
@@ -1933,7 +1929,7 @@ Rectangle {
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
                                     validator: DoubleValidator {}
-                                    text: "0.2"
+                                    text: Number(Td.outValveD)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
@@ -2050,15 +2046,6 @@ Rectangle {
                             border.color: returnValveTxtInput.focus ? "#2563eb" : "#e2e8f0"
                             color: "#f1f5f9"
                             radius: 8
-
-                            // Item {
-                            //     id: container_17
-
-                            //     x: 13
-                            //     y: 14
-
-                            //     height: 16
-                            //     width: 513.33
                             Text {
                                 id: returV
 
@@ -2091,64 +2078,12 @@ Rectangle {
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignRight
                                 validator: DoubleValidator {}
-                                text: "45"
+                                text: Number(Td.returnValveOpening)
                                 verticalAlignment: Text.AlignVCenter
                             }
                             // }
                         }
-                        //     Rectangle {
-                        //         id: background_Border_5
 
-                        //         y: 64
-
-                        //         height: 49
-                        //         width: 539.33
-
-                        //         border.width: returnValveTxtInput.focus ? 3 : 1
-                        //         border.color: returnValveSetTxtInput.focus ? "#2563eb" : "#e2e8f0"
-                        //         color: "#f1f5f9"
-                        //         radius: 8
-
-                        //         Text {
-                        //             id: element_35
-
-                        //             x: 13
-                        //             y: 17
-
-                        //             height: 15
-                        //             width: 94
-
-                        //             color: "#94a3b8"
-                        //             font.capitalization: Font.AllUppercase
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 20
-                        //             font.weight: Font.Bold
-                        //             horizontalAlignment: Text.AlignLeft
-                        //             lineHeight: 15
-                        //             lineHeightMode: Text.FixedHeight
-                        //             text: "設定數值"
-                        //             textFormat: Text.PlainText
-                        //             verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //         TextInput {
-                        //             id: returnValveSetTxtInput
-
-                        //             x: 468
-                        //             y: 17
-
-                        //             height: 20
-                        //             width: 63
-
-                        //             color: "#1e293b"
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 20
-                        //             font.weight: Font.Bold
-                        //             horizontalAlignment: Text.AlignRight
-
-                        //             text: "45"
-                        //             verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //     }
                     }
                     Rectangle {
                         id: button_3
@@ -2345,7 +2280,7 @@ Rectangle {
                                         font.weight: Font.Bold
                                         horizontalAlignment: Text.AlignRight
 
-                                        text: "50"
+                                        text: Number(Td.motorFrequency)
                                         verticalAlignment: Text.AlignVCenter
                                     }
                                     Text {
@@ -2476,7 +2411,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignRight
                                     lineHeight: 36
                                     lineHeightMode: Text.FixedHeight
-                                    text: "111"
+                                    text: Td.currentWaterFlow
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -2735,18 +2670,10 @@ Rectangle {
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
 
-                                    text: "10"
+                                    text: Number(Td.fanPidP)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
-                            // Image {
-                            //     id: background_Border_Shadow_11
-
-                            //     x: 111.66
-                            //     y: -1
-
-                            //     source: Qt.resolvedUrl(
-                            //                 "assets/background_Border_Shadow_11.png")
                             Rectangle {
                                 id: fansI
 
@@ -2793,7 +2720,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
-                                    text: "10"
+                                    text: Number(Td.fanPidI)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
@@ -2844,7 +2771,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignRight
-                                    text: "10"
+                                    text: Number(Td.fanPidD)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
@@ -2946,7 +2873,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignRight
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: "600"
+                                    text: Td.pressureDiff
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -3014,7 +2941,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans1IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3089,7 +3016,7 @@ Rectangle {
                             }
 
                             Rectangle {
-                                id: background_Border_9
+                                id: background_fan1
 
                                 y: 22.17
 
@@ -3116,7 +3043,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan1TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3171,7 +3098,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon11.png"
+                                    source: fans2IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3245,7 +3172,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_11
+                                id: background_fan2
 
                                 y: 22.17
 
@@ -3272,7 +3199,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan2TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3327,7 +3254,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans3IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3400,7 +3327,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_13
+                                id: background_fan3
 
                                 y: 22.17
 
@@ -3427,7 +3354,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan3TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3482,7 +3409,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon11.png"
+                                    source: fans4IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3556,7 +3483,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_15
+                                id: background_fan4
 
                                 y: 22.17
 
@@ -3584,7 +3511,7 @@ Rectangle {
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
 
-                                    text: "1800"
+                                    text: Number(Td.fan4TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3639,7 +3566,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans5IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3711,7 +3638,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_17
+                                id: background_fan5
 
                                 y: 22.17
 
@@ -3738,7 +3665,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan5TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3793,7 +3720,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans6IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -3866,7 +3793,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_19
+                                id: background_fan6
 
                                 y: 22.17
 
@@ -3893,7 +3820,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan6TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -3949,7 +3876,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans7IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4021,7 +3948,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_21
+                                id: background_fan7
 
                                 y: 22.17
 
@@ -4048,7 +3975,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan7TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -4104,7 +4031,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: fans8IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4177,7 +4104,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_23
+                                id: background_fan8
 
                                 y: 22.17
 
@@ -4204,7 +4131,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan8TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
@@ -4260,7 +4187,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon11.png"
+                                    source: fans9IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4333,7 +4260,7 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                             Rectangle {
-                                id: background_Border_25
+                                id: background_fan9
 
                                 y: 22.17
 
@@ -4360,7 +4287,7 @@ Rectangle {
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
                                     horizontalAlignment: Text.AlignLeft
-                                    text: "1800"
+                                    text: Number(Td.fan9TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 Image {
