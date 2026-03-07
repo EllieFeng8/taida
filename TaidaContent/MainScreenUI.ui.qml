@@ -10,7 +10,7 @@ Rectangle {
     width: 1920
 
     color: "#f0f4f8"
-
+    property alias motorFreqSetBtnMouseArea:motorFreqSetBtnMouseArea
     property alias motorFreqSwitchMouseArea: motorFreqSwitchMouseArea
     property alias allFansPIDSwitchMouseArea: allFansPIDSwitchMouseArea
     property alias allFansSwitchMouseArea: allFansSwitchMouseArea

@@ -5,9 +5,34 @@ import Core 1.0
 
 MainScreenUI {
     id: root
+    returnValveBtnMouseArea.onClicked: {
+        Td.returnValveOpening = returnValveTxtInput.text
+    console.log("回水:",Td.returnValveOpening)
+    }
+
+    motorFreqSetBtnMouseArea.onClicked: {
+        Td.motorFrequency = motorFreqTextInput.text
+        console.log("馬達:",Td.motorFrequency)
+    }
+
 
     waterValveSwitchMouseArea.onClicked: {
         waterValveIsOn = !waterValveIsOn
+    }
+    waterValveSetMouseArea.onClicked: {
+        Td.outValveOpening = waterValveOpenTxtInput.text
+        Td.outValveP = waterPTxtInpt.text
+        Td.outValveI = waterITxtInpt.text
+        Td.outValveD = waterDTxtInpt.text
+
+        console.log("出水閥:",Td.outValveOpening,Td.outValveP,Td.outValveI,Td.outValveD)
+    }
+
+    fansPIDSetBtnMouseArea.onClicked: {
+        Td.fanPidP = fansPTxtInput.text
+        Td.fanPidI = fansITxtInput.text
+        Td.fanPidD = fansDTxtInput.text
+    console.log("fans pid:",Td.fanPidP,Td.fanPidI,Td.fanPidD)
     }
 
     fans1SwitchMouseArea.onClicked: {
@@ -43,6 +68,7 @@ MainScreenUI {
     }
     allFansPIDSwitchMouseArea.onClicked: {
         fansPIDIsOn = !fansPIDIsOn
+    console.log("fansPIDIsOn",fansPIDIsOn)
     }
 
     allFansSwitchMouseArea.onClicked: {
