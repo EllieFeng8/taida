@@ -128,6 +128,15 @@ class TdProxy : public QObject
     Q_PROPERTY(bool fan8ConfirmButton READ getFan8ConfirmButton WRITE setFan8ConfirmButton NOTIFY fan8ConfirmButtonChanged)
     Q_PROPERTY(bool fan9ConfirmButton READ getFan9ConfirmButton WRITE setFan9ConfirmButton NOTIFY fan9ConfirmButtonChanged)
 
+    // =========================
+    // 網路設定數值欄位
+    // =========================
+    Q_PROPERTY(QString ipAddress READ getIpAddress WRITE setIpAddress NOTIFY ipAddressChanged)
+    Q_PROPERTY(QString subnetMask READ getSubnetMask WRITE setSubnetMask NOTIFY subnetMaskChanged)
+    Q_PROPERTY(QString defaultGateway READ getDefaultGateway WRITE setDefaultGateway NOTIFY defaultGatewayChanged)
+    Q_PROPERTY(QString dnsServer READ getDnsServer WRITE setDnsServer NOTIFY dnsServerChanged)
+
+
 public:
 
     explicit TdProxy(QObject *parent = nullptr) : QObject(parent) {}
@@ -592,6 +601,47 @@ public:
         emit fan9ConfirmButtonChanged(m_fan9ConfirmButton);
     }
 
+    // =========================
+    // IP地址
+    // =========================
+    Q_INVOKABLE QString getIpAddress() const { return m_ipAddress; }
+    Q_INVOKABLE void setIpAddress(const QString &value)
+    {
+        m_ipAddress = value;
+        emit ipAddressChanged(m_ipAddress);
+    }
+    // =========================
+    // 子網遮罩
+    // =========================
+    Q_INVOKABLE QString getSubnetMask() const { return m_subnetMask; }
+    Q_INVOKABLE void setSubnetMask(const QString &value)
+    {
+        m_subnetMask = value;
+        emit subnetMaskChanged(m_subnetMask);
+    }
+
+    // =========================
+    // 預設閘道
+    // =========================
+    Q_INVOKABLE QString getDefaultGateway() const { return m_defaultGateway; }
+    Q_INVOKABLE void setDefaultGateway(const QString &value)
+    {
+        m_defaultGateway = value;
+        emit defaultGatewayChanged(m_defaultGateway);
+    }
+
+    // =========================
+    // DNS伺服器
+    // =========================
+    Q_INVOKABLE QString getDnsServer() const { return m_dnsServer; }
+    Q_INVOKABLE void setDnsServer(const QString &value)
+    {
+        m_dnsServer = value;
+        emit dnsServerChanged(m_dnsServer);
+    }
+
+
+
 
     signals:
     void inWaterTempChanged(double value);
@@ -668,6 +718,11 @@ public:
     void fan7ConfirmButtonChanged(bool value);
     void fan8ConfirmButtonChanged(bool value);
     void fan9ConfirmButtonChanged(bool value);
+
+    void ipAddressChanged(QString value);
+    void subnetMaskChanged(QString value);
+    void defaultGatewayChanged(QString value);
+    void dnsServerChanged(QString value);
 private:
     // =========================
     // 成員變數
@@ -749,6 +804,11 @@ private:
     bool m_fan7ConfirmButton = false;
     bool m_fan8ConfirmButton = false;
     bool m_fan9ConfirmButton = false;
+
+    QString m_ipAddress = "192.168.00.00";
+    QString m_subnetMask = "255.255.00.00";
+    QString m_defaultGateway = "8.8.8.8";
+    QString m_dnsServer = "8.8.8.8";
 };
 
 

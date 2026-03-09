@@ -148,5 +148,16 @@ MainScreenUI {
                 typeof (Td.fan9TargetRpm));
         }
     }
+    setBtnMouseArea.onClicked: {
+        connectSet.visible = true
+    }
+
+    ConnectionSettings{
+        id:connectSet
+        visible: false
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
 
 }

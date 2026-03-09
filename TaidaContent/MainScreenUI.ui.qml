@@ -11,6 +11,7 @@ Rectangle {
 
     color: "#f0f4f8"
     property alias motorFreqSetBtnMouseArea:motorFreqSetBtnMouseArea
+    property alias setBtnMouseArea: setBtnMouseArea
     property alias motorFreqSwitchMouseArea: motorFreqSwitchMouseArea
     property alias allFansPIDSwitchMouseArea: allFansPIDSwitchMouseArea
     property alias allFansSwitchMouseArea: allFansSwitchMouseArea
@@ -131,24 +132,41 @@ Rectangle {
 
             //     // x: 19.45
             //     y: 944
-            Image {
-                id: setting
-                scale: 1.4
-                y: 944
+            Rectangle {
+                id: setDeco
+                width: 40
+                height: 40
+
+                y: 929
+                color: setBtnMouseArea.containsMouse ? "#dae7fe" : "#00ffffff"
+                radius: 12
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: "assets/Container.png"
-                // height: 40
-                // width: 40.10
 
-                // Item {
-                //     id: container_2
+                Image {
+                    id: setting
+                    scale: 1.4
+                    anchors.left: setDeco.left
+                    anchors.leftMargin: 10
+                    anchors.top: setDeco.top
+                    anchors.topMargin: 10
+                    // y: 949
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: "assets/Container.png"
+                    fillMode: Image.PreserveAspectFit
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: setBtnMouseArea.containsMouse ? true : false
+                        shadowColor: "#ecf3ff"
+                        shadowBlur: 0.8
+                    }
 
-                //     x: 10
-                //     y: 10
-
-                //     height: 20
-                //     width: 20.10
-                // }
+                    MouseArea {
+                        id: setBtnMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
             }
             // }
         }

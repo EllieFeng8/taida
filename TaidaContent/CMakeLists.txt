@@ -11,6 +11,7 @@ qt6_add_qml_module(TaidaContent
     QML_FILES
         "App.qml"
         "Screen01.ui.qml"
+        "ConnectionSettings.qml"
         "MainScreenUI.ui.qml"
         "MainScreen.qml"
     RESOURCES
@@ -68,6 +69,15 @@ qt6_add_qml_module(TaidaContent
         "assets/nav.png"
         "assets/background_Shadow_8.png"
         "assets/background_Border_Shadow_9.png"
+		"assets/connect5.png"
+        "assets/Overlay.png"
+        "assets/connect1.png"
+        "assets/connect2.png"
+        "assets/connect3.png"
+        "assets/connect4.png"
+        "assets/Container112.png"
+        "assets/Icon13.png"
+	"assets/Container11.png"
 )
 
 
