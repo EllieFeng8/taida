@@ -10,6 +10,15 @@ Rectangle {
     width: 1920
 
     color: "#f0f4f8"
+    property alias fansallSetTextInput : fansallSetTextInput
+    property alias fansallbtnMouseArea:fansallbtnMouseArea
+    property alias targetPressBtnMouseArea : targetPressBtnMouseArea
+    property alias outWaterTempBtnMouseArea : outWaterTempBtnMouseArea
+    property alias outWaterTempTxtInput : outWaterTempTxtInput
+    property alias correctionSwitchMouseArea: correctionSwitchMouseArea
+    property alias correction2SwitchMouseArea: correction2SwitchMouseArea
+    property alias targetPressTxtInput: targetPressTxtInput
+
     property alias motorFreqSetBtnMouseArea:motorFreqSetBtnMouseArea
     property alias setBtnMouseArea: setBtnMouseArea
     property alias motorFreqSwitchMouseArea: motorFreqSwitchMouseArea
@@ -81,6 +90,10 @@ Rectangle {
     property alias background_fan7 : background_fan7
     property alias background_fan8 : background_fan8
     property alias background_fan9 : background_fan9
+
+    property bool correctionIsOn: Td.outValveCorrectionOn
+    property bool correction2IsOn: Td.fanCorrectionSwitchOn
+
     Rectangle {
         id: background
 
@@ -1595,6 +1608,121 @@ Rectangle {
                             }
                         }
                     }
+                    Rectangle {
+                        id: background_Border111
+                        x: 17
+                        anchors.top: frame_15.bottom
+                        anchors.topMargin: 10
+                        height: 38
+                        width: 156
+
+                        border.width: outWaterTempTxtInput.focus ? 3 : 1
+                        border.color: outWaterTempTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                        color: "#f1f5f9"
+                        radius: 8
+
+                        Text {
+                            id: element_261
+
+                            x: 5
+                            y: 11.50
+
+                            height: 15
+                            width: 44
+
+                            color: "#94a3b8"
+                            font.capitalization: Font.AllUppercase
+                            font.family: "Noto Sans TC"
+                            font.pixelSize: 16
+                            font.weight: Font.Bold
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 15
+                            lineHeightMode: Text.FixedHeight
+                            text: "目標溫度"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        TextInput {
+                            id: outWaterTempTxtInput
+                            x: 92
+                            y: 0
+
+                            height: 38
+                            width: 48
+
+                            color: "#1e293b"
+                            font.family: "Noto Sans TC"
+                            font.pixelSize: 20
+                            font.weight: Font.Bold
+                            horizontalAlignment: Text.AlignRight
+
+                            text: Number(Td.outWaterTemp)
+                            verticalAlignment: Text.AlignVCenter
+                            validator: DoubleValidator {}
+                        }
+                        Text {
+
+                            id: c_51
+                            anchors.left: outWaterTempTxtInput.right
+                            y: 8
+
+                            height: 28
+                            width: 12.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 10
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: "°C"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        Rectangle {
+                            id: button_47
+
+                            anchors.left: c_51.right
+                            anchors.leftMargin: 15
+
+                            height: 38
+                            width: 46
+
+                            color: "#2563eb"
+                            radius: 8
+                            scale: outWaterTempBtnMouseArea.containsMouse ? 1.02 : 1
+
+                            Text {
+                                id: element_41
+
+                                color: "#ffffff"
+                                font.family: "Noto Sans TC"
+                                font.pixelSize: 16
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignHCenter
+                                lineHeight: 16
+                                lineHeightMode: Text.FixedHeight
+                                text: "OK"
+                                anchors.fill: parent
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            layer.enabled: true
+                            layer.effect: MultiEffect {
+                                shadowEnabled: outWaterTempBtnMouseArea.containsMouse ? true : false
+                                shadowColor: "#1d4ed8"
+                                shadowBlur: 0.8
+                            }
+                            MouseArea {
+                                id: outWaterTempBtnMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
+                    }
                 }
             }
             Item {
@@ -1655,6 +1783,85 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }
+                        Item {
+                            id: correction
+
+                            x: 309.95
+                            y: 2
+
+                            height: 20
+                            width: 89.05
+
+                            Image {
+                                id: correctionSwitch
+
+                                height: 20
+                                width: 40
+                                scale: correctionSwitchMouseArea.containsMouse ? 1.2 : 1
+                                source: correctionIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: correctionSwitchMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: correctionSwitchMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                            Item {
+                                id: _margin_0
+
+                                x: 40
+                                y: 0
+
+                                height: 16
+                                width: 49.05
+
+                                Text {
+                                    id: _text_15
+
+                                    x: 4
+
+                                    height: 16
+                                    width: 37.05
+
+                                    color: "red"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: correctionIsOn ? "正向" : "反向"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+                                    id: _text_16
+
+                                    anchors.left: _text_15.right
+
+                                    height: 16
+                                    width: 22.05
+
+                                    color: "#2563eb"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "修正"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                        }
+
                         Item {
                             id: label
 
@@ -2337,7 +2544,7 @@ Rectangle {
                                 scale: motorFreqSetBtnMouseArea.containsMouse ? 1.02 : 1
 
                                 Text {
-                                    id: element_41
+                                    // id: element_41
 
                                     x: 16
                                     y: 11
@@ -2484,81 +2691,160 @@ Rectangle {
                         height: 24
                         width: 652
 
-                        Item {
-                            id: container_20
+                        // Item {
+                        //     id: container_20
 
-                            x: 249
-                            y: 2
+                        //     x: 249
+                        //     y: 2
+
+                        //     height: 20
+                        //     width: 403
+
+                        // Item {
+                        //     id: label_1
+
+                        //     height: 20
+                        //     width: 174
+
+                        //     Text {
+                        //         id: element_44
+
+                        //         y: 2
+
+                        //         height: 16
+                        //         width: 123
+
+                        //         color: "#1e293b"
+                        //         font.family: "Noto Sans TC"
+                        //         font.pixelSize: 20
+                        //         font.weight: Font.Bold
+                        //         horizontalAlignment: Text.AlignLeft
+                        //         lineHeight: 16
+                        //         lineHeightMode: Text.FixedHeight
+                        //         text: "一鍵開啟全部"
+                        //         textFormat: Text.PlainText
+                        //         verticalAlignment: Text.AlignVCenter
+                        //     }
+                        //     Item {
+                        //         id: container_css_transform
+
+                        //         x: 135.99
+
+                        //         height: 20
+                        //         width: 36
+
+                        //         // Image {
+                        //         //     id: allFansSwitch
+                        //         //     y: 1
+                        //         //     height: 20
+                        //         //     width: 40
+                        //         //     scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
+                        //         //     source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                        //         //     layer.enabled: true
+                        //         //     layer.effect: MultiEffect {
+                        //         //         shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
+                        //         //         shadowColor: "#1d4ed8"
+                        //         //         shadowBlur: 0.8
+                        //         //     }
+                        //         //     MouseArea {
+                        //         //         id: allFansSwitchMouseArea
+                        //         //         anchors.fill: parent
+                        //         //         hoverEnabled: true
+                        //         //         cursorShape: Qt.PointingHandCursor
+                        //         //     }
+                        //         // }
+                        //     }
+                        // }
+                        Item {
+                            id: label_2
+
+                            x: 149
 
                             height: 20
-                            width: 403
+                            width: 174
 
                             Item {
-                                id: label_1
+                                id: correction2
 
+                                // x: 309.95
+                                // y: 2
                                 height: 20
-                                width: 174
+                                width: 89.05
 
-                                Text {
-                                    id: element_44
-
-                                    y: 2
-
-                                    height: 16
-                                    width: 123
-
-                                    color: "#1e293b"
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 16
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "一鍵開啟全部"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                Item {
-                                    id: container_css_transform
-
-                                    x: 135.99
+                                Image {
+                                    id: correction2Switch
 
                                     height: 20
-                                    width: 36
+                                    width: 40
+                                    scale: correction2SwitchMouseArea.containsMouse ? 1.2 : 1
+                                    source: correction2IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                    layer.enabled: true
+                                    layer.effect: MultiEffect {
+                                        shadowEnabled: correction2SwitchMouseArea.containsMouse ? true : false
+                                        shadowColor: "#1d4ed8"
+                                        shadowBlur: 0.8
+                                    }
+                                    MouseArea {
+                                        id: correction2SwitchMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                                Item {
+                                    id: _margin_2
 
-                                    Image {
-                                        id: allFansSwitch
-                                        y: 1
-                                        height: 20
-                                        width: 40
-                                        scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
-                                        source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
-                                        layer.enabled: true
-                                        layer.effect: MultiEffect {
-                                            shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
-                                            shadowColor: "#1d4ed8"
-                                            shadowBlur: 0.8
-                                        }
-                                        MouseArea {
-                                            id: allFansSwitchMouseArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                        }
+                                    x: 40
+                                    y: 0
+
+                                    height: 16
+                                    width: 49.05
+
+                                    Text {
+                                        id: _text_152
+
+                                        x: 4
+
+                                        height: 16
+                                        width: 37.05
+
+                                        color: "red"
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 18
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 16
+                                        lineHeightMode: Text.FixedHeight
+                                        text: correction2IsOn ? "正向" : "反向"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
+                                        id: _text_162
+
+                                        anchors.left: _text_152.right
+
+                                        height: 16
+                                        width: 22.05
+
+                                        color: "#2563eb"
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 18
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 16
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "修正"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
                                     }
                                 }
                             }
-                            Item {
-                                id: label_2
-
-                                x: 205.99
-
-                                height: 20
-                                width: 174
 
                                 Text {
                                     id: pID_
-
+                                anchors.left: allFansPIDSwitch.right
+                                anchors.leftMargin: 10
                                     y: 2
 
                                     height: 16
@@ -2578,7 +2864,9 @@ Rectangle {
 
                                 Image {
                                     id: allFansPIDSwitch
-                                    x: 134
+
+                                anchors.left: correction2.right
+                                anchors.leftMargin: 65
                                     y: 1
                                     height: 20
                                     width: 40
@@ -2598,7 +2886,7 @@ Rectangle {
                                     }
                                 }
                             }
-                        }
+                        // }
                         Text {
                             id: element_45
 
@@ -2843,7 +3131,7 @@ Rectangle {
                             id: container_23
 
                             y: 5
-
+                            x: -300
                             height: 28
                             width: 154.85
 
@@ -2871,7 +3159,7 @@ Rectangle {
                             Item {
                                 id: paragraph_10
 
-                                x: 97
+                                x: 87
 
                                 height: 28
                                 width: 53.09
@@ -2918,6 +3206,135 @@ Rectangle {
                                 }
                             }
                         }
+                        Item {
+                            x: 0
+                            y: 0
+                            //id: container_22
+
+                            // x: 206.03
+                            anchors.left: container_23.right
+                            anchors.leftMargin: 70
+                            height: 38
+                            width: 69
+
+                            Rectangle {
+                                id: targetPress
+                                x: -63
+                                y: 0
+
+                                height: 42
+                                width: 213
+
+                                border.width: targetPressTxtInput.focus ? 3 : 1
+                                border.color: targetPressTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                                color: "#ffffff"
+                                radius: 12
+                                Text {
+                                    id: targetPress_1
+
+                                    x: 13
+                                    y: 11.50
+
+                                    height: 15
+                                    width: 7.48
+
+                                    color: "#94a3b8"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "目標壓差"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                TextInput {
+                                    id: targetPressTxtInput
+
+                                    x: 13
+                                    y: 5
+
+                                    height: 28
+                                    width: 181
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
+
+                                    text: Number(Td.targetPressureDiff)
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+                                    id: pa1
+
+                                    anchors.left: targetPressTxtInput.right
+                                    y: 13
+
+                                    height: 15
+                                    width: 18
+
+                                    color: "#64748b"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 10
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "pa"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                            Rectangle {
+                                id: button_7
+
+                                anchors.left: targetPress.right
+                                anchors.leftMargin: 10
+                                height: 38
+                                width: 66
+
+                                color: "#2563eb"
+                                radius: 8
+
+                                scale: targetPressBtnMouseArea.containsMouse ? 1.02 : 1
+                                Text {
+                                    id: element_511
+
+                                    x: 16
+                                    y: 11
+
+                                    height: 16
+                                    width: 35
+
+                                    color: "#ffffff"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 16
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "套用"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: targetPressBtnMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: targetPressBtnMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                        }
                     }
                 }
                 Item {
@@ -2943,8 +3360,8 @@ Rectangle {
                         radius: 12
 
                         Item {
-                            id: _margin_2
 
+                            // id: _margin_2
                             x: 17
                             y: 14
 
@@ -4322,6 +4739,157 @@ Rectangle {
                                     }
                                     MouseArea {
                                         id: fans9btnMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle {
+                        id: background_Border_255
+
+                        x: 1390.40
+                        y: 186
+
+                        height: 170
+                        width: 337
+
+                        border.color: "#0e74fc"
+                        border.width: 3
+                        color: "#d3e4f4"
+                        radius: 12
+
+                        Item {
+                            id: _margin_101
+
+                            x: 17
+                            y: 17
+
+                            height: 32
+                            width: 303
+
+                            Item {
+                                id: container_331
+
+                                height: 20
+                                width: 65
+
+                                Text {
+                                    id: element_681
+
+                                    height: 20
+                                    width: 66
+                                    x: 0
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 20
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "一鍵開啟全部"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                            Image {
+                                id: fansallSwitch
+                                x: 273
+                                y: 1
+                                height: 20
+                                width: 40
+                                scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
+                                source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: allFansSwitchMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                        }
+                        Item {
+                            id: frame_311
+
+                            x: 17
+                            y: 62
+
+                            height: 91
+                            width: 303
+
+                            Text {
+                                id: target_RPM_81
+
+                                height: 14.96
+                                width: 305
+
+                                color: "#94a3b8"
+                                font.capitalization: Font.AllUppercase
+                                font.family: "Noto Sans TC"
+                                font.letterSpacing: 1
+                                font.pixelSize: 10
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignLeft
+                                lineHeight: 15
+                                lineHeightMode: Text.FixedHeight
+                                text: "ALL Target RPM"
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            Rectangle {
+                                id: background_Border_251
+
+                                y: 22.17
+
+                                height: 68.83
+                                width: 303
+
+                                border.width: fansallSetTextInput.focus ? 3 : 1
+                                border.color: fansallSetTextInput.focus ? "#2563eb" : "#e2e8f0"
+                                clip: true
+                                color: "#ffffff"
+                                radius: 8
+
+                                TextInput {
+                                    id: fansallSetTextInput
+
+                                    x: 1
+                                    y: 1
+
+                                    height: 67
+                                    width: 244
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    text: Number(Td.fanAllTargetRpm)
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Image {
+                                    id: fansallbtn
+                                    x: 244
+                                    y: 1
+                                    scale: 0.9
+                                    source: "assets/checkbtn.png"
+                                    layer.enabled: true
+                                    layer.effect: MultiEffect {
+                                        shadowEnabled: fansallbtnMouseArea.containsMouse ? true : false
+                                        shadowColor: "#caced2"
+                                        shadowBlur: 0.8
+                                    }
+                                    MouseArea {
+                                        id: fansallbtnMouseArea
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor

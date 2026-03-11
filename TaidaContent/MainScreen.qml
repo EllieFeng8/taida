@@ -7,11 +7,13 @@ MainScreenUI {
     id: root
     returnValveBtnMouseArea.onClicked: {
         Td.returnValveOpening = returnValveTxtInput.text
-    console.log("回水:",Td.returnValveOpening)
+        returnValveTxtInput.focus = false
+        console.log("回水:",Td.returnValveOpening)
     }
 
     motorFreqSetBtnMouseArea.onClicked: {
         Td.motorFrequency = motorFreqTextInput.text
+        motorFreqTextInput.focus = false
         console.log("馬達:",Td.motorFrequency)
     }
 
@@ -24,7 +26,10 @@ MainScreenUI {
         Td.outValveP = waterPTxtInpt.text
         Td.outValveI = waterITxtInpt.text
         Td.outValveD = waterDTxtInpt.text
-
+        waterValveOpenTxtInput.focus = false
+        waterPTxtInpt.focus = false
+        waterITxtInpt.focus = false
+        waterDTxtInpt.focus = false
         console.log("出水閥:",Td.outValveOpening,Td.outValveP,Td.outValveI,Td.outValveD)
     }
 
@@ -32,6 +37,10 @@ MainScreenUI {
         Td.fanPidP = fansPTxtInput.text
         Td.fanPidI = fansITxtInput.text
         Td.fanPidD = fansDTxtInput.text
+        fansPTxtInput.focus = false
+        fansITxtInput.focus = false
+        fansDTxtInput.focus = false
+
     console.log("fans pid:",Td.fanPidP,Td.fanPidI,Td.fanPidD)
     }
 
@@ -82,7 +91,7 @@ MainScreenUI {
                 Td.fan1TargetRpm,
                 typeof (Td.fan1TargetRpm));
         }
-        background_fan1.border.color= "#e2e8f0"
+        fans1SetTextInput.focus = false
     }
     fans2btnMouseArea.onClicked: {
         if(fans2SetTextInput.text>0) {
@@ -91,6 +100,7 @@ MainScreenUI {
                 Td.fan2TargetRpm,
                 typeof (Td.fan2TargetRpm));
         }
+        fans2SetTextInput.focus = false
     }
     fans3btnMouseArea.onClicked: {
         if(fans3SetTextInput.text>0) {
@@ -99,6 +109,7 @@ MainScreenUI {
                 Td.fan3TargetRpm,
                 typeof (Td.fan3TargetRpm));
         }
+        fans3SetTextInput.focus = false
     }
     fans4btnMouseArea.onClicked: {
         if(fans4SetTextInput.text>0) {
@@ -107,6 +118,7 @@ MainScreenUI {
                 Td.fan4TargetRpm,
                 typeof (Td.fan4TargetRpm));
         }
+        fans4SetTextInput.focus = false
     }
     fans5btnMouseArea.onClicked: {
         if(fans5SetTextInput.text>0) {
@@ -115,6 +127,7 @@ MainScreenUI {
                 Td.fan5TargetRpm,
                 typeof (Td.fan5TargetRpm));
         }
+        fans5SetTextInput.focus = false
     }
     fans6btnMouseArea.onClicked: {
         if(fans6SetTextInput.text>0) {
@@ -123,6 +136,7 @@ MainScreenUI {
                 Td.fan6TargetRpm,
                 typeof (Td.fan6TargetRpm));
         }
+        fans6SetTextInput.focus = false
     }
     fans7btnMouseArea.onClicked: {
         if(fans7SetTextInput.text>0) {
@@ -131,6 +145,7 @@ MainScreenUI {
                 Td.fan7TargetRpm,
                 typeof (Td.fan7TargetRpm));
         }
+        fans7SetTextInput.focus = false
     }
     fans8btnMouseArea.onClicked: {
         if(fans8SetTextInput.text>0) {
@@ -139,6 +154,7 @@ MainScreenUI {
                 Td.fan8TargetRpm,
                 typeof (Td.fan8TargetRpm));
         }
+        fans8SetTextInput.focus = false
     }
     fans9btnMouseArea.onClicked: {
         if(fans9SetTextInput.text>0) {
@@ -147,9 +163,48 @@ MainScreenUI {
                 Td.fan9TargetRpm,
                 typeof (Td.fan9TargetRpm));
         }
+        fans9SetTextInput.focus = false
+    }
+    fansallbtnMouseArea.onClicked: {
+        if(fansallSetTextInput.text>0) {
+            Td.fanAllTargetRpm = fansallSetTextInput.text
+            console.log("11 Td.fanAllTargetRpm changed~~~",
+                Td.fanAllTargetRpm,
+                typeof (Td.fanAllTargetRpm));
+        }
+        fansallSetTextInput.focus = false
     }
     setBtnMouseArea.onClicked: {
         connectSet.visible = true
+    }
+
+    correctionSwitchMouseArea.onClicked: {
+        Td.outValveCorrectionOn = !Td.outValveCorrectionOn
+        console.log("Td.outValveCorrectionOn",Td.outValveCorrectionOn)
+    }
+
+    correction2SwitchMouseArea.onClicked: {
+        Td.fanCorrectionSwitchOn = !Td.fanCorrectionSwitchOn
+        console.log("Td.fanCorrectionSwitchOn",Td.fanCorrectionSwitchOn)
+    }
+    outWaterTempBtnMouseArea.onClicked: {
+        if(outWaterTempTxtInput.text>0) {
+            Td.outWaterTemp = outWaterTempTxtInput.text
+            console.log("11 Td.outWaterTempTxtInput changed~~~",
+                Td.outWaterTemp,
+                typeof (Td.outWaterTemp));
+        }
+        outWaterTempTxtInput.focus = false
+    }
+
+    targetPressBtnMouseArea.onClicked: {
+        if(targetPressTxtInput.text>0) {
+            Td.targetPressureDiff = targetPressTxtInput.text
+            console.log("11 Td.targetPressureDiff changed~~~",
+                Td.targetPressureDiff,
+                typeof (Td.targetPressureDiff));
+        }
+        targetPressTxtInput.focus = false
     }
 
     ConnectionSettings{

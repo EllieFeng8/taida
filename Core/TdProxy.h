@@ -47,6 +47,7 @@ class TdProxy : public QObject
     // 出風溫度
     // =========================
     Q_PROPERTY(double outletAirTemp READ getOutletAirTemp WRITE setOutletAirTemp NOTIFY outletAirTempChanged)
+    Q_PROPERTY(double outWaterTargetTemp READ getOutWaterTargetTemp WRITE setOutWaterTargetTemp NOTIFY outWaterTargetTempChanged)
 
     // =========================
     // 出水閥控制
@@ -71,6 +72,7 @@ class TdProxy : public QObject
     // 風扇控制 / 壓差 / PID
     // =========================
     Q_PROPERTY(double pressureDiff READ getPressureDiff WRITE setPressureDiff NOTIFY pressureDiffChanged)
+    Q_PROPERTY(double targetPressureDiff READ getTargetPressureDiff WRITE setTargetPressureDiff NOTIFY targetPressureDiffChanged)
     Q_PROPERTY(double fanPidP READ getFanPidP WRITE setFanPidP NOTIFY fanPidPChanged)
     Q_PROPERTY(double fanPidI READ getFanPidI WRITE setFanPidI NOTIFY fanPidIChanged)
     Q_PROPERTY(double fanPidD READ getFanPidD WRITE setFanPidD NOTIFY fanPidDChanged)
@@ -87,12 +89,15 @@ class TdProxy : public QObject
     Q_PROPERTY(double fan7TargetRpm READ getFan7TargetRpm WRITE setFan7TargetRpm NOTIFY fan7TargetRpmChanged)
     Q_PROPERTY(double fan8TargetRpm READ getFan8TargetRpm WRITE setFan8TargetRpm NOTIFY fan8TargetRpmChanged)
     Q_PROPERTY(double fan9TargetRpm READ getFan9TargetRpm WRITE setFan9TargetRpm NOTIFY fan9TargetRpmChanged)
+    Q_PROPERTY(double fanAllTargetRpm READ getFanAllTargetRpm WRITE setFanAllTargetRpm NOTIFY fanAllTargetRpmChanged)
 
     // =========================
     // 系統 / 區塊開關
     // =========================
     Q_PROPERTY(bool systemRunning READ getSystemRunning WRITE setSystemRunning NOTIFY systemRunningChanged)
     Q_PROPERTY(bool outValvePidOn READ getOutValvePidOn WRITE setOutValvePidOn NOTIFY outValvePidOnChanged)
+    //TRUE=正向 FALSE=反向
+    Q_PROPERTY(bool outValveCorrectionOn READ getOutValveCorrectionOn WRITE setOutValveCorrectionOn NOTIFY outValveCorrectionOnChanged)
     Q_PROPERTY(bool motorFrequencySwitchOn READ getMotorFrequencySwitchOn WRITE setMotorFrequencySwitchOn NOTIFY motorFrequencySwitchOnChanged)
     Q_PROPERTY(bool fanAllOn READ getFanAllOn WRITE setFanAllOn NOTIFY fanAllOnChanged)
     Q_PROPERTY(bool fanPidMonitorOn READ getFanPidMonitorOn WRITE setFanPidMonitorOn NOTIFY fanPidMonitorOnChanged)
@@ -100,6 +105,8 @@ class TdProxy : public QObject
     // =========================
     // 風扇開關
     // =========================
+    //TRUE=正向 FALSE=反向
+    Q_PROPERTY(bool fanCorrectionSwitchOn READ getFanCorrectionSwitchOn WRITE setFanCorrectionSwitchOn NOTIFY fanCorrectionSwitchOnChanged)
     Q_PROPERTY(bool fan1SwitchOn READ getFan1SwitchOn WRITE setFan1SwitchOn NOTIFY fan1SwitchOnChanged)
     Q_PROPERTY(bool fan2SwitchOn READ getFan2SwitchOn WRITE setFan2SwitchOn NOTIFY fan2SwitchOnChanged)
     Q_PROPERTY(bool fan3SwitchOn READ getFan3SwitchOn WRITE setFan3SwitchOn NOTIFY fan3SwitchOnChanged)
@@ -249,6 +256,13 @@ public:
         emit outletAirTempChanged(m_outletAirTemp);
     }
 
+    Q_INVOKABLE double getOutWaterTargetTemp() const { return m_outWaterTargetTemp; }
+    Q_INVOKABLE void setOutWaterTargetTemp(double value)
+    {
+        m_outWaterTargetTemp = value;
+        emit outWaterTargetTempChanged(m_outWaterTargetTemp);
+    }
+
     // =========================
     // 出水閥控制
     // =========================
@@ -315,6 +329,12 @@ public:
     {
         m_pressureDiff = value;
         emit pressureDiffChanged(m_pressureDiff);
+    }
+    Q_INVOKABLE double getTargetPressureDiff() const { return m_targetPressureDiff; }
+    Q_INVOKABLE void setTargetPressureDiff(double value)
+    {
+        m_targetPressureDiff = value;
+        emit targetPressureDiffChanged(m_targetPressureDiff);
     }
 
     Q_INVOKABLE double getFanPidP() const { return m_fanPidP; }
@@ -403,6 +423,12 @@ public:
         m_fan9TargetRpm = value;
         emit fan9TargetRpmChanged(m_fan9TargetRpm);
     }
+    Q_INVOKABLE double getFanAllTargetRpm() const { return m_fanAllTargetRpm; }
+    Q_INVOKABLE void setFanAllTargetRpm(double value)
+    {
+        m_fanAllTargetRpm = value;
+        emit fanAllTargetRpmChanged(m_fanAllTargetRpm);
+    }
  // =========================
     // 系統 / 區塊開關
     // =========================
@@ -418,6 +444,12 @@ public:
     {
         m_outValvePidOn = value;
         emit outValvePidOnChanged(m_outValvePidOn);
+    }
+    Q_INVOKABLE bool getOutValveCorrectionOn() const { return m_outValveCorrectionOn; }
+    Q_INVOKABLE void setOutValveCorrectionOn(bool value)
+    {
+        m_outValveCorrectionOn = value;
+        emit outValveCorrectionOnChanged(m_outValveCorrectionOn);
     }
 
     Q_INVOKABLE bool getMotorFrequencySwitchOn() const { return m_motorFrequencySwitchOn; }
@@ -444,6 +476,12 @@ public:
     // =========================
     // 風扇開關
     // =========================
+    Q_INVOKABLE bool getFanCorrectionSwitchOn() const { return m_fanCorrectionSwitchOn; }
+    Q_INVOKABLE void setFanCorrectionSwitchOn(bool value)
+    {
+        m_fanCorrectionSwitchOn = value;
+        emit fanCorrectionSwitchOnChanged(m_fanCorrectionSwitchOn);
+    }
     Q_INVOKABLE bool getFan1SwitchOn() const { return m_fan1SwitchOn; }
     Q_INVOKABLE void setFan1SwitchOn(bool value)
     {
@@ -662,6 +700,7 @@ public:
     void inletAirHumidityChanged(double value);
 
     void outletAirTempChanged(double value);
+    void outWaterTargetTempChanged(double value);
 
     void outValveOpeningChanged(double value);
     void outValvePChanged(double value);
@@ -674,6 +713,7 @@ public:
     void currentWaterFlowChanged(double value);
 
     void pressureDiffChanged(double value);
+    void targetPressureDiffChanged(double value);
     void fanPidPChanged(double value);
     void fanPidIChanged(double value);
     void fanPidDChanged(double value);
@@ -687,13 +727,16 @@ public:
     void fan7TargetRpmChanged(double value);
     void fan8TargetRpmChanged(double value);
     void fan9TargetRpmChanged(double value);
+    void fanAllTargetRpmChanged(double value);
 
     void systemRunningChanged(bool value);
     void outValvePidOnChanged(bool value);
+    void outValveCorrectionOnChanged(bool value);
     void motorFrequencySwitchOnChanged(bool value);
     void fanAllOnChanged(bool value);
     void fanPidMonitorOnChanged(bool value);
 
+    void fanCorrectionSwitchOnChanged(bool value);
     void fan1SwitchOnChanged(bool value);
     void fan2SwitchOnChanged(bool value);
     void fan3SwitchOnChanged(bool value);
@@ -727,68 +770,73 @@ private:
     // =========================
     // 成員變數
     // =========================
-    double m_inWaterTemp = 11.0;
-    double m_inWaterPressure = 11.0;
+    double m_inWaterTemp = 0;
+    double m_inWaterPressure = 0;
 
-    double m_outWaterTemp = 10.0;
-    double m_outWaterPressure = 10.0;
+    double m_outWaterTemp = 0;
+    double m_outWaterPressure = 0;
 
-    double m_returnWaterTemp = 10.0;
-    double m_returnWaterPressure = 10.0;
+    double m_returnWaterTemp = 0;
+    double m_returnWaterPressure = 0;
 
-    double m_condenserLeft1Temp = 10.0;
-    double m_condenserRight1Temp = 10.0;
-    double m_condenserLeft2Temp = 10.0;
-    double m_condenserRight2Temp = 10.0;
+    double m_condenserLeft1Temp = 0;
+    double m_condenserRight1Temp = 0;
+    double m_condenserLeft2Temp = 0;
+    double m_condenserRight2Temp = 0;
 
-    double m_inletAirTemp = 10.0;
-    double m_inletAirHumidity = 10.0;
+    double m_inletAirTemp = 0;
+    double m_inletAirHumidity = 0;
 
-    double m_outletAirTemp = 10.0;
+    double m_outletAirTemp = 0;
+    double m_outWaterTargetTemp = 0;
 
-    double m_outValveOpening = 1.0;
-    double m_outValveP = 1.5;
-    double m_outValveI = 1.0;
-    double m_outValveD = 0.2;
+    double m_outValveOpening = 0;
+    double m_outValveP = 0;
+    double m_outValveI = 0;
+    double m_outValveD = 0;
 
-    double m_returnValveOpening = 45.0;
+    double m_returnValveOpening = 0;
 
-    double m_motorFrequency = 50.0;
-    double m_currentWaterFlow = 111.0;
+    double m_motorFrequency = 0;
+    double m_currentWaterFlow = 0;
 
-    double m_pressureDiff = 600.0;
-    double m_fanPidP = 10.0;
-    double m_fanPidI = 10.0;
-    double m_fanPidD = 10.0;
+    double m_pressureDiff = 0;
+    double m_targetPressureDiff = 0;
+    double m_fanPidP = 0;
+    double m_fanPidI = 0;
+    double m_fanPidD = 0;
 
-    double m_fan1TargetRpm = 1800.0;
-    double m_fan2TargetRpm = 1800.0;
-    double m_fan3TargetRpm = 1800.0;
-    double m_fan4TargetRpm = 1800.0;
-    double m_fan5TargetRpm = 1800.0;
-    double m_fan6TargetRpm = 1800.0;
-    double m_fan7TargetRpm = 1800.0;
-    double m_fan8TargetRpm = 1800.0;
-    double m_fan9TargetRpm = 1800.0;
+    double m_fan1TargetRpm = 0;
+    double m_fan2TargetRpm = 0;
+    double m_fan3TargetRpm = 0;
+    double m_fan4TargetRpm = 0;
+    double m_fan5TargetRpm = 0;
+    double m_fan6TargetRpm = 0;
+    double m_fan7TargetRpm = 0;
+    double m_fan8TargetRpm = 0;
+    double m_fan9TargetRpm = 0;
+    double m_fanAllTargetRpm = 0;
 
     // =========================
     // 成員變數
     // =========================
-    bool m_systemRunning = true;
-    bool m_outValvePidOn = true;
-    bool m_motorFrequencySwitchOn = true;
-    bool m_fanAllOn = true;
-    bool m_fanPidMonitorOn = true;
+    bool m_systemRunning = false;
+    bool m_outValvePidOn = false;
+    bool m_outValveCorrectionOn = false;
+    bool m_motorFrequencySwitchOn = false;
+    bool m_fanAllOn = false;
+    bool m_fanPidMonitorOn = false;
 
-    bool m_fan1SwitchOn = true;
-    bool m_fan2SwitchOn = true;
-    bool m_fan3SwitchOn = true;
-    bool m_fan4SwitchOn = true;
-    bool m_fan5SwitchOn = true;
-    bool m_fan6SwitchOn = true;
-    bool m_fan7SwitchOn = true;
-    bool m_fan8SwitchOn = true;
-    bool m_fan9SwitchOn = true;
+    bool m_fanCorrectionSwitchOn = false;
+    bool m_fan1SwitchOn = false;
+    bool m_fan2SwitchOn = false;
+    bool m_fan3SwitchOn = false;
+    bool m_fan4SwitchOn = false;
+    bool m_fan5SwitchOn = false;
+    bool m_fan6SwitchOn = false;
+    bool m_fan7SwitchOn = false;
+    bool m_fan8SwitchOn = false;
+    bool m_fan9SwitchOn = false;
 
     bool m_confirmOutValveButton = false;
     bool m_confirmReturnValveButton = false;
@@ -805,10 +853,10 @@ private:
     bool m_fan8ConfirmButton = false;
     bool m_fan9ConfirmButton = false;
 
-    QString m_ipAddress = "192.168.00.00";
-    QString m_subnetMask = "255.255.00.00";
-    QString m_defaultGateway = "8.8.8.8";
-    QString m_dnsServer = "8.8.8.8";
+    QString m_ipAddress = "00.00.00.00";
+    QString m_subnetMask = "00.00.00.00";
+    QString m_defaultGateway = "0.0.0.0";
+    QString m_dnsServer = "0.0.0.0";
 };
 
 
