@@ -16,13 +16,12 @@ set(QML_IMPORT_PATH ${QT_QML_OUTPUT_DIRECTORY}
     FORCE
 )
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Qml Quick QuickTimeline ShaderTools)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Widgets Qml Quick QuickTimeline ShaderTools SerialBus)
 qt_standard_project_setup()
 
 add_subdirectory(Core)
 
-qt_add_executable(${CMAKE_PROJECT_NAME}
-        Core/TdProxy.h)
+qt_add_executable(${CMAKE_PROJECT_NAME})
 
 
 qt_add_resources(${CMAKE_PROJECT_NAME} "configuration"

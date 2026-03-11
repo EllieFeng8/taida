@@ -6,12 +6,16 @@
 
 #include "autogen/environment.h"
 #include "Core/TdProxy.h"
+#include "Core/core.h"
+
 int main(int argc, char *argv[])
 {
     set_qt_environment();
     QApplication app(argc, argv);
-
-    TdProxy *Td = new TdProxy();
+    
+    Core& core = Core::instance();
+    core.init();
+    TdProxy *Td = core.m_proxy;
     qmlRegisterSingletonInstance<TdProxy>("Core", 1, 0, "Td", Td);
 
 

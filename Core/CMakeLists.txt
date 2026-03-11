@@ -3,6 +3,15 @@ qt_add_qml_module(Core STATIC
         VERSION 1.0
         SOURCES
         TdProxy.h
+        core.h
+        core.cpp
+        manager.h
+        manager.cpp
+        clientWorker.h
+        clientWorker.cpp        
+        serverWorker.h
+        serverWorker.cpp
+
 
 )
 
@@ -20,6 +29,6 @@ target_link_libraries(Core
         Qt${QT_VERSION_MAJOR}::ShaderTools
         Qt${QT_VERSION_MAJOR}::Network
         Qt${QT_VERSION_MAJOR}::Concurrent
-        #        Qt${QT_VERSION_MAJOR}::SerialBus
+        Qt${QT_VERSION_MAJOR}::SerialBus
         #        Qt${QT_VERSION_MAJOR}::OpcUa
 )
