@@ -8,7 +8,9 @@ MainScreenUI {
     returnValveBtnMouseArea.onClicked: {
         Td.returnValveOpening = returnValveTxtInput.text
         returnValveTxtInput.focus = false
-        console.log("回水:",Td.returnValveOpening)
+        Td.returnValveValue = returnValveSetTxtInput.text
+        returnValveSetTxtInput.focus = false
+        console.log("回水:",Td.returnValveOpening,Td.returnValveValue)
     }
 
     motorFreqSetBtnMouseArea.onClicked: {
