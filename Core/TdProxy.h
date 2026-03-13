@@ -69,12 +69,18 @@ class TdProxy : public QObject
     Q_PROPERTY(double returnValveOpening READ getReturnValveOpening WRITE setReturnValveOpening NOTIFY returnValveOpeningChanged)
     Q_PROPERTY(double returnValveOpeningP READ getReturnValveOpeningP WRITE setReturnValveOpeningP NOTIFY returnValveOpeningPChanged)
 
+    Q_PROPERTY(double returnValveValue READ getReturnValveValue WRITE setReturnValveValue NOTIFY returnValveValueChanged)
+    Q_PROPERTY(double returnValveValueP READ getReturnValveValueP WRITE setReturnValveValueP NOTIFY returnValveValuePChanged)
+
     // =========================
     // 馬達頻率控制
     // =========================
     Q_PROPERTY(double motorFrequency READ getMotorFrequency WRITE setMotorFrequency NOTIFY motorFrequencyChanged)
     Q_PROPERTY(double motorFrequencyP READ getMotorFrequencyP WRITE setMotorFrequencyP NOTIFY motorFrequencyPChanged)
     Q_PROPERTY(double currentWaterFlow READ getCurrentWaterFlow WRITE setCurrentWaterFlow NOTIFY currentWaterFlowChanged)
+
+    Q_PROPERTY(double heatExchange READ getHeatExchange WRITE setHeatExchange NOTIFY heatExchangeChanged)
+    // Q_PROPERTY(double heatExchangeP READ getHeatExchangeP WRITE setHeatExchangeP NOTIFY heatExchangePChanged)
 
     // =========================
     // 風扇控制 / 壓差 / PID
@@ -376,6 +382,18 @@ public:
         m_returnValveOpeningP = value;
         emit returnValveOpeningPChanged(m_returnValveOpeningP);
     }
+    Q_INVOKABLE double getReturnValveValue() const { return m_returnValveValue; }
+    Q_INVOKABLE void setReturnValveValue(double value)
+    {
+        m_returnValveValue = value;
+        emit returnValveValueChanged(m_returnValveValue);
+    }
+    Q_INVOKABLE double getReturnValveValueP() const { return m_returnValveValueP; }
+    Q_INVOKABLE void setReturnValveValueP(double value)
+    {
+        m_returnValveValueP = value;
+        emit returnValveValuePChanged(m_returnValveValueP);
+    }
 
     // =========================
     // 馬達頻率控制
@@ -399,6 +417,19 @@ public:
         m_currentWaterFlow = value;
         emit currentWaterFlowChanged(m_currentWaterFlow);
     }
+
+    Q_INVOKABLE double getHeatExchange() const { return m_heatExchange; }
+    Q_INVOKABLE void setHeatExchange(double value)
+    {
+        m_heatExchange = value;
+        emit heatExchangeChanged(m_heatExchange);
+    }
+    // Q_INVOKABLE double getHeatExchangeP() const { return m_heatExchangeP; }
+    // Q_INVOKABLE void setHeatExchangeP(double value)
+    // {
+    //     m_heatExchangeP = value;
+    //     emit heatExchangePChanged(m_heatExchangeP);
+    // }
 
     // =========================
     // 風扇控制 / 壓差 / PID
@@ -951,10 +982,14 @@ public:
 
     void returnValveOpeningChanged(double value);
     void returnValveOpeningPChanged(double value);
+    void returnValveValueChanged(double value);
+    void returnValveValuePChanged(double value);
 
     void motorFrequencyChanged(double value);
     void motorFrequencyPChanged(double value);
     void currentWaterFlowChanged(double value);
+    void heatExchangeChanged(double value);
+    // void heatExchangePChanged(double value);
 
     void pressureDiffChanged(double value);
     void targetPressureDiffChanged(double value);
@@ -1071,10 +1106,14 @@ private:
 
     double m_returnValveOpening = 0;
     double m_returnValveOpeningP = 0;
+    double m_returnValveValue = 0;
+    double m_returnValveValueP = 0;
 
     double m_motorFrequency = 0;
     double m_motorFrequencyP = 0;
     double m_currentWaterFlow = 0;
+    double m_heatExchange = 0;
+    // double m_heatExchangeP = 0;
 
     double m_pressureDiff = 0;
     double m_targetPressureDiff = 0;

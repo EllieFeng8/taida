@@ -59,7 +59,7 @@ Rectangle {
     property alias fans3SetTextInput: fans3SetTextInput
     property alias fans2SetTextInput: fans2SetTextInput
     property alias fans1SetTextInput: fans1SetTextInput
-    // property alias returnValveSetTxtInput: returnValveSetTxtInput
+    property alias returnValveSetTxtInput: returnValveSetTxtInput
     property alias returnValveTxtInput: returnValveTxtInput
     property alias waterPTxtInpt: waterPTxtInpt
     property alias waterITxtInpt: waterITxtInpt
@@ -1004,7 +1004,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 20
                             lineHeightMode: Text.FixedHeight
-                            text: "冷排溫度監控"
+                            text: "盤管水溫監控"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -2082,7 +2082,7 @@ Rectangle {
                                         horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
-                                        text: "D"
+                                        text: "P"
                                         textFormat: Text.PlainText
                                         verticalAlignment: Text.AlignVCenter
                                     }
@@ -2486,7 +2486,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 24
                             lineHeightMode: Text.FixedHeight
-                            text: "回水閥控制"
+                            text: "混水閥控制"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -2609,121 +2609,122 @@ Rectangle {
                                 }
                             }
                         }
-                        //
-                        // Rectangle {
-                        //     id: background_Border_5
-                        //
-                        //     y: 64
-                        //
-                        //     height: 49
-                        //     width: 539.33
-                        //
-                        //     border.width: returnValveTxtInput.focus ? 3 : 1
-                        //     border.color: returnValveSetTxtInput.focus ? "#2563eb" : "#e2e8f0"
-                        //     color: "#f1f5f9"
-                        //     radius: 8
-                        //
-                        //     RowLayout {
-                        //         anchors.fill: parent
-                        //         Layout.fillWidth: true
-                        //         spacing: 8
-                        //
-                        //         Text {
-                        //             // id: element_26
-                        //
-                        //             // height: 15
-                        //             Layout.leftMargin: 10
-                        //             // Layout.preferredWidth: 60
-                        //             color: "#94a3b8"
-                        //             font.capitalization: Font.AllUppercase
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 20
-                        //             font.weight: Font.Bold
-                        //             horizontalAlignment: Text.AlignLeft
-                        //             lineHeight: 15
-                        //             lineHeightMode: Text.FixedHeight
-                        //             text: "設定數值"
-                        //             textFormat: Text.PlainText
-                        //             verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //         Text {
-                        //
-                        //             // id: element_26
-                        //             // height: 15
-                        //             Layout.leftMargin: 10
-                        //             color: "#94a3b8"
-                        //             font.capitalization: Font.AllUppercase
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 12
-                        //             font.weight: Font.Medium
-                        //             // horizontalAlignment: Text.AlignLeft
-                        //             lineHeight: 15
-                        //             lineHeightMode: Text.FixedHeight
-                        //             text: "PV"
-                        //             textFormat: Text.PlainText
-                        //             // verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //         Text {
-                        //
-                        //             // id: element_26
-                        //             // height: 15
-                        //             // Layout.preferredWidth: 44
-                        //             color: "#94a3b8"
-                        //             font.capitalization: Font.AllUppercase
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 20
-                        //             font.weight: Font.Medium
-                        //             Layout.leftMargin: 20
-                        //             // horizontalAlignment: Text.AlignLeft
-                        //             lineHeight: 15
-                        //             lineHeightMode: Text.FixedHeight
-                        //             text: "45"
-                        //             textFormat: Text.PlainText
-                        //             // verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //         Rectangle {
-                        //             Layout.preferredWidth: 1
-                        //             Layout.preferredHeight: 20
-                        //             color: "#94a3b8"
-                        //             opacity: 0.5
-                        //             Layout.leftMargin: 60
-                        //         }
-                        //         Text {
-                        //
-                        //             // id: element_26
-                        //             // height: 15
-                        //             Layout.preferredWidth: 44
-                        //             Layout.leftMargin: 50
-                        //             color: "#94a3b8"
-                        //             font.capitalization: Font.AllUppercase
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 12
-                        //             font.weight: Font.Medium
-                        //             // horizontalAlignment: Text.AlignLeft
-                        //             lineHeight: 15
-                        //             lineHeightMode: Text.FixedHeight
-                        //             text: "SV"
-                        //             textFormat: Text.PlainText
-                        //             // verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //
-                        //         TextInput {
-                        //             id: returnValveSetTxtInput
-                        //
-                        //             Layout.leftMargin: -400
-                        //             Layout.preferredWidth: parent.width
-                        //
-                        //             color: "#1e293b"
-                        //             font.family: "Noto Sans TC"
-                        //             font.pixelSize: 20
-                        //             font.weight: Font.Bold
-                        //             horizontalAlignment: Text.AlignRight
-                        //
-                        //             text: "45"
-                        //             verticalAlignment: Text.AlignVCenter
-                        //         }
-                        //     }
-                        // }
+
+                        Rectangle {
+                            id: background_Border_5
+
+                            y: 64
+
+                            height: 49
+                            width: 539.33
+
+                            border.width: returnValveSetTxtInput.focus ? 3 : 1
+                            border.color: returnValveSetTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                            color: "#f1f5f9"
+                            radius: 8
+
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                Text {
+                                    // id: element_26
+
+                                    // height: 15
+                                    Layout.leftMargin: 10
+                                    // Layout.preferredWidth: 60
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "設定數值"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+
+                                    // id: element_26
+                                    // height: 15
+                                    Layout.leftMargin: 10
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "PV"
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+
+                                    // id: element_26
+                                    // height: 15
+                                    // Layout.preferredWidth: 44
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Medium
+                                    Layout.leftMargin: 20
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: Td.returnValveValueP
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
+                                Rectangle {
+                                    Layout.preferredWidth: 1
+                                    Layout.preferredHeight: 20
+                                    color: "#94a3b8"
+                                    opacity: 0.5
+                                    Layout.leftMargin: 60
+                                }
+                                Text {
+
+                                    // id: element_26
+                                    // height: 15
+                                    Layout.preferredWidth: 44
+                                    Layout.leftMargin: 50
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "SV"
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
+
+                                TextInput {
+                                    id: returnValveSetTxtInput
+
+                                    Layout.leftMargin: -400
+                                    Layout.preferredWidth: parent.width
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
+
+                                    text: Number(Td.returnValveValue)
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                        }
+
                     }
                     Rectangle {
                         id: button_3
@@ -2852,7 +2853,7 @@ Rectangle {
                         x: 21
                         y: 60
 
-                        height: 116
+                        height: 196
                         width: 539.33
 
                         clip: true
@@ -3114,6 +3115,93 @@ Rectangle {
                                     lineHeight: 16
                                     lineHeightMode: Text.FixedHeight
                                     text: "l/min"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignBottom
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+                        }
+                        Rectangle {
+
+                            // id: background_Border_7
+                            anchors.top: background_Border_7.bottom
+                            anchors.topMargin: 16
+
+                            height: 53.54
+                            width: 539.33
+
+                            border.color: "#dbeafe"
+                            border.width: 1
+                            color: "#eff6ff"
+                            radius: 12
+
+                            Text {
+
+                                // id: element_42
+                                x: 17
+                                y: 19.27
+
+                                height: 15
+                                width: 122.50
+
+                                color: "#2563eb"
+                                font.capitalization: Font.AllUppercase
+                                font.family: "Noto Sans TC"
+                                font.letterSpacing: 0.50
+                                font.pixelSize: 20
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignLeft
+                                lineHeight: 15
+                                lineHeightMode: Text.FixedHeight
+                                text: "當前熱交換"
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            Item {
+
+                                // id: paragraph_9
+                                x: 442.33
+                                y: 8.77
+
+                                height: 36
+                                width: 80
+
+                                Text {
+                                    // id: element_43
+                                    x: -27
+                                    y: 0
+
+                                    height: 36
+                                    width: 70
+
+                                    color: "#3b82f6"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
+                                    lineHeight: 36
+                                    lineHeightMode: Text.FixedHeight
+                                    text: Td.heatExchange
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+
+                                    // id: l_min
+                                    x: 46
+                                    y: 10
+
+                                    height: 16
+                                    width: 36
+
+                                    color: "#3b82f6"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 10
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "kW"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignBottom
                                     wrapMode: Text.WordWrap
