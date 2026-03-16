@@ -14,8 +14,8 @@ Rectangle {
     property alias fansallSetTextInput : fansallSetTextInput
     property alias fansallbtnMouseArea:fansallbtnMouseArea
     property alias targetPressBtnMouseArea : targetPressBtnMouseArea
-    property alias outWaterTempBtnMouseArea : outWaterTempBtnMouseArea
-    property alias outWaterTempTxtInput : outWaterTempTxtInput
+    property alias outWaterTargetTempBtnMouseArea : outWaterTargetTempBtnMouseArea
+    property alias outWaterTargetTempTxtInput : outWaterTargetTempTxtInput
     property alias correctionSwitchMouseArea: correctionSwitchMouseArea
     property alias correction2SwitchMouseArea: correction2SwitchMouseArea
     property alias targetPressTxtInput: targetPressTxtInput
@@ -59,7 +59,7 @@ Rectangle {
     property alias fans3SetTextInput: fans3SetTextInput
     property alias fans2SetTextInput: fans2SetTextInput
     property alias fans1SetTextInput: fans1SetTextInput
-    property alias returnValveSetTxtInput: returnValveSetTxtInput
+    // property alias returnValveSetTxtInput: returnValveSetTxtInput
     property alias returnValveTxtInput: returnValveTxtInput
     property alias waterPTxtInpt: waterPTxtInpt
     property alias waterITxtInpt: waterITxtInpt
@@ -1644,7 +1644,7 @@ Rectangle {
                             verticalAlignment: Text.AlignVCenter
                         }
                         TextInput {
-                            id: outWaterTempTxtInput
+                            id: outWaterTargetTempTxtInput
                             x: 92
                             y: 0
 
@@ -1657,14 +1657,14 @@ Rectangle {
                             font.weight: Font.Bold
                             horizontalAlignment: Text.AlignRight
 
-                            text: Number(Td.outWaterTemp)
+                            text: Number(Td.outWaterTargetTemp)
                             verticalAlignment: Text.AlignVCenter
                             validator: DoubleValidator {}
                         }
                         Text {
 
                             id: c_51
-                            anchors.left: outWaterTempTxtInput.right
+                            anchors.left: outWaterTargetTempTxtInput.right
                             y: 8
 
                             height: 28
@@ -1693,7 +1693,7 @@ Rectangle {
 
                             color: "#2563eb"
                             radius: 8
-                            scale: outWaterTempBtnMouseArea.containsMouse ? 1.02 : 1
+                            scale: outWaterTargetTempBtnMouseArea.containsMouse ? 1.02 : 1
 
                             Text {
                                 id: element_41
@@ -1712,12 +1712,12 @@ Rectangle {
                             }
                             layer.enabled: true
                             layer.effect: MultiEffect {
-                                shadowEnabled: outWaterTempBtnMouseArea.containsMouse ? true : false
+                                shadowEnabled: outWaterTargetTempBtnMouseArea.containsMouse ? true : false
                                 shadowColor: "#1d4ed8"
                                 shadowBlur: 0.8
                             }
                             MouseArea {
-                                id: outWaterTempBtnMouseArea
+                                id: outWaterTargetTempBtnMouseArea
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
@@ -2610,120 +2610,6 @@ Rectangle {
                             }
                         }
 
-                        Rectangle {
-                            id: background_Border_5
-
-                            y: 64
-
-                            height: 49
-                            width: 539.33
-
-                            border.width: returnValveSetTxtInput.focus ? 3 : 1
-                            border.color: returnValveSetTxtInput.focus ? "#2563eb" : "#e2e8f0"
-                            color: "#f1f5f9"
-                            radius: 8
-
-                            RowLayout {
-                                anchors.fill: parent
-                                Layout.fillWidth: true
-                                spacing: 8
-
-                                Text {
-                                    // id: element_26
-
-                                    // height: 15
-                                    Layout.leftMargin: 10
-                                    // Layout.preferredWidth: 60
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "設定數值"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                Text {
-
-                                    // id: element_26
-                                    // height: 15
-                                    Layout.leftMargin: 10
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 12
-                                    font.weight: Font.Medium
-                                    // horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "PV"
-                                    textFormat: Text.PlainText
-                                    // verticalAlignment: Text.AlignVCenter
-                                }
-                                Text {
-
-                                    // id: element_26
-                                    // height: 15
-                                    // Layout.preferredWidth: 44
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Medium
-                                    Layout.leftMargin: 20
-                                    // horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: Td.returnValveValueP
-                                    textFormat: Text.PlainText
-                                    // verticalAlignment: Text.AlignVCenter
-                                }
-                                Rectangle {
-                                    Layout.preferredWidth: 1
-                                    Layout.preferredHeight: 20
-                                    color: "#94a3b8"
-                                    opacity: 0.5
-                                    Layout.leftMargin: 60
-                                }
-                                Text {
-
-                                    // id: element_26
-                                    // height: 15
-                                    Layout.preferredWidth: 44
-                                    Layout.leftMargin: 50
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 12
-                                    font.weight: Font.Medium
-                                    // horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "SV"
-                                    textFormat: Text.PlainText
-                                    // verticalAlignment: Text.AlignVCenter
-                                }
-
-                                TextInput {
-                                    id: returnValveSetTxtInput
-
-                                    Layout.leftMargin: -400
-                                    Layout.preferredWidth: parent.width
-
-                                    color: "#1e293b"
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignRight
-
-                                    text: Number(Td.returnValveValue)
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                            }
-                        }
 
                     }
                     Rectangle {

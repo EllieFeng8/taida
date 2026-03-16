@@ -1077,7 +1077,7 @@ private:
     double m_inWaterTemp = 0;
     double m_inWaterPressure = 0;
 
-    double m_outWaterTemp = 0;
+    double m_outWaterTemp = 20;
     double m_outWaterPressure = 0;
 
     double m_returnWaterTemp = 0;
@@ -1091,8 +1091,8 @@ private:
     double m_inletAirTemp = 0;
     double m_inletAirHumidity = 0;
 
-    double m_outletAirTemp = 0;
-    double m_outWaterTargetTemp = 0;
+    double m_outletAirTemp = 10;
+    double m_outWaterTargetTemp = 100;
     double m_outWaterTargetTempP = 0;
 
     double m_outValveOpening = 0;
