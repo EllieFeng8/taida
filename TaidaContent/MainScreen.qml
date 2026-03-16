@@ -21,7 +21,7 @@ MainScreenUI {
 
 
     waterValveSwitchMouseArea.onClicked: {
-        waterValveIsOn = !waterValveIsOn
+        Td.outValvePidOn = !Td.outValvePidOn
     }
     waterValveSetMouseArea.onClicked: {
         Td.outValveOpening = waterValveOpenTxtInput.text
@@ -78,8 +78,8 @@ MainScreenUI {
         motorFreqIsOn = !motorFreqIsOn
     }
     allFansPIDSwitchMouseArea.onClicked: {
-        fansPIDIsOn = !fansPIDIsOn
-    console.log("fansPIDIsOn",fansPIDIsOn)
+        Td.fanPidMonitorOn = !Td.fanPidMonitorOn
+    console.log("Td.fanPidMonitorOn",Td.fanPidMonitorOn)
     }
 
     allFansSwitchMouseArea.onClicked: {

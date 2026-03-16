@@ -1878,7 +1878,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: waterValveSwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: waterValveIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.outValvePidOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: waterValveSwitchMouseArea.containsMouse ? true : false
@@ -1916,7 +1916,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 16
                                     lineHeightMode: Text.FixedHeight
-                                    text: waterValveIsOn ? "PID ON" : "PID OFF"
+                                    text: Td.outValvePidOn ? "PID ON" : "PID OFF"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -3302,7 +3302,7 @@ Rectangle {
                                     height: 20
                                     width: 40
                                     scale: allFansPIDSwitchMouseArea.containsMouse ? 1.2 : 1
-                                    source: fansPIDIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                    source: Td.fanPidMonitorOn ? "assets/switchon.png" : "assets/switchoff.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
                                         shadowEnabled: allFansPIDSwitchMouseArea.containsMouse ? true : false
