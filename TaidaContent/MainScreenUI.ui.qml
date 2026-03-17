@@ -743,7 +743,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
-                                text: Td.returnWaterPressure
+                                text: Td.outWaterPressure
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1047,7 +1047,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
-                                    text: "左1"
+                                    text: "左入"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1113,7 +1113,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
-                                    text: "左2"
+                                    text: "左出"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1187,7 +1187,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
-                                    text: "右1"
+                                    text: "右入"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1253,7 +1253,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
-                                    text: "右2"
+                                    text: "右出"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1269,7 +1269,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 28
                                     lineHeightMode: Text.FixedHeight
-                                    text: Td.condenserRight1Temp
+                                    text: Td.condenserRight2Temp
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
