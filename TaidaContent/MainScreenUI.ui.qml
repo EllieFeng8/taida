@@ -1629,17 +1629,58 @@ Rectangle {
                             y: 11.50
 
                             height: 15
-                            width: 44
+                            width: 60
 
                             color: "#94a3b8"
                             font.capitalization: Font.AllUppercase
                             font.family: "Noto Sans TC"
                             font.pixelSize: 16
-                            font.weight: Font.Bold
+                            // font.weight: Font.Bold
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 15
                             lineHeightMode: Text.FixedHeight
                             text: "目標溫度"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Text {
+
+                             id: _pv
+                            anchors.left: element_261.left
+                            anchors.top: element_261.top
+                            anchors.topMargin: -30
+
+                            height: 28
+                            width: 19.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: "PV:"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Text {
+
+                            // id: c_5
+                            anchors.left: _pv.right
+                            anchors.top: _pv.top
+
+                            height: 28
+                            width: 12.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: Td.outWaterTargetTempP
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
