@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import QtQuick.Controls
 import Core 1.0
 
 Rectangle {
@@ -67,21 +68,7 @@ Rectangle {
     property alias waterValveSetMouseArea: waterValveSetMouseArea
     property alias waterValveSwitch: waterValveSwitch
     property alias waterValveSwitchMouseArea: waterValveSwitchMouseArea
-    property bool waterValveIsOn: Td.outValvePidOn
     property bool waterValveSetBtn: true
-    property bool motorFreqIsOn: Td.motorFrequencySwitchOn
-    property bool allFansIsOn: Td.fanAllOn
-    property bool fansPIDIsOn: Td.fanPidMonitorOn
-    property bool fans1IsOn: Td.fan1SwitchOn
-    property bool fans2IsOn: Td.fan2SwitchOn
-    property bool fans3IsOn: Td.fan3SwitchOn
-    property bool fans4IsOn: Td.fan4SwitchOn
-    property bool fans5IsOn: Td.fan5SwitchOn
-    property bool fans6IsOn: Td.fan6SwitchOn
-    property bool fans7IsOn: Td.fan7SwitchOn
-    property bool fans8IsOn: Td.fan8SwitchOn
-    property bool fans9IsOn: Td.fan9SwitchOn
-
     property alias background_fan1 : background_fan1
     property alias background_fan2 : background_fan2
     property alias background_fan3 : background_fan3
@@ -94,6 +81,7 @@ Rectangle {
 
     property bool correctionIsOn: Td.outValveCorrectionOn
     property bool correction2IsOn: Td.fanCorrectionSwitchOn
+    property bool fansEmergency:false
 
     Rectangle {
         id: background
@@ -257,109 +245,6 @@ Rectangle {
                             lineHeight: 16
                             lineHeightMode: Text.FixedHeight
                             text: "即時監控工業冷卻系統狀態"
-                            textFormat: Text.PlainText
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
-                }
-                Image {
-                    id: background_Border_Shadow
-
-                    x: 1475.82
-                    y: 3
-
-                    source: Qt.resolvedUrl(
-                                "assets/background_Border_Shadow.png")
-
-                    Rectangle {
-                        id: background_1
-
-                        x: 21
-                        y: 16
-
-                        height: 10
-                        width: 10
-
-                        color: "#22c55e"
-                        radius: 9999
-                    }
-                    Item {
-                        id: container_5
-
-                        x: 47
-                        y: 13
-
-                        height: 16
-                        width: 72.02
-
-                        Text {
-                            id: element_1
-
-                            height: 16
-                            width: 73.02
-
-                            color: "#1e293b"
-                            font.family: "Noto Sans TC"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            horizontalAlignment: Text.AlignLeft
-                            lineHeight: 16
-                            lineHeightMode: Text.FixedHeight
-                            text: "系統運行正常"
-                            textFormat: Text.PlainText
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
-                    Item {
-                        id: container_6
-
-                        x: 135.02
-                        y: 9
-
-                        height: 24
-                        width: 5.33
-
-                        Text {
-                            id: _text_1
-
-                            height: 24
-                            width: 6.33
-
-                            color: "#cbd5e1"
-                            font.family: "Inter"
-                            font.pixelSize: 16
-                            font.weight: Font.Normal
-                            horizontalAlignment: Text.AlignLeft
-                            lineHeight: 24
-                            lineHeightMode: Text.FixedHeight
-                            text: "|"
-                            textFormat: Text.PlainText
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
-                    Item {
-                        id: container_7
-
-                        x: 156.35
-                        y: 13
-
-                        height: 16
-                        width: 136.83
-
-                        Text {
-                            id: _text_2
-
-                            height: 16
-                            width: 137.83
-
-                            color: "#1e293b"
-                            font.family: "Liberation Mono"
-                            font.pixelSize: 12
-                            font.weight: Font.Medium
-                            horizontalAlignment: Text.AlignLeft
-                            lineHeight: 16
-                            lineHeightMode: Text.FixedHeight
-                            text: "2026-03-05 07:56:43"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -1565,10 +1450,11 @@ Rectangle {
                         Item {
                             id: paragraph_8
 
-                            x: 170.39
+                            x: 65
+                            y: 0
 
                             height: 31
-                            width: 38.61
+                            width: 41
 
                             Text {
                                 id: element_24
@@ -1617,8 +1503,8 @@ Rectangle {
                         height: 38
                         width: 156
 
-                        border.width: outWaterTempTxtInput.focus ? 3 : 1
-                        border.color: outWaterTempTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                        border.width: outWaterTargetTempTxtInput.focus ? 3 : 1
+                        border.color: outWaterTargetTempTxtInput.focus ? "#2563eb" : "#e2e8f0"
                         color: "#f1f5f9"
                         radius: 8
 
@@ -1629,7 +1515,7 @@ Rectangle {
                             y: 11.50
 
                             height: 15
-                            width: 60
+                            width: 50
 
                             color: "#94a3b8"
                             font.capitalization: Font.AllUppercase
@@ -1648,10 +1534,11 @@ Rectangle {
                              id: _pv
                             anchors.left: element_261.left
                             anchors.top: element_261.top
-                            anchors.topMargin: -30
+                            anchors.leftMargin: 121
+                            anchors.topMargin: -48
 
-                            height: 28
-                            width: 19.75
+                            height: 21
+                            width: 13
 
                             color: "#94a3b8"
                             font.family: "Inter"
@@ -1666,12 +1553,14 @@ Rectangle {
                         }
                         Text {
 
-                            // id: c_5
+                            id: c_11
                             anchors.left: _pv.right
                             anchors.top: _pv.top
+                            anchors.leftMargin: 35
 
-                            height: 28
-                            width: 12.75
+
+                            height: 21
+                            width: 13
 
                             color: "#94a3b8"
                             font.family: "Inter"
@@ -1681,6 +1570,45 @@ Rectangle {
                             lineHeight: 28
                             lineHeightMode: Text.FixedHeight
                             text: Td.outWaterTargetTempP
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                            Text {
+
+                                // // id: c_51
+                                anchors.left: c_11.right
+                                anchors.leftMargin: 3
+
+                                height: 21
+                                width: 13
+
+                                color: "#94a3b8"
+                                font.family: "Inter"
+                                font.pixelSize: 10
+                                font.weight: Font.Normal
+                                horizontalAlignment: Text.AlignLeft
+                                lineHeight: 28
+                                lineHeightMode: Text.FixedHeight
+                                text: "°C"
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+                        Text {
+
+                            // id: c_51
+                            anchors.left: c_11.right
+
+                            height: 21
+                            width: 13
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 10
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: "°C"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -2750,7 +2678,47 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                             }
                         }
+                        Button {
+                            id: resetBtn
+                            x: 379
+                            y: -3
 
+                            text: "Reset"
+                            font.pixelSize: 16
+                            font.bold: true
+
+                            width: 88
+                            height: 29
+
+                            background: Rectangle {
+                                radius: 10
+                                color: resetBtn.pressed ? "#fecaca" : resetBtn.hovered ? "#fee2e2" : "#f1f5f9"
+
+                                border.color: "#ef4444"
+                                border.width: 1
+                            }
+                            contentItem: Row {
+                                anchors.centerIn: parent
+                                spacing: 6
+                                Layout.alignment: Qt.AlignHCenter
+
+                                Text {
+                                    text: "⟲"
+                                    color: "#ef4444"
+                                    font.pixelSize: 16
+                                }
+
+                                Text {
+                                    color: "#ef4444"
+                                    text: "Reset"
+                                    font.pixelSize: 16
+                                    font.bold: true
+                                }
+                            }
+                            onClicked:{
+                                Td.motorReset = !Td.motorReset
+                            }
+                        }
                         Image {
                             id: motorFreqSwitch
                             x: 499.32
@@ -2759,11 +2727,11 @@ Rectangle {
                             height: 20
                             width: 40
                             scale: motorFreqSwitchMouseArea.containsMouse ? 1.2 : 1
-                            source: motorFreqIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                            source: Td.motorFrequencySwitchOn ? "assets/emergencyon.png" : "assets/emergencyoff.png"
                             layer.enabled: true
                             layer.effect: MultiEffect {
                                 shadowEnabled: motorFreqSwitchMouseArea.containsMouse ? true : false
-                                shadowColor: "#1d4ed8"
+                                shadowColor: "#ff4940"
                                 shadowBlur: 0.8
                             }
                             MouseArea {
@@ -3390,7 +3358,7 @@ Rectangle {
                     Item {
                         id: group_2
 
-                        x: 1095
+                        x: 1108
 
                         height: 38
                         width: 611
@@ -3398,7 +3366,7 @@ Rectangle {
                         Item {
                             id: container_22
 
-                            x: 29.03
+                            x: -105
 
                             height: 38
                             width: 506.97
@@ -3806,7 +3774,7 @@ Rectangle {
                             id: container_23
 
                             y: 5
-                            x: -500
+                            x: -580
                             height: 28
                             width: 154.85
 
@@ -4010,6 +3978,85 @@ Rectangle {
                                 }
                             }
                         }
+                        Button {
+                            id: emergencyOffBtn
+
+                            width: 120
+                            height: 44
+
+                            property color bgNormal: "#fee2e2"
+                            property color bgHover: "#fecaca"
+                            property color bgPressed: "#fca5a5"
+                            property color borderColor: "#ef4444"
+                            property color textColor: "#b91c1c"
+                            property color disabledBg: "#f1f5f9"
+                            property color disabledText: "#94a3b8"
+                            x: 514
+                            y: -3
+
+                            background: Rectangle {
+                                radius: 10
+                                color: !emergencyOffBtn.enabled ? emergencyOffBtn.disabledBg : emergencyOffBtn.down ? emergencyOffBtn.bgPressed : emergencyOffBtn.hovered ? emergencyOffBtn.bgHover : emergencyOffBtn.bgNormal
+
+                                border.width: 1
+                                border.color: !emergencyOffBtn.enabled ? "#cbd5e1" : emergencyOffBtn.borderColor
+                            }
+
+                            contentItem: Row {
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                Text {
+                                    text: "緊急開關"
+                                    color: emergencyOffBtn.enabled ? emergencyOffBtn.textColor : emergencyOffBtn.disabledText
+                                    font.pixelSize: 15
+                                    font.bold: true
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                Image {
+                                    id: fansemSwitch
+                                    // x: 499.32
+                                    y: 2
+
+                                    // height: 20
+                                    // width: 40
+                                    scale: 0.8
+                                    source: fansEmergency ? "assets/emergencyon.png" : "assets/emergencyoff.png"
+                                    layer.enabled: true
+
+                                }
+                            }
+
+                            onClicked: {
+                                fansEmergency = !fansEmergency
+                                if(fansEmergency === true) {
+                                    Td.fan1SwitchOn = true
+                                    Td.fan2SwitchOn = true
+                                    Td.fan3SwitchOn = true
+                                    Td.fan4SwitchOn = true
+                                    Td.fan5SwitchOn = true
+                                    Td.fan6SwitchOn = true
+                                    Td.fan7SwitchOn = true
+                                    Td.fan8SwitchOn = true
+                                    Td.fan9SwitchOn = true
+                                    Td.fanAllOn = true
+
+                                }else{
+                                    Td.fan1SwitchOn = false
+                                    Td.fan2SwitchOn = false
+                                    Td.fan3SwitchOn = false
+                                    Td.fan4SwitchOn = false
+                                    Td.fan5SwitchOn = false
+                                    Td.fan6SwitchOn = false
+                                    Td.fan7SwitchOn = false
+                                    Td.fan8SwitchOn = false
+                                    Td.fan9SwitchOn = false
+                                    Td.fanAllOn = false
+                                }
+
+                            }
+                        }
+
                     }
                 }
                 Item {
@@ -4051,7 +4098,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans1IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan1SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4081,7 +4128,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans1SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans1IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan1SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans1SwitchMouseArea.containsMouse ? true : false
@@ -4276,6 +4323,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan1TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans1btn
@@ -4332,7 +4385,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans2IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan2SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4362,7 +4415,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans2SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans2IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan2SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans2SwitchMouseArea.containsMouse ? true : false
@@ -4556,6 +4609,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan2TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans2btn
@@ -4612,7 +4671,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans3IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan3SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4641,7 +4700,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans3SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans3IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan3SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans3SwitchMouseArea.containsMouse ? true : false
@@ -4835,6 +4894,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan3TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans3btn
@@ -4891,7 +4956,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans4IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan4SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -4921,7 +4986,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans4SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans4IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan4SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans4SwitchMouseArea.containsMouse ? true : false
@@ -5116,6 +5181,12 @@ Rectangle {
 
                                     text: Number(Td.fan4TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans4btn
@@ -5172,7 +5243,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans5IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan5SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -5200,7 +5271,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans5SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans5IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan5SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans5SwitchMouseArea.containsMouse ? true : false
@@ -5394,6 +5465,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan5TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans5btn
@@ -5450,7 +5527,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans6IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan6SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -5479,7 +5556,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans6SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans6IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan6SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans6SwitchMouseArea.containsMouse ? true : false
@@ -5673,6 +5750,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan6TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans6btn
@@ -5730,7 +5813,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans7IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan7SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -5758,7 +5841,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans7SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans7IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan7SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans7SwitchMouseArea.containsMouse ? true : false
@@ -5927,8 +6010,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                            Layout.preferredHeight: 75
-                                            Layout.preferredWidth: parent.width
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans7SetTextInput.focus ? 3 : 1
                                 border.color: fans7SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -5939,9 +6022,9 @@ Rectangle {
                                 TextInput {
                                     id: fans7SetTextInput
 
-                                                x: 10
-                                                // y: -1
-                                                // Layout.leftMargin: 10
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -5949,9 +6032,16 @@ Rectangle {
                                     font.family: "Noto Sans TC"
                                     font.pixelSize: 20
                                     font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan7TargetRpm)
+                                    horizontalAlignment: Text.AlignLeft
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
+
                                 }
                                 Image {
                                     id: fans7btn
@@ -6009,7 +6099,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans8IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan8SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -6038,7 +6128,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans8SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans8IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan8SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans8SwitchMouseArea.containsMouse ? true : false
@@ -6232,6 +6322,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan8TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans8btn
@@ -6289,7 +6385,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: fans9IsOn ?"assets/Icon12.png" : "assets/Icon11.png"
+                                    source: Td.fan9SwitchOn ?"assets/Icon12.png" : "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -6318,7 +6414,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: fans9SwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: fans9IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fan9SwitchOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: fans9SwitchMouseArea.containsMouse ? true : false
@@ -6512,6 +6608,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     text: Number(Td.fan9TargetRpm)
                                     verticalAlignment: Text.AlignVCenter
+                                    validator: IntValidator {
+                                        bottom: 1
+                                        top: 100
+                                    }
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    maximumLength: 3   // ⭐ 防止輸入太長
                                 }
                                 Image {
                                     id: fans9btn
@@ -6569,7 +6671,7 @@ Rectangle {
                                 Image {
                                     y: 5
                                     scale: 1.2
-                                    source: "assets/Icon12.png"
+                                    source: Td.fanAllOn ? "assets/Icon12.png": "assets/Icon11.png"
                                 }
 
                                 Text {
@@ -6598,7 +6700,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.fanAllOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false

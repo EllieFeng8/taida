@@ -77,6 +77,8 @@ qt6_add_qml_module(TaidaContent
         "assets/connect4.png"
         "assets/Container112.png"
         "assets/Icon13.png"
+        "assets/emergencyoff.png"
+        "assets/emergencyon.png"
 	"assets/Container11.png"
 )
 
