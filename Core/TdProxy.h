@@ -47,6 +47,8 @@ class TdProxy : public QObject
     // 出風溫度
     // =========================
     Q_PROPERTY(double outletAirTemp READ getOutletAirTemp WRITE setOutletAirTemp NOTIFY outletAirTempChanged)
+    Q_PROPERTY(double outWaterTargetTemp READ getOutWaterTargetTemp WRITE setOutWaterTargetTemp NOTIFY outWaterTargetTempChanged)
+    Q_PROPERTY(double outWaterTargetTempP READ getOutWaterTargetTempP WRITE setOutWaterTargetTempP NOTIFY outWaterTargetTempPChanged)
 
     // =========================
     // 出水閥控制
@@ -56,24 +58,41 @@ class TdProxy : public QObject
     Q_PROPERTY(double outValveI READ getOutValveI WRITE setOutValveI NOTIFY outValveIChanged)
     Q_PROPERTY(double outValveD READ getOutValveD WRITE setOutValveD NOTIFY outValveDChanged)
 
+    Q_PROPERTY(double outValveOpeningP READ getOutValveOpeningP WRITE setOutValveOpeningP NOTIFY outValveOpeningPChanged)
+    Q_PROPERTY(double outValvePP READ getOutValvePP WRITE setOutValvePP NOTIFY outValvePPChanged)
+    Q_PROPERTY(double outValveIP READ getOutValveIP WRITE setOutValveIP NOTIFY outValveIPChanged)
+    Q_PROPERTY(double outValveDP READ getOutValveDP WRITE setOutValveDP NOTIFY outValveDPChanged)
+
     // =========================
     // 回水閥控制
     // =========================
     Q_PROPERTY(double returnValveOpening READ getReturnValveOpening WRITE setReturnValveOpening NOTIFY returnValveOpeningChanged)
+    Q_PROPERTY(double returnValveOpeningP READ getReturnValveOpeningP WRITE setReturnValveOpeningP NOTIFY returnValveOpeningPChanged)
+
+    Q_PROPERTY(double returnValveValue READ getReturnValveValue WRITE setReturnValveValue NOTIFY returnValveValueChanged)
+    Q_PROPERTY(double returnValveValueP READ getReturnValveValueP WRITE setReturnValveValueP NOTIFY returnValveValuePChanged)
 
     // =========================
     // 馬達頻率控制
     // =========================
     Q_PROPERTY(double motorFrequency READ getMotorFrequency WRITE setMotorFrequency NOTIFY motorFrequencyChanged)
+    Q_PROPERTY(double motorFrequencyP READ getMotorFrequencyP WRITE setMotorFrequencyP NOTIFY motorFrequencyPChanged)
     Q_PROPERTY(double currentWaterFlow READ getCurrentWaterFlow WRITE setCurrentWaterFlow NOTIFY currentWaterFlowChanged)
+
+    Q_PROPERTY(double heatExchange READ getHeatExchange WRITE setHeatExchange NOTIFY heatExchangeChanged)
+    // Q_PROPERTY(double heatExchangeP READ getHeatExchangeP WRITE setHeatExchangeP NOTIFY heatExchangePChanged)
 
     // =========================
     // 風扇控制 / 壓差 / PID
     // =========================
     Q_PROPERTY(double pressureDiff READ getPressureDiff WRITE setPressureDiff NOTIFY pressureDiffChanged)
+    Q_PROPERTY(double targetPressureDiff READ getTargetPressureDiff WRITE setTargetPressureDiff NOTIFY targetPressureDiffChanged)
     Q_PROPERTY(double fanPidP READ getFanPidP WRITE setFanPidP NOTIFY fanPidPChanged)
     Q_PROPERTY(double fanPidI READ getFanPidI WRITE setFanPidI NOTIFY fanPidIChanged)
     Q_PROPERTY(double fanPidD READ getFanPidD WRITE setFanPidD NOTIFY fanPidDChanged)
+    Q_PROPERTY(double fanPidPP READ getFanPidPP WRITE setFanPidPP NOTIFY fanPidPPChanged)
+    Q_PROPERTY(double fanPidIP READ getFanPidIP WRITE setFanPidIP NOTIFY fanPidIPChanged)
+    Q_PROPERTY(double fanPidDP READ getFanPidDP WRITE setFanPidDP NOTIFY fanPidDPChanged)
 
     // =========================
     // 風扇 1 ~ 9 目標轉速
@@ -87,12 +106,37 @@ class TdProxy : public QObject
     Q_PROPERTY(double fan7TargetRpm READ getFan7TargetRpm WRITE setFan7TargetRpm NOTIFY fan7TargetRpmChanged)
     Q_PROPERTY(double fan8TargetRpm READ getFan8TargetRpm WRITE setFan8TargetRpm NOTIFY fan8TargetRpmChanged)
     Q_PROPERTY(double fan9TargetRpm READ getFan9TargetRpm WRITE setFan9TargetRpm NOTIFY fan9TargetRpmChanged)
+    Q_PROPERTY(double fanAllTargetRpm READ getFanAllTargetRpm WRITE setFanAllTargetRpm NOTIFY fanAllTargetRpmChanged)
+
+    Q_PROPERTY(double fan1TargetRpmPercent READ getFan1TargetRpmPercent WRITE setFan1TargetRpmPercent NOTIFY fan1TargetRpmPercentChanged)
+    Q_PROPERTY(double fan2TargetRpmPercent READ getFan2TargetRpmPercent WRITE setFan2TargetRpmPercent NOTIFY fan2TargetRpmPercentChanged)
+    Q_PROPERTY(double fan3TargetRpmPercent READ getFan3TargetRpmPercent WRITE setFan3TargetRpmPercent NOTIFY fan3TargetRpmPercentChanged)
+    Q_PROPERTY(double fan4TargetRpmPercent READ getFan4TargetRpmPercent WRITE setFan4TargetRpmPercent NOTIFY fan4TargetRpmPercentChanged)
+    Q_PROPERTY(double fan5TargetRpmPercent READ getFan5TargetRpmPercent WRITE setFan5TargetRpmPercent NOTIFY fan5TargetRpmPercentChanged)
+    Q_PROPERTY(double fan6TargetRpmPercent READ getFan6TargetRpmPercent WRITE setFan6TargetRpmPercent NOTIFY fan6TargetRpmPercentChanged)
+    Q_PROPERTY(double fan7TargetRpmPercent READ getFan7TargetRpmPercent WRITE setFan7TargetRpmPercent NOTIFY fan7TargetRpmPercentChanged)
+    Q_PROPERTY(double fan8TargetRpmPercent READ getFan8TargetRpmPercent WRITE setFan8TargetRpmPercent NOTIFY fan8TargetRpmPercentChanged)
+    Q_PROPERTY(double fan9TargetRpmPercent READ getFan9TargetRpmPercent WRITE setFan9TargetRpmPercent NOTIFY fan9TargetRpmPercentChanged)
+    Q_PROPERTY(double fanAllTargetRpmPercent READ getFanAllTargetRpmPercent WRITE setFanAllTargetRpmPercent NOTIFY fanAllTargetRpmPercentChanged)
+
+    Q_PROPERTY(double fan1TargetRpmP READ getFan1TargetRpmP WRITE setFan1TargetRpmP NOTIFY fan1TargetRpmPChanged)
+    Q_PROPERTY(double fan2TargetRpmP READ getFan2TargetRpmP WRITE setFan2TargetRpmP NOTIFY fan2TargetRpmPChanged)
+    Q_PROPERTY(double fan3TargetRpmP READ getFan3TargetRpmP WRITE setFan3TargetRpmP NOTIFY fan3TargetRpmPChanged)
+    Q_PROPERTY(double fan4TargetRpmP READ getFan4TargetRpmP WRITE setFan4TargetRpmP NOTIFY fan4TargetRpmPChanged)
+    Q_PROPERTY(double fan5TargetRpmP READ getFan5TargetRpmP WRITE setFan5TargetRpmP NOTIFY fan5TargetRpmPChanged)
+    Q_PROPERTY(double fan6TargetRpmP READ getFan6TargetRpmP WRITE setFan6TargetRpmP NOTIFY fan6TargetRpmPChanged)
+    Q_PROPERTY(double fan7TargetRpmP READ getFan7TargetRpmP WRITE setFan7TargetRpmP NOTIFY fan7TargetRpmPChanged)
+    Q_PROPERTY(double fan8TargetRpmP READ getFan8TargetRpmP WRITE setFan8TargetRpmP NOTIFY fan8TargetRpmPChanged)
+    Q_PROPERTY(double fan9TargetRpmP READ getFan9TargetRpmP WRITE setFan9TargetRpmP NOTIFY fan9TargetRpmPChanged)
+    Q_PROPERTY(double fanAllTargetRpmP READ getFanAllTargetRpmP WRITE setFanAllTargetRpmP NOTIFY fanAllTargetRpmPChanged)
 
     // =========================
     // 系統 / 區塊開關
     // =========================
     Q_PROPERTY(bool systemRunning READ getSystemRunning WRITE setSystemRunning NOTIFY systemRunningChanged)
     Q_PROPERTY(bool outValvePidOn READ getOutValvePidOn WRITE setOutValvePidOn NOTIFY outValvePidOnChanged)
+    //TRUE=正向 FALSE=反向
+    Q_PROPERTY(bool outValveCorrectionOn READ getOutValveCorrectionOn WRITE setOutValveCorrectionOn NOTIFY outValveCorrectionOnChanged)
     Q_PROPERTY(bool motorFrequencySwitchOn READ getMotorFrequencySwitchOn WRITE setMotorFrequencySwitchOn NOTIFY motorFrequencySwitchOnChanged)
     Q_PROPERTY(bool fanAllOn READ getFanAllOn WRITE setFanAllOn NOTIFY fanAllOnChanged)
     Q_PROPERTY(bool fanPidMonitorOn READ getFanPidMonitorOn WRITE setFanPidMonitorOn NOTIFY fanPidMonitorOnChanged)
@@ -100,6 +144,8 @@ class TdProxy : public QObject
     // =========================
     // 風扇開關
     // =========================
+    //TRUE=正向 FALSE=反向
+    Q_PROPERTY(bool fanCorrectionSwitchOn READ getFanCorrectionSwitchOn WRITE setFanCorrectionSwitchOn NOTIFY fanCorrectionSwitchOnChanged)
     Q_PROPERTY(bool fan1SwitchOn READ getFan1SwitchOn WRITE setFan1SwitchOn NOTIFY fan1SwitchOnChanged)
     Q_PROPERTY(bool fan2SwitchOn READ getFan2SwitchOn WRITE setFan2SwitchOn NOTIFY fan2SwitchOnChanged)
     Q_PROPERTY(bool fan3SwitchOn READ getFan3SwitchOn WRITE setFan3SwitchOn NOTIFY fan3SwitchOnChanged)
@@ -249,6 +295,19 @@ public:
         emit outletAirTempChanged(m_outletAirTemp);
     }
 
+    Q_INVOKABLE double getOutWaterTargetTemp() const { return m_outWaterTargetTemp; }
+    Q_INVOKABLE void setOutWaterTargetTemp(double value)
+    {
+        m_outWaterTargetTemp = value;
+        emit outWaterTargetTempChanged(m_outWaterTargetTemp);
+    }
+    Q_INVOKABLE double getOutWaterTargetTempP() const { return m_outWaterTargetTempP; }
+    Q_INVOKABLE void setOutWaterTargetTempP(double value)
+    {
+        m_outWaterTargetTempP = value;
+        emit outWaterTargetTempPChanged(m_outWaterTargetTempP);
+    }
+
     // =========================
     // 出水閥控制
     // =========================
@@ -280,6 +339,34 @@ public:
         emit outValveDChanged(m_outValveD);
     }
 
+    Q_INVOKABLE double getOutValveOpeningP() const { return m_outValveOpeningP; }
+    Q_INVOKABLE void setOutValveOpeningP(double value)
+    {
+        m_outValveOpeningP = value;
+        emit outValveOpeningPChanged(m_outValveOpeningP);
+    }
+
+    Q_INVOKABLE double getOutValvePP() const { return m_outValvePP; }
+    Q_INVOKABLE void setOutValvePP(double value)
+    {
+        m_outValvePP = value;
+        emit outValvePPChanged(m_outValvePP);
+    }
+
+    Q_INVOKABLE double getOutValveIP() const { return m_outValveIP; }
+    Q_INVOKABLE void setOutValveIP(double value)
+    {
+        m_outValveIP = value;
+        emit outValveIChanged(m_outValveIP);
+    }
+
+    Q_INVOKABLE double getOutValveDP() const { return m_outValveDP; }
+    Q_INVOKABLE void setOutValveDP(double value)
+    {
+        m_outValveDP = value;
+        emit outValveDPChanged(m_outValveDP);
+    }
+
     // =========================
     // 回水閥控制
     // =========================
@@ -288,6 +375,24 @@ public:
     {
         m_returnValveOpening = value;
         emit returnValveOpeningChanged(m_returnValveOpening);
+    }
+    Q_INVOKABLE double getReturnValveOpeningP() const { return m_returnValveOpeningP; }
+    Q_INVOKABLE void setReturnValveOpeningP(double value)
+    {
+        m_returnValveOpeningP = value;
+        emit returnValveOpeningPChanged(m_returnValveOpeningP);
+    }
+    Q_INVOKABLE double getReturnValveValue() const { return m_returnValveValue; }
+    Q_INVOKABLE void setReturnValveValue(double value)
+    {
+        m_returnValveValue = value;
+        emit returnValveValueChanged(m_returnValveValue);
+    }
+    Q_INVOKABLE double getReturnValveValueP() const { return m_returnValveValueP; }
+    Q_INVOKABLE void setReturnValveValueP(double value)
+    {
+        m_returnValveValueP = value;
+        emit returnValveValuePChanged(m_returnValveValueP);
     }
 
     // =========================
@@ -299,6 +404,12 @@ public:
         m_motorFrequency = value;
         emit motorFrequencyChanged(m_motorFrequency);
     }
+    Q_INVOKABLE double getMotorFrequencyP() const { return m_motorFrequencyP; }
+    Q_INVOKABLE void setMotorFrequencyP(double value)
+    {
+        m_motorFrequencyP = value;
+        emit motorFrequencyPChanged(m_motorFrequencyP);
+    }
 
     Q_INVOKABLE double getCurrentWaterFlow() const { return m_currentWaterFlow; }
     Q_INVOKABLE void setCurrentWaterFlow(double value)
@@ -306,6 +417,19 @@ public:
         m_currentWaterFlow = value;
         emit currentWaterFlowChanged(m_currentWaterFlow);
     }
+
+    Q_INVOKABLE double getHeatExchange() const { return m_heatExchange; }
+    Q_INVOKABLE void setHeatExchange(double value)
+    {
+        m_heatExchange = value;
+        emit heatExchangeChanged(m_heatExchange);
+    }
+    // Q_INVOKABLE double getHeatExchangeP() const { return m_heatExchangeP; }
+    // Q_INVOKABLE void setHeatExchangeP(double value)
+    // {
+    //     m_heatExchangeP = value;
+    //     emit heatExchangePChanged(m_heatExchangeP);
+    // }
 
     // =========================
     // 風扇控制 / 壓差 / PID
@@ -315,6 +439,12 @@ public:
     {
         m_pressureDiff = value;
         emit pressureDiffChanged(m_pressureDiff);
+    }
+    Q_INVOKABLE double getTargetPressureDiff() const { return m_targetPressureDiff; }
+    Q_INVOKABLE void setTargetPressureDiff(double value)
+    {
+        m_targetPressureDiff = value;
+        emit targetPressureDiffChanged(m_targetPressureDiff);
     }
 
     Q_INVOKABLE double getFanPidP() const { return m_fanPidP; }
@@ -336,6 +466,27 @@ public:
     {
         m_fanPidD = value;
         emit fanPidDChanged(m_fanPidD);
+    }
+
+    Q_INVOKABLE double getFanPidPP() const { return m_fanPidPP; }
+    Q_INVOKABLE void setFanPidPP(double value)
+    {
+        m_fanPidPP = value;
+        emit fanPidPPChanged(m_fanPidPP);
+    }
+
+    Q_INVOKABLE double getFanPidIP() const { return m_fanPidIP; }
+    Q_INVOKABLE void setFanPidIP(double value)
+    {
+        m_fanPidIP = value;
+        emit fanPidIPChanged(m_fanPidIP);
+    }
+
+    Q_INVOKABLE double getFanPidDP() const { return m_fanPidDP; }
+    Q_INVOKABLE void setFanPidDP(double value)
+    {
+        m_fanPidDP = value;
+        emit fanPidDPChanged(m_fanPidDP);
     }
 
     // =========================
@@ -403,6 +554,149 @@ public:
         m_fan9TargetRpm = value;
         emit fan9TargetRpmChanged(m_fan9TargetRpm);
     }
+    Q_INVOKABLE double getFanAllTargetRpm() const { return m_fanAllTargetRpm; }
+    Q_INVOKABLE void setFanAllTargetRpm(double value)
+    {
+        m_fanAllTargetRpm = value;
+        emit fanAllTargetRpmChanged(m_fanAllTargetRpm);
+    }
+
+    Q_INVOKABLE double getFan1TargetRpmP() const { return m_fan1TargetRpmP; }
+    Q_INVOKABLE void setFan1TargetRpmP(double value)
+    {
+        m_fan1TargetRpmP = value;
+        emit fan1TargetRpmPChanged(m_fan1TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan2TargetRpmP() const { return m_fan2TargetRpmP; }
+    Q_INVOKABLE void setFan2TargetRpmP(double value)
+    {
+        m_fan2TargetRpmP = value;
+        emit fan2TargetRpmPChanged(m_fan2TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan3TargetRpmP() const { return m_fan3TargetRpmP; }
+    Q_INVOKABLE void setFan3TargetRpmP(double value)
+    {
+        m_fan3TargetRpmP = value;
+        emit fan3TargetRpmPChanged(m_fan3TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan4TargetRpmP() const { return m_fan4TargetRpmP; }
+    Q_INVOKABLE void setFan4TargetRpmP(double value)
+    {
+        m_fan4TargetRpmP = value;
+        emit fan4TargetRpmPChanged(m_fan4TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan5TargetRpmP() const { return m_fan5TargetRpmP; }
+    Q_INVOKABLE void setFan5TargetRpmP(double value)
+    {
+        m_fan5TargetRpmP = value;
+        emit fan5TargetRpmPChanged(m_fan5TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan6TargetRpmP() const { return m_fan6TargetRpmP; }
+    Q_INVOKABLE void setFan6TargetRpmP(double value)
+    {
+        m_fan6TargetRpmP = value;
+        emit fan6TargetRpmPChanged(m_fan6TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan7TargetRpmP() const { return m_fan7TargetRpmP; }
+    Q_INVOKABLE void setFan7TargetRpmP(double value)
+    {
+        m_fan7TargetRpmP = value;
+        emit fan7TargetRpmPChanged(m_fan7TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan8TargetRpmP() const { return m_fan8TargetRpmP; }
+    Q_INVOKABLE void setFan8TargetRpmP(double value)
+    {
+        m_fan8TargetRpmP = value;
+        emit fan8TargetRpmPChanged(m_fan8TargetRpmP);
+    }
+
+    Q_INVOKABLE double getFan9TargetRpmP() const { return m_fan9TargetRpmP; }
+    Q_INVOKABLE void setFan9TargetRpmP(double value)
+    {
+        m_fan9TargetRpmP = value;
+        emit fan9TargetRpmPChanged(m_fan9TargetRpmP);
+    }
+    Q_INVOKABLE double getFanAllTargetRpmP() const { return m_fanAllTargetRpmP; }
+    Q_INVOKABLE void setFanAllTargetRpmP(double value)
+    {
+        m_fanAllTargetRpmP = value;
+        emit fanAllTargetRpmPChanged(m_fanAllTargetRpmP);
+    }
+    Q_INVOKABLE double getFan1TargetRpmPercent() const { return m_fan1TargetRpmPercent; }
+    Q_INVOKABLE void setFan1TargetRpmPercent(double value)
+    {
+        m_fan1TargetRpmPercent = value;
+        emit fan1TargetRpmPercentChanged(m_fan1TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan2TargetRpmPercent() const { return m_fan2TargetRpmPercent; }
+    Q_INVOKABLE void setFan2TargetRpmPercent(double value)
+    {
+        m_fan2TargetRpmPercent = value;
+        emit fan2TargetRpmPercentChanged(m_fan2TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan3TargetRpmPercent() const { return m_fan3TargetRpmPercent; }
+    Q_INVOKABLE void setFan3TargetRpmPercent(double value)
+    {
+        m_fan3TargetRpmPercent = value;
+        emit fan3TargetRpmPercentChanged(m_fan3TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan4TargetRpmPercent() const { return m_fan4TargetRpmPercent; }
+    Q_INVOKABLE void setFan4TargetRpmPercent(double value)
+    {
+        m_fan4TargetRpmPercent = value;
+        emit fan4TargetRpmPercentChanged(m_fan4TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan5TargetRpmPercent() const { return m_fan5TargetRpmPercent; }
+    Q_INVOKABLE void setFan5TargetRpmPercent(double value)
+    {
+        m_fan5TargetRpmPercent = value;
+        emit fan5TargetRpmPercentChanged(m_fan5TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan6TargetRpmPercent() const { return m_fan6TargetRpmPercent; }
+    Q_INVOKABLE void setFan6TargetRpmPercent(double value)
+    {
+        m_fan6TargetRpmPercent = value;
+        emit fan6TargetRpmPercentChanged(m_fan6TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan7TargetRpmPercent() const { return m_fan7TargetRpmPercent; }
+    Q_INVOKABLE void setFan7TargetRpmPercent(double value)
+    {
+        m_fan7TargetRpmPercent = value;
+        emit fan7TargetRpmPercentChanged(m_fan7TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan8TargetRpmPercent() const { return m_fan8TargetRpmPercent; }
+    Q_INVOKABLE void setFan8TargetRpmPercent(double value)
+    {
+        m_fan8TargetRpmPercent = value;
+        emit fan8TargetRpmPercentChanged(m_fan8TargetRpmPercent);
+    }
+
+    Q_INVOKABLE double getFan9TargetRpmPercent() const { return m_fan9TargetRpmPercent; }
+    Q_INVOKABLE void setFan9TargetRpmPercent(double value)
+    {
+        m_fan9TargetRpmPercent = value;
+        emit fan9TargetRpmPercentChanged(m_fan9TargetRpmPercent);
+    }
+    Q_INVOKABLE double getFanAllTargetRpmPercent() const { return m_fanAllTargetRpmPercent; }
+    Q_INVOKABLE void setFanAllTargetRpmPercent(double value)
+    {
+        m_fanAllTargetRpmPercent = value;
+        emit fanAllTargetRpmPercentChanged(m_fanAllTargetRpmPercent);
+    }
  // =========================
     // 系統 / 區塊開關
     // =========================
@@ -418,6 +712,12 @@ public:
     {
         m_outValvePidOn = value;
         emit outValvePidOnChanged(m_outValvePidOn);
+    }
+    Q_INVOKABLE bool getOutValveCorrectionOn() const { return m_outValveCorrectionOn; }
+    Q_INVOKABLE void setOutValveCorrectionOn(bool value)
+    {
+        m_outValveCorrectionOn = value;
+        emit outValveCorrectionOnChanged(m_outValveCorrectionOn);
     }
 
     Q_INVOKABLE bool getMotorFrequencySwitchOn() const { return m_motorFrequencySwitchOn; }
@@ -444,6 +744,12 @@ public:
     // =========================
     // 風扇開關
     // =========================
+    Q_INVOKABLE bool getFanCorrectionSwitchOn() const { return m_fanCorrectionSwitchOn; }
+    Q_INVOKABLE void setFanCorrectionSwitchOn(bool value)
+    {
+        m_fanCorrectionSwitchOn = value;
+        emit fanCorrectionSwitchOnChanged(m_fanCorrectionSwitchOn);
+    }
     Q_INVOKABLE bool getFan1SwitchOn() const { return m_fan1SwitchOn; }
     Q_INVOKABLE void setFan1SwitchOn(bool value)
     {
@@ -662,21 +968,37 @@ public:
     void inletAirHumidityChanged(double value);
 
     void outletAirTempChanged(double value);
+    void outWaterTargetTempChanged(double value);
+    void outWaterTargetTempPChanged(double value);
 
     void outValveOpeningChanged(double value);
     void outValvePChanged(double value);
     void outValveIChanged(double value);
     void outValveDChanged(double value);
+    void outValveOpeningPChanged(double value);
+    void outValvePPChanged(double value);
+    void outValveIPChanged(double value);
+    void outValveDPChanged(double value);
 
     void returnValveOpeningChanged(double value);
+    void returnValveOpeningPChanged(double value);
+    void returnValveValueChanged(double value);
+    void returnValveValuePChanged(double value);
 
     void motorFrequencyChanged(double value);
+    void motorFrequencyPChanged(double value);
     void currentWaterFlowChanged(double value);
+    void heatExchangeChanged(double value);
+    // void heatExchangePChanged(double value);
 
     void pressureDiffChanged(double value);
+    void targetPressureDiffChanged(double value);
     void fanPidPChanged(double value);
     void fanPidIChanged(double value);
     void fanPidDChanged(double value);
+    void fanPidPPChanged(double value);
+    void fanPidIPChanged(double value);
+    void fanPidDPChanged(double value);
 
     void fan1TargetRpmChanged(double value);
     void fan2TargetRpmChanged(double value);
@@ -687,13 +1009,38 @@ public:
     void fan7TargetRpmChanged(double value);
     void fan8TargetRpmChanged(double value);
     void fan9TargetRpmChanged(double value);
+    void fanAllTargetRpmChanged(double value);
+
+    void fan1TargetRpmPChanged(double value);
+    void fan2TargetRpmPChanged(double value);
+    void fan3TargetRpmPChanged(double value);
+    void fan4TargetRpmPChanged(double value);
+    void fan5TargetRpmPChanged(double value);
+    void fan6TargetRpmPChanged(double value);
+    void fan7TargetRpmPChanged(double value);
+    void fan8TargetRpmPChanged(double value);
+    void fan9TargetRpmPChanged(double value);
+    void fanAllTargetRpmPChanged(double value);
+
+    void fan1TargetRpmPercentChanged(double value);
+    void fan2TargetRpmPercentChanged(double value);
+    void fan3TargetRpmPercentChanged(double value);
+    void fan4TargetRpmPercentChanged(double value);
+    void fan5TargetRpmPercentChanged(double value);
+    void fan6TargetRpmPercentChanged(double value);
+    void fan7TargetRpmPercentChanged(double value);
+    void fan8TargetRpmPercentChanged(double value);
+    void fan9TargetRpmPercentChanged(double value);
+    void fanAllTargetRpmPercentChanged(double value);
 
     void systemRunningChanged(bool value);
     void outValvePidOnChanged(bool value);
+    void outValveCorrectionOnChanged(bool value);
     void motorFrequencySwitchOnChanged(bool value);
     void fanAllOnChanged(bool value);
     void fanPidMonitorOnChanged(bool value);
 
+    void fanCorrectionSwitchOnChanged(bool value);
     void fan1SwitchOnChanged(bool value);
     void fan2SwitchOnChanged(bool value);
     void fan3SwitchOnChanged(bool value);
@@ -723,72 +1070,113 @@ public:
     void subnetMaskChanged(QString value);
     void defaultGatewayChanged(QString value);
     void dnsServerChanged(QString value);
-private:
+public:
     // =========================
     // 成員變數
     // =========================
-    double m_inWaterTemp = 11.0;
-    double m_inWaterPressure = 11.0;
+    double m_inWaterTemp = 0;
+    double m_inWaterPressure = 0;
 
-    double m_outWaterTemp = 10.0;
-    double m_outWaterPressure = 10.0;
+    double m_outWaterTemp = 20;
+    double m_outWaterPressure = 0;
 
-    double m_returnWaterTemp = 10.0;
-    double m_returnWaterPressure = 10.0;
+    double m_returnWaterTemp = 0;
+    double m_returnWaterPressure = 0;
 
-    double m_condenserLeft1Temp = 10.0;
-    double m_condenserRight1Temp = 10.0;
-    double m_condenserLeft2Temp = 10.0;
-    double m_condenserRight2Temp = 10.0;
+    double m_condenserLeft1Temp = 0;
+    double m_condenserRight1Temp = 0;
+    double m_condenserLeft2Temp = 0;
+    double m_condenserRight2Temp = 0;
 
-    double m_inletAirTemp = 10.0;
-    double m_inletAirHumidity = 10.0;
+    double m_inletAirTemp = 0;
+    double m_inletAirHumidity = 0;
 
-    double m_outletAirTemp = 10.0;
+    double m_outletAirTemp = 10;
+    double m_outWaterTargetTemp = 100;
+    double m_outWaterTargetTempP = 0;
 
-    double m_outValveOpening = 1.0;
-    double m_outValveP = 1.5;
-    double m_outValveI = 1.0;
-    double m_outValveD = 0.2;
+    double m_outValveOpening = 0;
+    double m_outValveP = 0;
+    double m_outValveI = 0;
+    double m_outValveD = 0;
+    double m_outValveOpeningP = 0;
+    double m_outValvePP = 0;
+    double m_outValveIP = 0;
+    double m_outValveDP = 0;
 
-    double m_returnValveOpening = 45.0;
+    double m_returnValveOpening = 0;
+    double m_returnValveOpeningP = 0;
+    double m_returnValveValue = 0;
+    double m_returnValveValueP = 0;
 
-    double m_motorFrequency = 50.0;
-    double m_currentWaterFlow = 111.0;
+    double m_motorFrequency = 0;
+    double m_motorFrequencyP = 0;
+    double m_currentWaterFlow = 0;
+    double m_heatExchange = 0;
+    // double m_heatExchangeP = 0;
 
-    double m_pressureDiff = 600.0;
-    double m_fanPidP = 10.0;
-    double m_fanPidI = 10.0;
-    double m_fanPidD = 10.0;
+    double m_pressureDiff = 0;
+    double m_targetPressureDiff = 0;
+    double m_fanPidP = 0;
+    double m_fanPidI = 0;
+    double m_fanPidD = 0;
+    double m_fanPidPP = 0;
+    double m_fanPidIP = 0;
+    double m_fanPidDP = 0;
 
-    double m_fan1TargetRpm = 1800.0;
-    double m_fan2TargetRpm = 1800.0;
-    double m_fan3TargetRpm = 1800.0;
-    double m_fan4TargetRpm = 1800.0;
-    double m_fan5TargetRpm = 1800.0;
-    double m_fan6TargetRpm = 1800.0;
-    double m_fan7TargetRpm = 1800.0;
-    double m_fan8TargetRpm = 1800.0;
-    double m_fan9TargetRpm = 1800.0;
+    double m_fan1TargetRpm = 0;
+    double m_fan2TargetRpm = 0;
+    double m_fan3TargetRpm = 0;
+    double m_fan4TargetRpm = 0;
+    double m_fan5TargetRpm = 0;
+    double m_fan6TargetRpm = 0;
+    double m_fan7TargetRpm = 0;
+    double m_fan8TargetRpm = 0;
+    double m_fan9TargetRpm = 0;
+    double m_fanAllTargetRpm = 0;
+
+    double m_fan1TargetRpmP = 0;
+    double m_fan2TargetRpmP = 0;
+    double m_fan3TargetRpmP = 0;
+    double m_fan4TargetRpmP = 0;
+    double m_fan5TargetRpmP = 0;
+    double m_fan6TargetRpmP = 0;
+    double m_fan7TargetRpmP = 0;
+    double m_fan8TargetRpmP = 0;
+    double m_fan9TargetRpmP = 0;
+    double m_fanAllTargetRpmP = 0;
+
+    double m_fan1TargetRpmPercent = 0;
+    double m_fan2TargetRpmPercent = 0;
+    double m_fan3TargetRpmPercent = 0;
+    double m_fan4TargetRpmPercent = 0;
+    double m_fan5TargetRpmPercent = 0;
+    double m_fan6TargetRpmPercent = 0;
+    double m_fan7TargetRpmPercent = 0;
+    double m_fan8TargetRpmPercent = 0;
+    double m_fan9TargetRpmPercent = 0;
+    double m_fanAllTargetRpmPercent = 0;
 
     // =========================
     // 成員變數
     // =========================
-    bool m_systemRunning = true;
-    bool m_outValvePidOn = true;
-    bool m_motorFrequencySwitchOn = true;
-    bool m_fanAllOn = true;
-    bool m_fanPidMonitorOn = true;
+    bool m_systemRunning = false;
+    bool m_outValvePidOn = false;
+    bool m_outValveCorrectionOn = false;
+    bool m_motorFrequencySwitchOn = false;
+    bool m_fanAllOn = false;
+    bool m_fanPidMonitorOn = false;
 
-    bool m_fan1SwitchOn = true;
-    bool m_fan2SwitchOn = true;
-    bool m_fan3SwitchOn = true;
-    bool m_fan4SwitchOn = true;
-    bool m_fan5SwitchOn = true;
-    bool m_fan6SwitchOn = true;
-    bool m_fan7SwitchOn = true;
-    bool m_fan8SwitchOn = true;
-    bool m_fan9SwitchOn = true;
+    bool m_fanCorrectionSwitchOn = false;
+    bool m_fan1SwitchOn = false;
+    bool m_fan2SwitchOn = false;
+    bool m_fan3SwitchOn = false;
+    bool m_fan4SwitchOn = false;
+    bool m_fan5SwitchOn = false;
+    bool m_fan6SwitchOn = false;
+    bool m_fan7SwitchOn = false;
+    bool m_fan8SwitchOn = false;
+    bool m_fan9SwitchOn = false;
 
     bool m_confirmOutValveButton = false;
     bool m_confirmReturnValveButton = false;
@@ -805,10 +1193,10 @@ private:
     bool m_fan8ConfirmButton = false;
     bool m_fan9ConfirmButton = false;
 
-    QString m_ipAddress = "192.168.00.00";
-    QString m_subnetMask = "255.255.00.00";
-    QString m_defaultGateway = "8.8.8.8";
-    QString m_dnsServer = "8.8.8.8";
+    QString m_ipAddress = "00.00.00.00";
+    QString m_subnetMask = "00.00.00.00";
+    QString m_defaultGateway = "0.0.0.0";
+    QString m_dnsServer = "0.0.0.0";
 };
 
 

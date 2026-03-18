@@ -18,6 +18,10 @@ public:
 public slots:
     // 接收來自 Client 執行緒的資料並更新至 Server 暫存器
     void updateHoldingRegisters(int startAddr, const QVector<quint16>& data);
+    void updateHoldingRegister(int startAddr, const quint16 data);
+
+    void updateInputRegisters(int startAddr, const QVector<quint16>& data);
+    void updateInputRegister(int startAddr, const quint16 data);
 
 private:
     QModbusTcpServer* m_server = nullptr;

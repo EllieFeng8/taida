@@ -15,14 +15,15 @@ public:
     ~Manager();
 
     void init();
-    void set_mode(bool v);
+    void set_mode1(bool v);
+    void set_mode2(bool v);
+
     void set_sv(int v);
-    void set_p1(int v);
-    void set_i1(int v);
-    void set_d1(int v);
-    void set_p2(int v);
-    void set_i2(int v);
-    void set_d2(int v);
+    void set_sv2(int v);
+
+    void set_PID(double p, double i, double d);
+    void set_PID2(double p, double i, double d);
+
     void motorFrequency(double v);
     void fan1TargetRpm(double v);
     void fan2TargetRpm(double v);
@@ -38,7 +39,18 @@ signals:
     void Coil(QVector <quint16> result);
     void HodingRegister(QVector <quint16> result);
     void Adam6022Data(QVector <quint16> result);
+    void _PID1(QVector <quint16> result);
+    void _PID2(QVector <quint16> result);
+
+    void _PV1(QVector <quint16> result);
+    void _PV2(QVector <quint16> result);
+    void _MV(QVector <quint16> result);
 private:
+    bool m_PID1 = false;
+    bool m_PID2 = false;
+
+    quint16 PID_AO1;
+    quint16 PID_AO2;
     clientWorker* m_clientWorker = nullptr;
     QThread* m_clientThread = nullptr;
 

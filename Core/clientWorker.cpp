@@ -45,11 +45,11 @@ void clientWorker::init()
         m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port2);
         m_6022->setTimeout(1000);
         m_6022->setNumberOfRetries(2);
-        //connect(m_6022, &QModbusTcpClient::stateChanged,
-        //    this, &clientWorker::onStateChanged);
-        //connect(m_6022, &QModbusTcpClient::errorOccurred,
-        //    this, &clientWorker::onErrorOccurred);
-        //m_6022->connectDevice();
+        connect(m_6022, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_6022, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_6022->connectDevice();
     }
 }
 void clientWorker::onStateChanged(QModbusDevice::State state)
@@ -115,93 +115,252 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
     }
 }
 
-void clientWorker::ReadHoldingRegisters(bool target, int slave, int startAddress, int number)
+void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int number)
 {
-    // 如果target = true 代表Adam5000
-    // 如果target = false 代表Adam6022
+    
     // slave = 站號
     // startAddress = modbus 起始位置
     // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
-    if (target) {
-      
-        if (!m_5000) return;
-        QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, startAddress, number);
-        QEventLoop loop;
-        QVector <quint16> result;
-
-        if (auto reply = m_5000->sendReadRequest(readUnit, slave)) {
-            QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
-                if (reply->error() == QModbusDevice::NoError) {
-                    for(int i =0;i< reply->result().valueCount();i++)
+    if (!m_5000) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, startAddress, number);
+    QEventLoop loop;
+    QVector <quint16> result;
+    QVector <quint16> result_in;
+    QVector <quint16> result_out;
+    if (auto reply = m_5000->sendReadRequest(readUnit, slave)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
+                    if (i < 15)
                     {
-                        result.append(reply->result().value(i));
-                        qDebug() << result[i]<<"\n";
+                        result_in.append(reply->result().value(i));
                     }
-                    emit m_5000HodingRegister(result);
+                    else
+                    {
+                        result_out.append(reply->result().value(i));
+                    }
                 }
-                else {
-                    qDebug() << "Modbus read error:" << reply->errorString();
-                }
-                reply->deleteLater();
-                loop.quit();
-                });
-            loop.exec();  
-        }
-
-        return ;
+                MV1 = result[15]/16;
+                emit m_5000HodingRegister(result, result_in, result_out);
+            }
+            else {
+                qDebug() << "Modbus adam-5000 read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
     }
-    else if(!target) 
-    {
+}
+void clientWorker::ReadPID1()
+{
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1073, 6);
+    QEventLoop loop;
+    QVector <quint16> result;
+    result.resize(3);
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
 
-        if (!m_6022) return;
-        QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, startAddress, number);
-        QEventLoop loop;
-        QVector <quint16> result;
+                quint16 P0 = res.value(0);
+                quint16 P1 = res.value(1);
+                quint16 I0 = res.value(2);
+                quint16 I1 = res.value(3);
+                quint16 D0 = res.value(4);
+                quint16 D1 = res.value(5);
+                result[0] = (static_cast<int32_t>(P1) << 16) | (P0 & 0xFFFF);
+                result[1] = (static_cast<int32_t>(I1) << 16) | (I0 & 0xFFFF);
+                result[2] = (static_cast<int32_t>(D1) << 16) | (D0 & 0xFFFF);
 
-        if (auto reply = m_6022->sendReadRequest(readUnit, slave)) {
-            QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
-                if (reply->error() == QModbusDevice::NoError) {
-                    for (int i = 0; i < reply->result().valueCount(); i++)
-                    {
-                        result.append(reply->result().value(i));
-                        qDebug() << result[i];
-                    }
-                    emit m_6022HodingRegister(result);
+                emit m_6022PID1(result);
 
-                }
-                else {
-                    qDebug() << "Modbus read error:" << reply->errorString();
-                }
-                reply->deleteLater();
-                loop.quit();
-                });
-            loop.exec();  
-        }
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+}
+void clientWorker::ReadPID2()
+{
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1327, 6);
+    QEventLoop loop;
+    QVector <quint16> result;
+    result.resize(3);
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
 
-        return;
+                quint16 P0 = res.value(0);
+                quint16 P1 = res.value(1);
+                quint16 I0 = res.value(2);
+                quint16 I1 = res.value(3);
+                quint16 D0 = res.value(4);
+                quint16 D1 = res.value(5);
+                result[0] = (static_cast<int32_t>(P1) << 16) | (P0 & 0xFFFF);
+                result[1] = (static_cast<int32_t>(I1) << 16) | (I0 & 0xFFFF);
+                result[2] = (static_cast<int32_t>(D1) << 16) | (D0 & 0xFFFF);
+
+                emit m_6022PID2(result);
+
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+}
+void clientWorker::Read6022PV1()
+{
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1043, 4);
+    QEventLoop loop;
+    QVector <quint16> result;
+    result.resize(2);
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
+
+                quint16 reg0 = res.value(0);
+                quint16 reg1 = res.value(1);
+                quint16 reg2 = res.value(2);
+                quint16 reg3 = res.value(3);
+                result[0]= (static_cast<int32_t>(reg1) << 16) | (reg0 & 0xFFFF);
+                result[1]= (static_cast<int32_t>(reg3) << 16) | (reg2 & 0xFFFF);
+                emit m_6022PV1(result);
+
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+}
+void clientWorker::Read6022PV2()
+{
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1299, 4);
+    QEventLoop loop;
+
+    QVector <quint16> result;
+    result.resize(2);
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
+
+                quint16 reg0 = res.value(0);
+                quint16 reg1 = res.value(1);
+                quint16 reg2 = res.value(2);
+                quint16 reg3 = res.value(3);
+                result[0] = (static_cast<int32_t>(reg1) << 16) | (reg0 & 0xFFFF);
+                result[1] = (static_cast<int32_t>(reg3) << 16) | (reg2 & 0xFFFF);
+
+                emit m_6022PV2(result);
+
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
     }
 }
 
-void clientWorker::ReadCoils(bool target, int slave, int startAddress, int number)
+void clientWorker::Read6022MV()
 {
-    // 如果target = true 代表Adam5000
-    // 如果target = false 代表Adam6022
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 10, 2);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
+                for (int i = 0; i < res.valueCount(); i++)
+                {
+                    result.append(res.value(i));
+                }
+                //MV1 = result[0];
+                MV2 = result[1];
+
+                emit m_6022MV(result);
+
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+}
+
+void clientWorker::ReadCoils( int slave, int startAddress, int number)
+{
     // slave = 站號
     // startAddress = modbus 起始位置
     // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
         if (!m_5000) return;
-        QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 15);
+        QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 11);
         QEventLoop loop;
         QVector <quint16> result;
+        QVector <quint16> result_in;
+        QVector <quint16> result_out;
 
         if (auto reply = m_5000->sendReadRequest(readUnit, slave)) {
             QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
                 if (reply->error() == QModbusDevice::NoError) {
                     for (int i = 0; i < reply->result().valueCount(); i++)
-                    {
+                    { 
                         result.append(reply->result().value(i));
+
+                        if (i < 11)
+                        {
+                            result_in.append(reply->result().value(i));
+                        }
+                        else 
+                        {
+                            result_out.append(reply->result().value(i));
+
+                        }
+
                     }
-                    emit m_5000Coil(result);
+                    emit m_5000Coil(result,result_in,result_out);
                 }
                 else {
                     qDebug() << "Modbus read error:" << reply->errorString();
@@ -236,16 +395,46 @@ void clientWorker::writeSingleCoil(int address, bool value)
 
     // 2. 建立區域 EventLoop
     QEventLoop loop;
-
-    // 3. 連接完成訊號到 EventLoop 的 quit 槽
-    // 無論成功或失敗，只要 reply 結束就跳出 loop
     connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
-    // 4. 開始事件循環 (程式碼會在此阻塞，但 thread 不會當死，仍能處理其他事件)
     loop.exec();
 
     // 處理寫入結果
+    if (reply->error() == QModbusDevice::NoError) {
 
+    }
+    else {
+        qDebug() << "Worker" << "write single coil error:" << address << reply->errorString();
+    }
+    reply->deleteLater();
+}
+void clientWorker::writeHoldingRegisters(int address, double value, int number)
+{
+    //qDebug() << "Write single coil addr:" << address << " = " << value;
+
+    if (m_5000->state() != QModbusDevice::ConnectedState)
+    {
+        return;
+    }
+    qDebug() << "set all fan value = " << value;
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, address, number);
+    for (int i = 0; i < 17; ++i) {
+        writeUnit.setValue(i, value);
+    }
+    // 發送請求
+    QModbusReply* reply = m_5000->sendWriteRequest(writeUnit, 1); // 1 為 Server ID
+    if (!reply)
+    {
+        return;
+    }
+
+    // 2. 建立區域 EventLoop
+    QEventLoop loop;
+    connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+    loop.exec();
+
+    // 處理寫入結果
     if (reply->error() == QModbusDevice::NoError) {
 
     }
@@ -255,11 +444,10 @@ void clientWorker::writeSingleCoil(int address, bool value)
     reply->deleteLater();
 }
 
-
-void clientWorker::writeSV(int Addr, double targetSV) {
+void clientWorker::writeSV1(double targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "錯誤：Modbus 未連線";
-        return ;
+        qDebug() << "Modbus is not connect";
+        return;
     }
 
     // 1. 根據 ADAM-6022 手冊計算數值
@@ -269,41 +457,247 @@ void clientWorker::writeSV(int Addr, double targetSV) {
     uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
 
-    // 準備寫入數據單位 (PID 區塊必須用 Function Code 0x10，即 HoldingRegisters)
-    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, Addr, 2);
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1019, 2);
     writeUnit.setValue(0, highWord);
     writeUnit.setValue(1, lowWord);
+
+    QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
+    if (!reply) {
+        qDebug() << "set SV failed = " << m_6022->errorString();
+        return;
+    }
+
+
+    QEventLoop loop;
+    QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+    loop.exec();
+
+    if (reply->error() == QModbusDevice::NoError) {
+        qDebug() << "success set SV =" << targetSV;
+    }
+    else {
+        qDebug() << "set SV failed :" << reply->errorString();
+    }
+
+    reply->deleteLater();
+
+}
+
+void clientWorker::writeSV2(double targetSV) {
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus is not connect";
+        return;
+    }
+
+    // 1. 根據 ADAM-6022 手冊計算數值
+    // SV 地址 41020 -> Offset 1019
+    // 假設小數位數為 3，需乘以 1000
+    int32_t rawValue = static_cast<int32_t>(targetSV * 1000);
+    uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
+    uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
+
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1275, 2);
+    writeUnit.setValue(0, highWord);
+    writeUnit.setValue(1, lowWord);
+
+    QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
+    if (!reply) {
+        qDebug() << "set SV failed = " << m_6022->errorString();
+        return;
+    }
+
+
+    QEventLoop loop;
+    QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+    loop.exec();
+
+    if (reply->error() == QModbusDevice::NoError) {
+        qDebug() << "success set SV =" << targetSV;
+    }
+    else {
+        qDebug() << "set SV failed :" << reply->errorString();
+    }
+
+    reply->deleteLater();
+
+}
+
+void clientWorker::writePID1(double p, double i, double d) {
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus is not connect";
+        return;
+    }
+
+    int32_t P = static_cast<int32_t>(p * 1000);
+    uint16_t highWord_P = static_cast<uint16_t>((P >> 16) & 0xFFFF);
+    uint16_t lowWord_P = static_cast<uint16_t>(P & 0xFFFF);
+
+    int32_t I = static_cast<int32_t>(i * 1000);
+    uint16_t highWord_I = static_cast<uint16_t>((I >> 16) & 0xFFFF);
+    uint16_t lowWord_I = static_cast<uint16_t>(I & 0xFFFF);
+
+    int32_t D = static_cast<int32_t>(d * 1000);
+    uint16_t highWord_D = static_cast<uint16_t>((D >> 16) & 0xFFFF);
+    uint16_t lowWord_D = static_cast<uint16_t>(D & 0xFFFF);
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1061, 6);
+    writeUnit.setValue(0, highWord_P);
+    writeUnit.setValue(1, lowWord_P);
+    writeUnit.setValue(2, highWord_I);
+    writeUnit.setValue(3, lowWord_I);
+    writeUnit.setValue(4, highWord_D);
+    writeUnit.setValue(5, lowWord_D);
 
     // 2. 發送寫入請求
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "發送請求失敗：" << m_6022->errorString();
-        return ;
+        qDebug() << "set PID-0 failed :" << m_6022->errorString();
+        return;
     }
 
-    // 3. 使用 QEventLoop 達成同步阻塞
-    QEventLoop loop;
 
-    // 當 reply 完成或超時時，退出事件迴圈
+    QEventLoop loop;
     QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
-    loop.exec(); // 程式碼會在此停留，直到收到訊號
+    loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "同步寫入成功！SV =" << targetSV;
+        qDebug() << "success set loop-0  P = " << p << "I = "<<i<<"D = "<<d;
     }
     else {
-        qDebug() << "寫入錯誤：" << reply->errorString();
+        qDebug() << "set PID-0 failed :" << reply->errorString();
     }
 
     reply->deleteLater();
 }
+
+void clientWorker::writePID2(double p, double i, double d) {
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus is not connect";
+        return;
+    }
+
+    int32_t P = static_cast<int32_t>(p * 1000);
+    uint16_t highWord_P = static_cast<uint16_t>((P >> 16) & 0xFFFF);
+    uint16_t lowWord_P = static_cast<uint16_t>(P & 0xFFFF);
+
+    int32_t I = static_cast<int32_t>(i * 1000);
+    uint16_t highWord_I = static_cast<uint16_t>((I >> 16) & 0xFFFF);
+    uint16_t lowWord_I = static_cast<uint16_t>(I & 0xFFFF);
+
+    int32_t D = static_cast<int32_t>(d * 1000);
+    uint16_t highWord_D = static_cast<uint16_t>((D >> 16) & 0xFFFF);
+    uint16_t lowWord_D = static_cast<uint16_t>(D & 0xFFFF);
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1317, 6);
+    writeUnit.setValue(0, highWord_P);
+    writeUnit.setValue(1, lowWord_P);
+    writeUnit.setValue(2, highWord_I);
+    writeUnit.setValue(3, lowWord_I);
+    writeUnit.setValue(4, highWord_D);
+    writeUnit.setValue(5, lowWord_D);
+
+    // 2. 發送寫入請求
+    QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
+    if (!reply) {
+        qDebug() << "set PID-1 failed :" << m_6022->errorString();
+        return;
+    }
+
+
+    QEventLoop loop;
+    QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+    loop.exec();
+
+    if (reply->error() == QModbusDevice::NoError) {
+        qDebug() << "success set loop-1  P = " << p << "I = " << i << "D = " << d;
+    }
+    else {
+        qDebug() << "set PID-1 failed :" << reply->errorString();
+    }
+
+    reply->deleteLater();
+}
+
+void clientWorker::set_SV1(double v)
+{
+    f_setSV1 = true;
+    SV1 = v;
+}
+void clientWorker::set_SV2(double v) 
+{
+    f_setSV2 = true;
+    SV2 = v;
+}
+void clientWorker::set_PID1(double p, double i, double d)
+{
+    f_setPID1 = true;
+    p1 = p; 
+    i1 = i;
+    d1 = d;
+}
+void clientWorker::set_PID2(double p, double i, double d)
+{
+    f_setPID2 = true;
+    p2 = p;
+    i2 = i;
+    d2 = d;
+}
+void clientWorker::set_Fan(double v)
+{
+    f_setFAN = true;
+    m_setALL = v;
+}
+void clientWorker::init_flag()
+{
+    f_setFAN = false;
+    f_setSV1 = false;
+    f_setSV2 = false;
+    f_setPID1 = false;
+    f_setPID2 = false;
+    
+}
+
 void clientWorker::poll()
 {
     m_pollTimer->stop(); // 暫停計時器，避免重入
+    if (m_mode1)
+    {
+        writeHoldingRegisters(25, MV1, 17);
+    }
+    if (!m_mode1 && f_setFAN)
+    {
+        writeHoldingRegisters(25, m_setALL, 17);
+    }
+    if (f_setSV1)
+    {
+        writeSV1(SV1);
+    }
+    if (f_setSV2)
+    {
+        writeSV2(SV2);
+    }
+    if (f_setPID1)
+    {
+        writePID1(p1,i1,d1);
+    }
+    if (f_setPID2)
+    {
+        writePID2(p2, i2, d2);
+    }
 
-    ReadHoldingRegisters(true, 1, 9, 15);
+    ReadCoils(1, 0, 14);
+    Read5000HoldingRegisters( 1, 8, 35);
 
+    Read6022PV1();
+    Read6022PV2();
 
-    m_pollTimer->start(); // 全部讀完後，才開啟下一次計時
+    init_flag();
+    m_pollTimer->start(); // 全部讀寫完後，才開啟下一次計時
 }
+

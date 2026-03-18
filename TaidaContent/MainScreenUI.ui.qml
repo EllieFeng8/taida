@@ -10,6 +10,16 @@ Rectangle {
     width: 1920
 
     color: "#f0f4f8"
+    property alias _text_14 : _text_14
+    property alias fansallSetTextInput : fansallSetTextInput
+    property alias fansallbtnMouseArea:fansallbtnMouseArea
+    property alias targetPressBtnMouseArea : targetPressBtnMouseArea
+    property alias outWaterTargetTempBtnMouseArea : outWaterTargetTempBtnMouseArea
+    property alias outWaterTargetTempTxtInput : outWaterTargetTempTxtInput
+    property alias correctionSwitchMouseArea: correctionSwitchMouseArea
+    property alias correction2SwitchMouseArea: correction2SwitchMouseArea
+    property alias targetPressTxtInput: targetPressTxtInput
+
     property alias motorFreqSetBtnMouseArea:motorFreqSetBtnMouseArea
     property alias setBtnMouseArea: setBtnMouseArea
     property alias motorFreqSwitchMouseArea: motorFreqSwitchMouseArea
@@ -81,6 +91,10 @@ Rectangle {
     property alias background_fan7 : background_fan7
     property alias background_fan8 : background_fan8
     property alias background_fan9 : background_fan9
+
+    property bool correctionIsOn: Td.outValveCorrectionOn
+    property bool correction2IsOn: Td.fanCorrectionSwitchOn
+
     Rectangle {
         id: background
 
@@ -990,7 +1004,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 20
                             lineHeightMode: Text.FixedHeight
-                            text: "冷排溫度監控"
+                            text: "盤管水溫監控"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -1595,6 +1609,162 @@ Rectangle {
                             }
                         }
                     }
+                    Rectangle {
+                        id: background_Border111
+                        x: 17
+                        anchors.top: frame_15.bottom
+                        anchors.topMargin: 10
+                        height: 38
+                        width: 156
+
+                        border.width: outWaterTempTxtInput.focus ? 3 : 1
+                        border.color: outWaterTempTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                        color: "#f1f5f9"
+                        radius: 8
+
+                        Text {
+                            id: element_261
+
+                            x: 5
+                            y: 11.50
+
+                            height: 15
+                            width: 60
+
+                            color: "#94a3b8"
+                            font.capitalization: Font.AllUppercase
+                            font.family: "Noto Sans TC"
+                            font.pixelSize: 16
+                            // font.weight: Font.Bold
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 15
+                            lineHeightMode: Text.FixedHeight
+                            text: "目標溫度"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Text {
+
+                             id: _pv
+                            anchors.left: element_261.left
+                            anchors.top: element_261.top
+                            anchors.topMargin: -30
+
+                            height: 28
+                            width: 19.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: "PV:"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Text {
+
+                            // id: c_5
+                            anchors.left: _pv.right
+                            anchors.top: _pv.top
+
+                            height: 28
+                            width: 12.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: Td.outWaterTargetTempP
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        TextInput {
+                            id: outWaterTargetTempTxtInput
+                            x: 92
+                            y: 0
+
+                            height: 38
+                            width: 48
+
+                            color: "#1e293b"
+                            font.family: "Noto Sans TC"
+                            font.pixelSize: 20
+                            font.weight: Font.Bold
+                            horizontalAlignment: Text.AlignRight
+
+                            text: Number(Td.outWaterTargetTemp)
+                            verticalAlignment: Text.AlignVCenter
+                            validator: DoubleValidator {}
+                        }
+                        Text {
+
+                            id: c_51
+                            anchors.left: outWaterTargetTempTxtInput.right
+                            y: 8
+
+                            height: 28
+                            width: 12.75
+
+                            color: "#94a3b8"
+                            font.family: "Inter"
+                            font.pixelSize: 10
+                            font.weight: Font.Normal
+                            horizontalAlignment: Text.AlignLeft
+                            lineHeight: 28
+                            lineHeightMode: Text.FixedHeight
+                            text: "°C"
+                            textFormat: Text.PlainText
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        Rectangle {
+                            id: button_47
+
+                            anchors.left: c_51.right
+                            anchors.leftMargin: 15
+
+                            height: 38
+                            width: 46
+
+                            color: "#2563eb"
+                            radius: 8
+                            scale: outWaterTargetTempBtnMouseArea.containsMouse ? 1.02 : 1
+
+                            Text {
+                                id: element_41
+
+                                color: "#ffffff"
+                                font.family: "Noto Sans TC"
+                                font.pixelSize: 16
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignHCenter
+                                lineHeight: 16
+                                lineHeightMode: Text.FixedHeight
+                                text: "OK"
+                                anchors.fill: parent
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            layer.enabled: true
+                            layer.effect: MultiEffect {
+                                shadowEnabled: outWaterTargetTempBtnMouseArea.containsMouse ? true : false
+                                shadowColor: "#1d4ed8"
+                                shadowBlur: 0.8
+                            }
+                            MouseArea {
+                                id: outWaterTargetTempBtnMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
+                    }
                 }
             }
             Item {
@@ -1656,6 +1826,85 @@ Rectangle {
                             }
                         }
                         Item {
+                            id: correction
+
+                            x: 309.95
+                            y: 2
+
+                            height: 20
+                            width: 89.05
+
+                            Image {
+                                id: correctionSwitch
+
+                                height: 20
+                                width: 40
+                                scale: correctionSwitchMouseArea.containsMouse ? 1.2 : 1
+                                source: correctionIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: correctionSwitchMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: correctionSwitchMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                            Item {
+                                id: _margin_0
+
+                                x: 40
+                                y: 0
+
+                                height: 16
+                                width: 49.05
+
+                                Text {
+                                    id: _text_15
+
+                                    x: 4
+
+                                    height: 16
+                                    width: 37.05
+
+                                    color: "red"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: correctionIsOn ? "正向" : "反向"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+                                    id: _text_16
+
+                                    anchors.left: _text_15.right
+
+                                    height: 16
+                                    width: 22.05
+
+                                    color: "#2563eb"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "修正"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                        }
+
+                        Item {
                             id: label
 
                             x: 449.95
@@ -1670,7 +1919,7 @@ Rectangle {
                                 height: 20
                                 width: 40
                                 scale: waterValveSwitchMouseArea.containsMouse ? 1.2 : 1
-                                source: waterValveIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                source: Td.outValvePidOn ? "assets/switchon.png" : "assets/switchoff.png"
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: waterValveSwitchMouseArea.containsMouse ? true : false
@@ -1708,7 +1957,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 16
                                     lineHeightMode: Text.FixedHeight
-                                    text: "PID ON"
+                                    text: Td.outValvePidOn ? "PID ON" : "PID OFF"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -1740,16 +1989,17 @@ Rectangle {
                                 border.color: waterValveOpenTxtInput.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#f1f5f9"
                                 radius: 8
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Layout.fillWidth: true
+                                    spacing: 8
 
                                 Text {
                                     id: element_26
 
-                                    x: 13
-                                    y: 11.50
-
-                                    height: 15
-                                    width: 44
-
+                                        // height: 15
+                                        Layout.leftMargin: 10
+                                        Layout.preferredWidth: 44
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
                                     font.family: "Noto Sans TC"
@@ -1762,13 +2012,73 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "PV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: Td.outValveOpeningP
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: 1
+                                        Layout.preferredHeight: 20
+                                        color: "#94a3b8"
+                                        opacity: 0.5
+                                        Layout.leftMargin: 5
+                                    }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.preferredWidth: 44
+                                        Layout.leftMargin: 10
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "SV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
                                 TextInput {
                                     id: waterValveOpenTxtInput
-                                    x: 92
-                                    y: 0
+                                        // x: 92
+                                        // y: 0
 
-                                    height: 38
-                                    width: 133
+                                        // height: 38
+                                        Layout.leftMargin: -200
+                                        Layout.preferredWidth: parent.width
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -1779,6 +2089,7 @@ Rectangle {
                                     text: Number(Td.outValveOpening)
                                     verticalAlignment: Text.AlignVCenter
                                     validator: DoubleValidator {}
+                                    }
                                 }
                             }
                             Rectangle {
@@ -1793,36 +2104,93 @@ Rectangle {
                                 border.color: waterPTxtInpt.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#f1f5f9"
                                 radius: 8
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Layout.fillWidth: true
+                                    spacing: 8
 
-                                Text {
-                                    id: p
+                                    Text {
+                                        // id: element_26
 
-                                    x: 13
-                                    y: 11.50
+                                        // height: 15
+                                        Layout.leftMargin: 10
+                                        Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "P"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    height: 15
-                                    width: 7.48
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "PV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "P"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: Td.outValvePP
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: 1
+                                        Layout.preferredHeight: 20
+                                        color: "#94a3b8"
+                                        opacity: 0.5
+                                        Layout.leftMargin: 5
+                                    }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.preferredWidth: 44
+                                        Layout.leftMargin: 10
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "SV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
                                 TextInput {
                                     id: waterPTxtInpt
 
-                                    x: 94
-                                    y: 0
-
-                                    height: 35
-                                    width: 131
+                                        Layout.leftMargin: -200
+                                        Layout.preferredWidth: parent.width
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -1832,6 +2200,7 @@ Rectangle {
                                     validator: DoubleValidator {}
                                     text: Number(Td.outValveP)
                                     verticalAlignment: Text.AlignVCenter
+                                    }
                                 }
                             }
                         }
@@ -1857,35 +2226,93 @@ Rectangle {
                                 border.width: waterITxtInpt.focus ? 3 : 1
                                 border.color: waterITxtInpt.focus ? "#2563eb" : "#e2e8f0"
 
-                                Text {
-                                    id: i
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Layout.fillWidth: true
+                                    spacing: 8
 
-                                    x: 13
-                                    y: 11.50
+                                    Text {
+                                        // id: element_26
 
-                                    height: 15
-                                    width: 3.81
+                                        // height: 15
+                                        Layout.leftMargin: 10
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "I"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "I"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "PV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: Td.outValveIP
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: 1
+                                        Layout.preferredHeight: 20
+                                        color: "#94a3b8"
+                                        opacity: 0.5
+                                        Layout.leftMargin: 5
+                                    }
+                                    Text {
+
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.preferredWidth: 44
+                                        Layout.leftMargin: 10
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "SV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
                                 TextInput {
                                     id: waterITxtInpt
 
-                                    x: 69
-                                    y: 0
-
-                                    height: 33
-                                    width: 156
+                                        Layout.leftMargin: -200
+                                        Layout.preferredWidth: parent.width
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -1896,6 +2323,7 @@ Rectangle {
                                     validator: DoubleValidator {}
                                      text: Number(Td.outValveI)
                                     verticalAlignment: Text.AlignVCenter
+                                    }
                                 }
                             }
                             Rectangle {
@@ -1910,36 +2338,94 @@ Rectangle {
                                 border.color: waterDTxtInpt.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#f1f5f9"
                                 radius: 8
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Layout.fillWidth: true
+                                    spacing: 8
 
-                                Text {
-                                    id: d
+                                    Text {
+                                        // id: element_26
 
-                                    x: 13
-                                    y: 11.50
+                                        // height: 15
+                                        Layout.leftMargin: 10
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "D"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    height: 15
-                                    width: 8.23
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "PV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    color: "#94a3b8"
-                                    font.capitalization: Font.AllUppercase
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 15
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "D"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                TextInput {
-                                    id: waterDTxtInpt
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: Td.outValveDP
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: 1
+                                        Layout.preferredHeight: 20
+                                        color: "#94a3b8"
+                                        opacity: 0.5
+                                        Layout.leftMargin: 10
+                                    }
+                                    Text {
 
-                                    x: 55
-                                    y: 0
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.preferredWidth: 44
+                                        Layout.leftMargin: 10
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "SV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
 
-                                    height: 35
-                                    width: 170
+                                    TextInput {
+                                        id: waterDTxtInpt
+                                        Layout.leftMargin: -200
+                                        Layout.preferredWidth: parent.width
+
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -1949,6 +2435,7 @@ Rectangle {
                                     validator: DoubleValidator {}
                                     text: Number(Td.outValveD)
                                     verticalAlignment: Text.AlignVCenter
+                                    }
                                 }
                             }
                         }
@@ -2040,7 +2527,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 24
                             lineHeightMode: Text.FixedHeight
-                            text: "回水閥控制"
+                            text: "混水閥控制"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -2064,43 +2551,106 @@ Rectangle {
                             border.color: returnValveTxtInput.focus ? "#2563eb" : "#e2e8f0"
                             color: "#f1f5f9"
                             radius: 8
-                            Text {
-                                id: returV
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
 
-                                height: 16
-                                width: 83
-                                y: 14
-                                x: 13
+                                Text {
+                                    // id: element_26
 
-                                color: "#94a3b8"
-                                font.family: "Noto Sans TC"
-                                font.pixelSize: 20
-                                font.weight: Font.Bold
-                                horizontalAlignment: Text.AlignLeft
+                                    // height: 15
+                                    Layout.leftMargin: 10
+                                    // Layout.preferredWidth: 60
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "開度"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
 
-                                text: "開度"
+                                    // id: element_26
+                                    // height: 15
+                                    Layout.leftMargin: 50
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "PV"
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
 
-                                verticalAlignment: Text.AlignVCenter
-                            }
+                                    // id: element_26
+                                    // height: 15
+                                    // Layout.preferredWidth: 44
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Medium
+                                    Layout.leftMargin: 20
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: Td.returnValveOpeningP
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
+                                Rectangle {
+                                    Layout.preferredWidth: 1
+                                    Layout.preferredHeight: 20
+                                    color: "#94a3b8"
+                                    opacity: 0.5
+                                    Layout.leftMargin: 60
+                                }
+                                Text {
+
+                                    // id: element_26
+                                    // height: 15
+                                    Layout.preferredWidth: 44
+                                    Layout.leftMargin: 50
+                                    color: "#94a3b8"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    // horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "SV"
+                                    textFormat: Text.PlainText
+                                    // verticalAlignment: Text.AlignVCenter
+                                }
                             TextInput {
                                 id: returnValveTxtInput
 
-                                x: 179
-                                y: 0
-
-                                height: 44
-                                width: 352
+                                    Layout.leftMargin: -400
+                                    Layout.preferredWidth: parent.width
                                 font.pixelSize: 20
                                 color: "black"
                                 font.family: "Noto Sans TC"
                                 font.weight: Font.Bold
                                 horizontalAlignment: Text.AlignRight
                                 validator: DoubleValidator {}
+				verticalAlignment: Text.AlignVCenter
                                 text: Number(Td.returnValveOpening)
-                                verticalAlignment: Text.AlignVCenter
+                                }
                             }
-                            // }
                         }
+
 
                     }
                     Rectangle {
@@ -2195,7 +2745,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 24
                                 lineHeightMode: Text.FixedHeight
-                                text: "馬達頻率控制"
+                                text: "混水泵浦控制"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -2230,7 +2780,7 @@ Rectangle {
                         x: 21
                         y: 60
 
-                        height: 116
+                        height: 196
                         width: 539.33
 
                         clip: true
@@ -2253,15 +2803,15 @@ Rectangle {
                                 border.color: motorFreqTextInput.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#f1f5f9"
                                 radius: 8
-
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Layout.fillWidth: true
+                                    spacing: 8
+                                    clip: true
                                 Text {
                                     id: element_39
 
-                                    x: 13
-                                    y: 11.50
-
-                                    height: 15
-                                    width: 45
+                                        Layout.leftMargin: 10
 
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
@@ -2275,23 +2825,70 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
-                                Item {
-                                    id: frame_22
+                                    Text {
 
-                                    x: 389
-                                    y: 0
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.leftMargin: 50
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "PV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
 
-                                    height: 38
-                                    width: 60
+                                        // id: element_26
+                                        // height: 15
+                                        // Layout.preferredWidth: 44
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Medium
+                                        Layout.leftMargin: 0
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: Td.motorFrequencyP
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: 1
+                                        Layout.preferredHeight: 20
+                                        color: "#94a3b8"
+                                        opacity: 0.5
+                                        Layout.leftMargin: 50
+                                    }
+                                    Text {
 
+                                        // id: element_26
+                                        // height: 15
+                                        Layout.preferredWidth: 44
+                                        Layout.leftMargin: 30
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        // horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "SV"
+                                        textFormat: Text.PlainText
+                                        // verticalAlignment: Text.AlignVCenter
+                                    }
                                     TextInput {
                                         id: motorFreqTextInput
-                                        x: -211
-
-                                        height: 38
-                                        width: 256
-                                        y: -3
-
+                                        Layout.leftMargin: -400
+                                        Layout.preferredWidth: parent.width
                                         color: "#1e293b"
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
@@ -2302,14 +2899,9 @@ Rectangle {
                                         verticalAlignment: Text.AlignVCenter
                                     }
                                     Text {
-                                        id: hz
 
-                                        x: 47
-                                        y: 7
-
-                                        height: 28
-                                        width: 17
-
+                                        // id: hz
+                                        Layout.leftMargin: -20
                                         color: "#94a3b8"
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 10
@@ -2337,7 +2929,7 @@ Rectangle {
                                 scale: motorFreqSetBtnMouseArea.containsMouse ? 1.02 : 1
 
                                 Text {
-                                    id: element_41
+                                    // id: element_41
 
                                     x: 16
                                     y: 11
@@ -2456,6 +3048,93 @@ Rectangle {
                                 }
                             }
                         }
+                        Rectangle {
+
+                            // id: background_Border_7
+                            anchors.top: background_Border_7.bottom
+                            anchors.topMargin: 16
+
+                            height: 53.54
+                            width: 539.33
+
+                            border.color: "#dbeafe"
+                            border.width: 1
+                            color: "#eff6ff"
+                            radius: 12
+
+                            Text {
+
+                                // id: element_42
+                                x: 17
+                                y: 19.27
+
+                                height: 15
+                                width: 122.50
+
+                                color: "#2563eb"
+                                font.capitalization: Font.AllUppercase
+                                font.family: "Noto Sans TC"
+                                font.letterSpacing: 0.50
+                                font.pixelSize: 20
+                                font.weight: Font.Bold
+                                horizontalAlignment: Text.AlignLeft
+                                lineHeight: 15
+                                lineHeightMode: Text.FixedHeight
+                                text: "當前熱交換"
+                                textFormat: Text.PlainText
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            Item {
+
+                                // id: paragraph_9
+                                x: 442.33
+                                y: 8.77
+
+                                height: 36
+                                width: 80
+
+                                Text {
+                                    // id: element_43
+                                    x: -27
+                                    y: 0
+
+                                    height: 36
+                                    width: 70
+
+                                    color: "#3b82f6"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
+                                    lineHeight: 36
+                                    lineHeightMode: Text.FixedHeight
+                                    text: Td.heatExchange
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+
+                                    // id: l_min
+                                    x: 46
+                                    y: 10
+
+                                    height: 16
+                                    width: 36
+
+                                    color: "#3b82f6"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 10
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "kW"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignBottom
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -2484,81 +3163,160 @@ Rectangle {
                         height: 24
                         width: 652
 
-                        Item {
-                            id: container_20
+                        // Item {
+                        //     id: container_20
 
-                            x: 249
-                            y: 2
+                        //     x: 249
+                        //     y: 2
+
+                        //     height: 20
+                        //     width: 403
+
+                        // Item {
+                        //     id: label_1
+
+                        //     height: 20
+                        //     width: 174
+
+                        //     Text {
+                        //         id: element_44
+
+                        //         y: 2
+
+                        //         height: 16
+                        //         width: 123
+
+                        //         color: "#1e293b"
+                        //         font.family: "Noto Sans TC"
+                        //         font.pixelSize: 20
+                        //         font.weight: Font.Bold
+                        //         horizontalAlignment: Text.AlignLeft
+                        //         lineHeight: 16
+                        //         lineHeightMode: Text.FixedHeight
+                        //         text: "一鍵開啟全部"
+                        //         textFormat: Text.PlainText
+                        //         verticalAlignment: Text.AlignVCenter
+                        //     }
+                        //     Item {
+                        //         id: container_css_transform
+
+                        //         x: 135.99
+
+                        //         height: 20
+                        //         width: 36
+
+                        //         // Image {
+                        //         //     id: allFansSwitch
+                        //         //     y: 1
+                        //         //     height: 20
+                        //         //     width: 40
+                        //         //     scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
+                        //         //     source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                        //         //     layer.enabled: true
+                        //         //     layer.effect: MultiEffect {
+                        //         //         shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
+                        //         //         shadowColor: "#1d4ed8"
+                        //         //         shadowBlur: 0.8
+                        //         //     }
+                        //         //     MouseArea {
+                        //         //         id: allFansSwitchMouseArea
+                        //         //         anchors.fill: parent
+                        //         //         hoverEnabled: true
+                        //         //         cursorShape: Qt.PointingHandCursor
+                        //         //     }
+                        //         // }
+                        //     }
+                        // }
+                        Item {
+                            id: label_2
+
+                            x: 149
 
                             height: 20
-                            width: 403
+                            width: 174
 
                             Item {
-                                id: label_1
+                                id: correction2
 
+                                // x: 309.95
+                                // y: 2
                                 height: 20
-                                width: 174
+                                width: 89.05
 
-                                Text {
-                                    id: element_44
-
-                                    y: 2
-
-                                    height: 16
-                                    width: 123
-
-                                    color: "#1e293b"
-                                    font.family: "Noto Sans TC"
-                                    font.pixelSize: 20
-                                    font.weight: Font.Bold
-                                    horizontalAlignment: Text.AlignLeft
-                                    lineHeight: 16
-                                    lineHeightMode: Text.FixedHeight
-                                    text: "一鍵開啟全部"
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                Item {
-                                    id: container_css_transform
-
-                                    x: 135.99
+                                Image {
+                                    id: correction2Switch
 
                                     height: 20
-                                    width: 36
+                                    width: 40
+                                    scale: correction2SwitchMouseArea.containsMouse ? 1.2 : 1
+                                    source: correction2IsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                    layer.enabled: true
+                                    layer.effect: MultiEffect {
+                                        shadowEnabled: correction2SwitchMouseArea.containsMouse ? true : false
+                                        shadowColor: "#1d4ed8"
+                                        shadowBlur: 0.8
+                                    }
+                                    MouseArea {
+                                        id: correction2SwitchMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                                Item {
+                                    id: _margin_2
 
-                                    Image {
-                                        id: allFansSwitch
-                                        y: 1
-                                        height: 20
-                                        width: 40
-                                        scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
-                                        source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
-                                        layer.enabled: true
-                                        layer.effect: MultiEffect {
-                                            shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
-                                            shadowColor: "#1d4ed8"
-                                            shadowBlur: 0.8
-                                        }
-                                        MouseArea {
-                                            id: allFansSwitchMouseArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                        }
+                                    x: 40
+                                    y: 0
+
+                                    height: 16
+                                    width: 49.05
+
+                                    Text {
+                                        id: _text_152
+
+                                        x: 4
+
+                                        height: 16
+                                        width: 37.05
+
+                                        color: "red"
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 18
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 16
+                                        lineHeightMode: Text.FixedHeight
+                                        text: correction2IsOn ? "正向" : "反向"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Text {
+                                        id: _text_162
+
+                                        anchors.left: _text_152.right
+
+                                        height: 16
+                                        width: 22.05
+
+                                        color: "#2563eb"
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 18
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 16
+                                        lineHeightMode: Text.FixedHeight
+                                        text: "修正"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
                                     }
                                 }
                             }
-                            Item {
-                                id: label_2
-
-                                x: 205.99
-
-                                height: 20
-                                width: 174
 
                                 Text {
                                     id: pID_
-
+                                anchors.left: allFansPIDSwitch.right
+                                anchors.leftMargin: 10
                                     y: 2
 
                                     height: 16
@@ -2578,12 +3336,14 @@ Rectangle {
 
                                 Image {
                                     id: allFansPIDSwitch
-                                    x: 134
+
+                                anchors.left: correction2.right
+                                anchors.leftMargin: 65
                                     y: 1
                                     height: 20
                                     width: 40
                                     scale: allFansPIDSwitchMouseArea.containsMouse ? 1.2 : 1
-                                    source: fansPIDIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                    source: Td.fanPidMonitorOn ? "assets/switchon.png" : "assets/switchoff.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
                                         shadowEnabled: allFansPIDSwitchMouseArea.containsMouse ? true : false
@@ -2598,7 +3358,7 @@ Rectangle {
                                     }
                                 }
                             }
-                        }
+                        // }
                         Text {
                             id: element_45
 
@@ -2630,37 +3390,44 @@ Rectangle {
                     Item {
                         id: group_2
 
-                        x: 1137
+                        x: 1095
 
                         height: 38
-                        width: 613
+                        width: 611
 
                         Item {
                             id: container_22
 
-                            x: 206.03
+                            x: 29.03
 
                             height: 38
-                            width: 406.97
-
+                            width: 506.97
+                            RowLayout {
                             Rectangle {
                                 id: fansP
 
                                 height: 42
-                                width: 110
+                                    width: 170
 
                                 border.width: fansPTxtInput.focus ? 3 : 1
                                 border.color: fansPTxtInput.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#ffffff"
                                 radius: 12
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.rightMargin: 0
+                                        // anchors.rightMargin: -45
+                                        Layout.fillWidth: true
+                                        spacing: 8
                                 Text {
                                     id: p_1
 
-                                    x: 13
-                                    y: 11.50
+                                            // x: 13
+                                            // y: 11.50
 
-                                    height: 15
-                                    width: 7.48
+                                            // height: 15
+                                            // width: 7.48
+                                            Layout.leftMargin: 10
 
                                     color: "#94a3b8"
                                     font.family: "Noto Sans TC"
@@ -2673,14 +3440,75 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 30
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.preferredWidth: 44
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 20
+                                            font.weight: Font.Medium
+                                            // Layout.leftMargin: 20
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: Td.fanPidPP
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            Layout.preferredWidth: 1
+                                            Layout.preferredHeight: 20
+                                            color: "#94a3b8"
+                                            opacity: 0.5
+                                            // Layout.leftMargin: 30
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            Layout.preferredWidth: 44
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "SV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
                                 TextInput {
                                     id: fansPTxtInput
 
-                                    x: 13
-                                    y: 5
+                                            // x: 13
+                                            // y: 5
 
-                                    height: 28
-                                    width: 81
+                                            // height: 28
+                                            Layout.preferredWidth: 149
+                                            Layout.leftMargin: -160
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -2692,26 +3520,34 @@ Rectangle {
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
+                                }
                             Rectangle {
                                 id: fansI
 
                                 height: 42
-                                width: 110
-                                x: 111.66
-                                y: -1
+                                    width: 170
+                                    // x: 111.66
+                                    // y: -1
 
                                 border.width: fansITxtInput.focus ? 3 : 1
                                 border.color: fansITxtInput.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#ffffff"
                                 radius: 12
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.rightMargin: 0
+                                        // anchors.rightMargin: -45
+                                        Layout.fillWidth: true
+                                        spacing: 8
                                 Text {
                                     id: i_1
 
-                                    x: 13
-                                    y: 11.50
+                                            // x: 13
+                                            // y: 11.50
 
-                                    height: 15
-                                    width: 3.81
+                                            // height: 15
+                                            // width: 3.81
+                                            Layout.leftMargin: 10
 
                                     color: "#94a3b8"
                                     font.family: "Noto Sans TC"
@@ -2724,14 +3560,76 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 30
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.preferredWidth: 44
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 20
+                                            font.weight: Font.Medium
+                                            // Layout.leftMargin: 20
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: Td.fanPidIP
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            Layout.preferredWidth: 1
+                                            Layout.preferredHeight: 20
+                                            color: "#94a3b8"
+                                            opacity: 0.5
+                                            // Layout.leftMargin: 30
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            Layout.preferredWidth: 44
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "SV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
                                 TextInput {
                                     id: fansITxtInput
 
-                                    x: 9.47
-                                    y: 5
+                                            // x: 9.47
+                                            // y: 5
 
-                                    height: 28
-                                    width: 84.19
+                                            // height: 28
+                                            // width: 84.19
+                                            Layout.preferredWidth: 149
+                                            Layout.leftMargin: -160
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -2742,28 +3640,35 @@ Rectangle {
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
+                                }
 
                             Rectangle {
                                 id: fansD
 
                                 height: 42
-                                width: 110
-                                x: 225.32
-                                y: -1
+                                    width: 170
+                                    // x: 225.32
+                                    // y: -1
 
                                 border.width: fansDTxtInput.focus ? 3 : 1
                                 border.color: fansDTxtInput.focus ? "#2563eb" : "#e2e8f0"
                                 color: "#ffffff"
                                 radius: 12
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.rightMargin: 0
+                                        // anchors.rightMargin: -45
+                                        Layout.fillWidth: true
+                                        spacing: 8
                                 Text {
                                     id: d_1
 
-                                    x: 13
-                                    y: 11.50
+                                    //x: 13
+                                    //y: 11.50
 
-                                    height: 15
-                                    width: 8.23
-
+                                    //height: 15
+                                    //width: 8.23
+                                            Layout.leftMargin: 10
                                     color: "#94a3b8"
                                     font.family: "Noto Sans TC"
                                     font.pixelSize: 20
@@ -2775,14 +3680,70 @@ Rectangle {
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 30
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.preferredWidth: 44
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 20
+                                            font.weight: Font.Medium
+                                            // Layout.leftMargin: 20
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: Td.fanPidDP
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            Layout.preferredWidth: 1
+                                            Layout.preferredHeight: 20
+                                            color: "#94a3b8"
+                                            opacity: 0.5
+                                            // Layout.leftMargin: 30
+                                        }
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            Layout.preferredWidth: 44
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "SV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
                                 TextInput {
                                     id: fansDTxtInput
-
-                                    x: 13.89
-                                    y: 5
-
-                                    height: 28
-                                    width: 79.77
+                                            Layout.preferredWidth: 149
+                                            Layout.leftMargin: -160
 
                                     color: "#1e293b"
                                     font.family: "Noto Sans TC"
@@ -2791,6 +3752,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignRight
                                     text: Number(Td.fanPidD)
                                     verticalAlignment: Text.AlignVCenter
+                                        }
                                 }
                             }
                             Rectangle {
@@ -2839,11 +3801,12 @@ Rectangle {
                                 }
                             }
                         }
+                        }
                         Item {
                             id: container_23
 
                             y: 5
-
+                            x: -500
                             height: 28
                             width: 154.85
 
@@ -2871,7 +3834,7 @@ Rectangle {
                             Item {
                                 id: paragraph_10
 
-                                x: 97
+                                x: 87
 
                                 height: 28
                                 width: 53.09
@@ -2918,6 +3881,135 @@ Rectangle {
                                 }
                             }
                         }
+                        Item {
+                            x: 0
+                            y: 0
+                            //id: container_22
+
+                            // x: 206.03
+                            anchors.left: container_23.right
+                            anchors.leftMargin: 70
+                            height: 38
+                            width: 69
+
+                            Rectangle {
+                                id: targetPress
+                                x: -63
+                                y: 0
+
+                                height: 42
+                                width: 213
+
+                                border.width: targetPressTxtInput.focus ? 3 : 1
+                                border.color: targetPressTxtInput.focus ? "#2563eb" : "#e2e8f0"
+                                color: "#ffffff"
+                                radius: 12
+                                Text {
+                                    id: targetPress_1
+
+                                    x: 13
+                                    y: 11.50
+
+                                    height: 15
+                                    width: 7.48
+
+                                    color: "#94a3b8"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "目標壓差"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                TextInput {
+                                    id: targetPressTxtInput
+
+                                    x: 13
+                                    y: 5
+
+                                    height: 28
+                                    width: 181
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignRight
+
+                                    text: Number(Td.targetPressureDiff)
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Text {
+                                    id: pa1
+
+                                    anchors.left: targetPressTxtInput.right
+                                    y: 13
+
+                                    height: 15
+                                    width: 18
+
+                                    color: "#64748b"
+                                    font.capitalization: Font.AllUppercase
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 10
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 15
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "pa"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                            Rectangle {
+                                id: button_7
+
+                                anchors.left: targetPress.right
+                                anchors.leftMargin: 10
+                                height: 38
+                                width: 66
+
+                                color: "#2563eb"
+                                radius: 8
+
+                                scale: targetPressBtnMouseArea.containsMouse ? 1.02 : 1
+                                Text {
+                                    id: element_511
+
+                                    x: 16
+                                    y: 11
+
+                                    height: 16
+                                    width: 35
+
+                                    color: "#ffffff"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 16
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    lineHeight: 16
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "套用"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: targetPressBtnMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: targetPressBtnMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                        }
                     }
                 }
                 Item {
@@ -2943,8 +4035,8 @@ Rectangle {
                         radius: 12
 
                         Item {
-                            id: _margin_2
 
+                            // id: _margin_2
                             x: 17
                             y: 14
 
@@ -3013,6 +4105,127 @@ Rectangle {
                             height: 91
                             width: 303
 
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan1TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan1TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
                             Text {
                                 id: target_RPM
 
@@ -3028,7 +4241,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3038,8 +4251,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans1SetTextInput.focus ? 3 : 1
                                 border.color: fans1SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3050,9 +4263,9 @@ Rectangle {
                                 TextInput {
                                     id: fans1SetTextInput
 
-                                    x: 1
-                                    y: -1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3066,9 +4279,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans1btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                                x: 91.5
+                                                y: 4
+                                                scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3083,6 +4296,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -3103,7 +4319,7 @@ Rectangle {
                             id: _margin_3
 
                             x: 17
-                            y: 17
+                            y: 14
 
                             height: 32
                             width: 303
@@ -3170,7 +4386,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan2TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan2TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_1
 
                                 height: 14.96
@@ -3185,7 +4522,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3194,8 +4531,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans2SetTextInput.focus ? 3 : 1
                                 border.color: fans2SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3206,9 +4543,9 @@ Rectangle {
                                 TextInput {
                                     id: fans2SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3222,9 +4559,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans2btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                    x: 91.5
+                                    y: 4
+                                    scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3242,6 +4579,9 @@ Rectangle {
                             }
                         }
                     }
+                }
+            }
+        }
                     Rectangle {
                         id: background_Border_12
 
@@ -3325,7 +4665,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan3TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan3TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_2
 
                                 height: 14.96
@@ -3340,7 +4801,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3349,8 +4810,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans3SetTextInput.focus ? 3 : 1
                                 border.color: fans3SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3361,9 +4822,9 @@ Rectangle {
                                 TextInput {
                                     id: fans3SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3377,9 +4838,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans3btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                    x: 91.5
+                                    y: 4
+                                    scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3394,6 +4855,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -3414,7 +4878,7 @@ Rectangle {
                             id: _margin_5
 
                             x: 17
-                            y: 17
+                            y: 14
 
                             height: 32
                             width: 303
@@ -3481,7 +4945,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan4TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan4TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_3
 
                                 height: 14.96
@@ -3496,7 +5081,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3505,8 +5090,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans4SetTextInput.focus ? 3 : 1
                                 border.color: fans4SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3517,9 +5102,9 @@ Rectangle {
                                 TextInput {
                                     id: fans4SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3534,9 +5119,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans4btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                    x: 91.5
+                                    y: 4
+                                    scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3554,6 +5139,9 @@ Rectangle {
                             }
                         }
                     }
+        	}
+        	}
+        }
                     Rectangle {
                         id: background_Border_16
 
@@ -3636,7 +5224,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan5TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan5TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_4
 
                                 height: 14.96
@@ -3651,7 +5360,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3660,8 +5369,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                            Layout.preferredHeight: 75
+                                            Layout.preferredWidth: parent.width
 
                                 border.width: fans5SetTextInput.focus ? 3 : 1
                                 border.color: fans5SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3672,9 +5381,9 @@ Rectangle {
                                 TextInput {
                                     id: fans5SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                                x: 10
+                                                // y: -1
+                                                // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3688,9 +5397,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans5btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                                x: 91.5
+                                                y: 4
+                                                scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3705,6 +5414,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -3791,7 +5503,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan6TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan6TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_5
 
                                 height: 14.96
@@ -3806,7 +5639,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3815,8 +5648,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans6SetTextInput.focus ? 3 : 1
                                 border.color: fans6SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3827,9 +5660,9 @@ Rectangle {
                                 TextInput {
                                     id: fans6SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3843,9 +5676,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans6btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                                x: 91.5
+                                                y: 4
+                                                scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -3860,6 +5693,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -3881,7 +5717,7 @@ Rectangle {
                             id: _margin_8
 
                             x: 17
-                            y: 17
+                            y: 14
 
                             height: 32
                             width: 303
@@ -3946,7 +5782,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan7TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan7TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_6
 
                                 height: 14.96
@@ -3961,7 +5918,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -3970,8 +5927,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                            Layout.preferredHeight: 75
+                                            Layout.preferredWidth: parent.width
 
                                 border.width: fans7SetTextInput.focus ? 3 : 1
                                 border.color: fans7SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -3982,9 +5939,9 @@ Rectangle {
                                 TextInput {
                                     id: fans7SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                                x: 10
+                                                // y: -1
+                                                // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -3998,9 +5955,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans7btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                                x: 91.5
+                                                y: 4
+                                                scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -4015,6 +5972,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -4036,7 +5996,7 @@ Rectangle {
                             id: _margin_9
 
                             x: 17
-                            y: 17
+                            y: 14
 
                             height: 32
                             width: 303
@@ -4102,7 +6062,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan8TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan8TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_7
 
                                 height: 14.96
@@ -4117,7 +6198,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -4126,8 +6207,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                Layout.preferredHeight: 75
+                                Layout.preferredWidth: parent.width
 
                                 border.width: fans8SetTextInput.focus ? 3 : 1
                                 border.color: fans8SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -4138,9 +6219,9 @@ Rectangle {
                                 TextInput {
                                     id: fans8SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -4154,9 +6235,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans8btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                                x: 91.5
+                                                y: 4
+                                                scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -4171,6 +6252,9 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                 }
+                            }
+                        }
+                    }
                             }
                         }
                     }
@@ -4192,7 +6276,7 @@ Rectangle {
                             id: _margin_10
 
                             x: 17
-                            y: 17
+                            y: 14
 
                             height: 32
                             width: 303
@@ -4258,7 +6342,128 @@ Rectangle {
                             height: 91
                             width: 303
 
-                            Text {
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan9TargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fan9TargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        Text {
                                 id: target_RPM_8
 
                                 height: 14.96
@@ -4273,7 +6478,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 15
                                 lineHeightMode: Text.FixedHeight
-                                text: "Target RPM"
+                                            text: "SV"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -4282,8 +6487,8 @@ Rectangle {
 
                                 y: 22.17
 
-                                height: 68.83
-                                width: 303
+                                            Layout.preferredHeight: 75
+                                            Layout.preferredWidth: parent.width
 
                                 border.width: fans9SetTextInput.focus ? 3 : 1
                                 border.color: fans9SetTextInput.focus ? "#2563eb" : "#e2e8f0"
@@ -4294,9 +6499,9 @@ Rectangle {
                                 TextInput {
                                     id: fans9SetTextInput
 
-                                    x: 1
-                                    y: 1
-
+                                    x: 10
+                                    // y: -1
+                                    // Layout.leftMargin: 10
                                     height: 67
                                     width: 244
 
@@ -4310,9 +6515,9 @@ Rectangle {
                                 }
                                 Image {
                                     id: fans9btn
-                                    x: 244
-                                    y: 1
-                                    scale: 0.9
+                                    x: 91.5
+                                    y: 4
+                                    scale: 1
                                     source: "assets/checkbtn.png"
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
@@ -4330,8 +6535,291 @@ Rectangle {
                             }
                         }
                     }
+        }
+    }
+}
+                    Rectangle {
+                        id: background_Border_255
+
+                        x: 1390.40
+                        y: 186
+
+                        height: 170
+                        width: 337
+
+                        border.color: "#0e74fc"
+                        border.width: 3
+                        color: "#d3e4f4"
+                        radius: 12
+
+                        Item {
+                            id: _margin_101
+
+                            x: 17
+                            y: 14
+
+                            height: 32
+                            width: 303
+
+                            Item {
+                                id: container_331
+
+                                height: 20
+                                width: 65
+                                Image {
+                                    y: 5
+                                    scale: 1.2
+                                    source: "assets/Icon12.png"
+                                }
+
+                                Text {
+                                    id: element_681
+
+                                    height: 20
+                                    width: 66
+                                    x: 25
+
+                                    color: "#1e293b"
+                                    font.family: "Noto Sans TC"
+                                    font.pixelSize: 20
+                                    font.weight: Font.Bold
+                                    horizontalAlignment: Text.AlignLeft
+                                    lineHeight: 20
+                                    lineHeightMode: Text.FixedHeight
+                                    text: "一鍵開啟全部"
+                                    textFormat: Text.PlainText
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                            Image {
+                                id: fansallSwitch
+                                x: 273
+                                y: 1
+                                height: 20
+                                width: 40
+                                scale: allFansSwitchMouseArea.containsMouse ? 1.2 : 1
+                                source: allFansIsOn ? "assets/switchon.png" : "assets/switchoff.png"
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: allFansSwitchMouseArea.containsMouse ? true : false
+                                    shadowColor: "#1d4ed8"
+                                    shadowBlur: 0.8
+                                }
+                                MouseArea {
+                                    id: allFansSwitchMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                        }
+                        Item {
+                            id: frame_311
+
+                            x: 17
+                            y: 62
+
+                            height: 91
+                            width: 303
+
+                            RowLayout {
+                                anchors.fill: parent
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        // spacing: 8
+                                        Text {
+
+                                            // id: element_26
+                                            // height: 15
+                                            // Layout.leftMargin: 50
+                                            color: "#94a3b8"
+                                            font.capitalization: Font.AllUppercase
+                                            font.family: "Noto Sans TC"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            // horizontalAlignment: Text.AlignLeft
+                                            lineHeight: 15
+                                            lineHeightMode: Text.FixedHeight
+                                            text: "PV"
+                                            textFormat: Text.PlainText
+                                            // verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            Layout.topMargin: -5
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fanAllTargetRpmPercent
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "%"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            border.width: 1
+                                            border.color: "#e2e8f0"
+                                            color: "#ffffff"
+                                            Layout.topMargin: -5
+                                            Layout.preferredWidth: parent.width * 1
+                                            Layout.preferredHeight: parent.height * 0.4
+                                            radius: 8
+
+                                            Text {
+                                                x: 8
+                                                width: 16
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: Td.fanAllTargetRpmP
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                            }
+                                            Text {
+                                                x: 0
+                                                width: 144
+                                                height: 21
+                                                color: "#94a3b8"
+                                                font.capitalization: Font.AllUppercase
+                                                font.family: "Noto Sans TC"
+                                                font.pixelSize: 14
+                                                font.weight: Font.Medium
+                                                // horizontalAlignment: Text.AlignLeft
+                                                lineHeight: 15
+                                                lineHeightMode: Text.FixedHeight
+                                                text: "RPM"
+                                                textFormat: Text.PlainText
+                                                anchors.verticalCenter: parent.verticalCenter //文字垂直置中
+                                                horizontalAlignment: Text.AlignRight
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    Layout.fillHeight: true
+                                    ColumnLayout {
+                                    anchors.fill: parent
+                                    Text {
+                                        id: target_RPM_81
+
+                                        height: 14.96
+                                        width: 305
+
+                                        color: "#94a3b8"
+                                        font.capitalization: Font.AllUppercase
+                                        font.family: "Noto Sans TC"
+                                        font.letterSpacing: 1
+                                        font.pixelSize: 10
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        lineHeight: 15
+                                        lineHeightMode: Text.FixedHeight
+                                                    text: "SV"
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Rectangle {
+                                    id: background_Border_251
+
+                                    y: 22.17
+
+                                    Layout.preferredHeight: 75
+                                    Layout.preferredWidth: parent.width
+
+                                    border.width: fansallSetTextInput.focus ? 3 : 1
+                                    border.color: fansallSetTextInput.focus ? "#2563eb" : "#e2e8f0"
+                                    clip: true
+                                    color: "#ffffff"
+                                    radius: 8
+
+                                    TextInput {
+                                        id: fansallSetTextInput
+
+                                        x: 10
+                                        // y: -1
+                                        // Layout.leftMargin: 10
+                                        height: 67
+                                        width: 244
+
+                                        color: "#1e293b"
+                                        font.family: "Noto Sans TC"
+                                        font.pixelSize: 20
+                                        font.weight: Font.Bold
+                                        horizontalAlignment: Text.AlignLeft
+                                        text: Number(Td.fanAllTargetRpm)
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Image {
+                                        id: fansallbtn
+                                                    x: 91.5
+                                                    y: 4
+                                                    scale: 1
+                                        source: "assets/checkbtn.png"
+                                        layer.enabled: true
+                                        layer.effect: MultiEffect {
+                                            shadowEnabled: fansallbtnMouseArea.containsMouse ? true : false
+                                            shadowColor: "#caced2"
+                                            shadowBlur: 0.8
+                                        }
+                                        MouseArea {
+                                            id: fansallbtnMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                        }
+                                    }
+                                }
+                            }
+                            }
+                        }
+                    }
                 }
             }
+        }
         }
     }
 }

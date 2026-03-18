@@ -11,7 +11,10 @@ qt_add_qml_module(Core STATIC
         clientWorker.cpp        
         serverWorker.h
         serverWorker.cpp
-
+        SqlManager.h
+        SqlManager.cpp
+        RestManager.h
+        RestManager.cpp
 
 )
 
@@ -30,5 +33,7 @@ target_link_libraries(Core
         Qt${QT_VERSION_MAJOR}::Network
         Qt${QT_VERSION_MAJOR}::Concurrent
         Qt${QT_VERSION_MAJOR}::SerialBus
+        Qt${QT_VERSION_MAJOR}::Sql
+
         #        Qt${QT_VERSION_MAJOR}::OpcUa
 )
