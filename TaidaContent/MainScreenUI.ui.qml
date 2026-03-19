@@ -4030,18 +4030,6 @@ Rectangle {
                             onClicked: {
                                 fansEmergency = !fansEmergency
                                 if(fansEmergency === true) {
-                                    Td.fan1SwitchOn = true
-                                    Td.fan2SwitchOn = true
-                                    Td.fan3SwitchOn = true
-                                    Td.fan4SwitchOn = true
-                                    Td.fan5SwitchOn = true
-                                    Td.fan6SwitchOn = true
-                                    Td.fan7SwitchOn = true
-                                    Td.fan8SwitchOn = true
-                                    Td.fan9SwitchOn = true
-                                    Td.fanAllOn = true
-
-                                }else{
                                     Td.fan1SwitchOn = false
                                     Td.fan2SwitchOn = false
                                     Td.fan3SwitchOn = false
