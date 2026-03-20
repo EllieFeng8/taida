@@ -1,5 +1,5 @@
 #pragma once
-
+#include<qsettings.h>
 #include <qobject>
 #include <Qvector>
 #include "manager.h"
@@ -31,6 +31,7 @@ private:
     explicit Core(QObject* parent = nullptr){}
     ~Core();
     void updateProxyProperty(int index, quint16 value);
+    void saveProductionSettings();
 
     quint16 v_0;
     quint16 v_1;

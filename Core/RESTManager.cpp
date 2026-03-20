@@ -10,10 +10,13 @@
 #include <QUrlQuery>
 #include <QtDebug>
 #include <QDateTime>
+#include <QDate>
 #include <QTimeZone>
 #include <QUrl>
 #include <QMap>
 #include <QRegularExpression>
+#include <QSettings>
+#include <QDir>
 
 RESTManager::RESTManager(SqlManager* sql, QObject* parent)
     : QObject(parent)
@@ -147,6 +150,57 @@ void RESTManager::setupRoutes()
 
     m_httpServer.route("/api/settings/frequency", QHttpServerRequest::Method::Options, optionsHandler);
 
+    // PUT modbus mode
+    m_httpServer.route("/api/modbus/mode", QHttpServerRequest::Method::Put, [this](const QHttpServerRequest& req) {
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(req.body(), &err);
+        if (err.error != QJsonParseError::NoError || !doc.isObject())
+        {
+            return errResp(400, "invalid json object");
+        }
+
+        QJsonObject obj = doc.object();
+        QString mode = obj.value("mode").toString().trimmed().toLower();
+        if (mode.isEmpty())
+        {
+            return errResp(400, "mode missing");
+        }
+
+        const QStringList allowed = {"network", "standalone"};
+        if (!allowed.contains(mode))
+        {
+            return errResp(400, "mode must be 'network' or 'standalone'");
+        }
+
+        {
+            QMutexLocker locker(&m_modbusMutex);
+            m_modbusMode = mode;
+        }
+
+        qInfo() << "Modbus mode changed to" << mode;
+        emit modbusModeChanged(mode);
+
+        QJsonObject ok; ok.insert("ok", true); ok.insert("mode", mode);
+        return jsonResp(ok);
+    });
+
+    m_httpServer.route("/api/modbus/mode", QHttpServerRequest::Method::Options, optionsHandler);
+
+    // GET modbus mode
+    m_httpServer.route("/api/modbus/mode", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest&) {
+        QString mode;
+        {
+            QMutexLocker locker(&m_modbusMutex);
+            mode = m_modbusMode;
+        }
+        if (mode.isEmpty())
+        {
+            mode = QStringLiteral("unknown");
+        }
+        QJsonObject obj; obj.insert("mode", mode);
+        return jsonResp(obj);
+    });
+
     // PUT read frequency
     m_httpServer.route("/api/settings/frequency", QHttpServerRequest::Method::Put, [this](const QHttpServerRequest& req) {
         QJsonParseError err;
@@ -190,6 +244,33 @@ void RESTManager::setupRoutes()
     });
 
     m_httpServer.route("/api/sensor/range", QHttpServerRequest::Method::Options, optionsHandler);
+
+    // GET device sn
+    m_httpServer.route("/api/device/sn", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest&) {
+        QString sn = loadDeviceSn();
+        return jsonResp(QJsonObject{{"sn", sn}});
+    });
+
+    m_httpServer.route("/api/device/sn", QHttpServerRequest::Method::Options, optionsHandler);
+
+    // GET last sample
+    m_httpServer.route("/api/sensor/last", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest&) {
+        auto rows = m_sql->fetchSensorData(QDate::currentDate(), 1);
+        if (rows.isEmpty())
+        {
+            return errResp(404, "no data");
+        }
+        const QVariantList& r = rows.first();
+        QJsonObject obj;
+        obj.insert("ts", r.value(0).toLongLong());
+        for (int i = 1; i < r.size(); ++i)
+        {
+            obj.insert(QString("s%1").arg(i), QJsonValue::fromVariant(r.at(i)));
+        }
+        return jsonResp(obj);
+    });
+
+    m_httpServer.route("/api/sensor/last", QHttpServerRequest::Method::Options, optionsHandler);
 
     // GET range by datetime (ISO string)
     m_httpServer.route("/api/sensor/rangeDateTime", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest& req) {
@@ -269,6 +350,20 @@ bool RESTManager::parseDateTimeIso(const QString& text, qint64& outSecs)
     return false;
 }
 
+QString RESTManager::loadDeviceSn()
+{
+    QString path = QDir::current().filePath("device_info.ini");
+    QSettings settings(path, QSettings::IniFormat);
+    QString sn = settings.value("device/sn").toString();
+    if (sn.isEmpty())
+    {
+        sn = QStringLiteral("sn000000");
+        settings.setValue("device/sn", sn);
+        settings.sync();
+    }
+    return sn;
+}
+
 bool RESTManager::start(quint16 port)
 {
     if (!m_sql)
@@ -276,6 +371,9 @@ bool RESTManager::start(quint16 port)
         qWarning() << "RESTManager start failed: SqlManager not set";
         return false;
     }
+
+    QString sn = loadDeviceSn();
+    qInfo() << "Device SN:" << sn;
 
     setupRoutes();
     if (!m_tcpServer)
@@ -295,3 +393,4 @@ bool RESTManager::start(quint16 port)
     qInfo() << "Running on http://127.0.0.1:" << m_tcpServer->serverPort() << "/";
     return true;
 }
+

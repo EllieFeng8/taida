@@ -19,6 +19,7 @@ Core::~Core()
         delete m_proxy;
         m_proxy = nullptr;
     }
+    //saveProductionSettings();
 }
 void Core::init()
 {
@@ -212,19 +213,19 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 16: 
         if (value == v_16) { return; }
         v_16 = value; 
-        m_proxy->setMotorFrequencyP(value / 40.95); break; //循環水泵速率輸出
+        m_proxy->setMotorFrequencyP(qRound((value / 40.95) * 10.0) / 10.0); break; //循環水泵速率輸出
     case 17: 
         if (value == v_17) { return; }
         v_17 = value; 
-        m_proxy->setFan1TargetRpmPercent(value/40.95); break; //風扇1
+        m_proxy->setFan1TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇1
     case 18: 
         if (value == v_18) { return; }
         v_18 = value;
-        m_proxy->setFan2TargetRpmPercent(value/40.95); break; //風扇2
+        m_proxy->setFan2TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇2
     case 19: 
         if (value == v_19) { return; }
         v_19 = value; 
-        m_proxy->setFan3TargetRpmPercent(value/40.95); break; //風扇3
+        m_proxy->setFan3TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇3
     case 20: break; //
     case 21: break; //
     case 22: break; //
@@ -232,19 +233,19 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 24: 
         if (value == v_24) { return; }
         v_24 = value; 
-        m_proxy->setFan4TargetRpmPercent(value/40.95); break; //風扇4
+        m_proxy->setFan4TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇4
     case 25:
         if (value == v_25) { return; }
         v_25 = value;
-        m_proxy->setFan5TargetRpmPercent(value/40.95); break; //風扇5
+        m_proxy->setFan5TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇5
     case 26: 
         if (value == v_26) { return; }
         v_26 = value; 
-        m_proxy->setFan6TargetRpmPercent(value / 40.95); break; //風扇6
+        m_proxy->setFan6TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇6
     case 27:
         if (value == v_27) { return; }
         v_27 = value; 
-        m_proxy->setFan7TargetRpmPercent(value / 40.95); break; //風扇7
+        m_proxy->setFan7TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇7
     case 28: break; //
     case 29: break; //
     case 30: break; //
@@ -252,17 +253,40 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 32:
         if (value == v_32) { return; }
         v_32 = value; 
-        m_proxy->setFan8TargetRpmPercent(value / 40.95); break; //風扇8
+        m_proxy->setFan8TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇8
     case 33:
         if (value == v_33) { return; }
         v_33 = value; 
-        m_proxy->setFan9TargetRpmPercent(value / 40.95); break; //風扇9
+        m_proxy->setFan9TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇9
     case 34:
         if (value == v_34) { return; }
         v_34 = value; 
-        m_proxy->setReturnValveOpeningP(value / 40.95); break; //回水閥開度
+        m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //回水閥開度
     case 35: break; //Null
 
     default: break;
 }
+}
+
+void Core::saveProductionSettings()
+{
+    QSettings settings("production.ini", QSettings::IniFormat);
+
+    settings.setValue("Production/Hz", m_proxy->m_motorFrequency);
+    settings.setValue("Production/fan1", m_proxy->m_fan1TargetRpm);
+    settings.setValue("Production/fan2", m_proxy->m_fan2TargetRpm);
+    settings.setValue("Production/fan3", m_proxy->m_fan3TargetRpm);
+    settings.setValue("Production/fan4", m_proxy->m_fan4TargetRpm);
+    settings.setValue("Production/fan5", m_proxy->m_fan5TargetRpm);
+    settings.setValue("Production/fan6", m_proxy->m_fan6TargetRpm);
+    settings.setValue("Production/fan7", m_proxy->m_fan7TargetRpm);
+    settings.setValue("Production/fan8", m_proxy->m_fan8TargetRpm);
+    settings.setValue("Production/fan9", m_proxy->m_fan9TargetRpm);
+    settings.setValue("Production/returnWaterOpen", m_proxy->m_returnValveOpening);
+    settings.setValue("Production/pressdiff", m_proxy->m_pressureDiff);
+    settings.setValue("Production/outAirTemp", m_proxy->m_outWaterTargetTemp);
+
+
+
+    settings.sync();
 }

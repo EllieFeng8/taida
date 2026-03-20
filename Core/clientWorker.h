@@ -40,7 +40,8 @@ public:
     void set_Fan8Open(bool v);
     void set_Fan9Open(bool v);
 
-    void set_Mode(bool v);
+    void set_Mode1(bool v);
+    void set_Mode2(bool v);
     void set_STO(bool v);
     void set_Reset();
     void set_SV1(double v);
@@ -51,6 +52,8 @@ public:
     void set_5000HoldingRegister(bool t,int addr, double v);
     
     void set6022Mode_1(bool v);
+    void set6022Mode_2(bool v);
+
     void writeSV1(double targetSV);
     void writeSV2(double targetSV);
     void writePID1( double p, double i, double d);
@@ -138,7 +141,8 @@ private:
     bool motor = false;
     bool power = false;
     double m_setALL = 0.0;
-    bool f_setMode = false;
+    bool f_setMode1 = false;
+    bool f_setMode2 = false;
     bool f_STO = false;
     bool f_Reset = false;
     bool f_setSV1 = false;

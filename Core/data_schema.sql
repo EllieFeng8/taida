@@ -23,3 +23,11 @@ CREATE TABLE IF NOT EXISTS sensor_data (
 );
 
 CREATE INDEX IF NOT EXISTS idx_sensor_data_ts ON sensor_data(timestamp);
+
+CREATE TABLE IF NOT EXISTS alarm_history (
+    id INTEGER PRIMARY KEY,
+    occurrence_time INTEGER,
+    reason VARCHAR(255)
+);
+
+CREATE INDEX IF NOT EXISTS idx_alarm_history_time ON alarm_history(occurrence_time);

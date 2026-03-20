@@ -81,6 +81,8 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
         qDebug() << "clientWorker" << "connected.";
         Fan_PowerControl(true);
         writeSingleCoil(14, true);
+        writeSingleCoil(12, true);
+
         if (m_pollTimer && !m_pollTimer->isActive())       
             m_pollTimer->start(50);
     }
@@ -584,6 +586,46 @@ void clientWorker::set6022Mode_1(bool v)
 
 }
 
+void clientWorker::set6022Mode_2(bool v)
+{
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus is not connect";
+        return;
+    }
+
+    // 1. 根據 ADAM-6022 手冊計算數值
+
+    uint16_t highWord = static_cast<uint16_t>((v >> 16) & 0xFFFF);
+    uint16_t lowWord = static_cast<uint16_t>(v & 0xFFFF);
+
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1255, 2);
+    writeUnit.setValue(0, highWord);
+    writeUnit.setValue(1, lowWord);
+
+    QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
+    if (!reply) {
+        qDebug() << "set mode failed = " << m_6022->errorString();
+        return;
+    }
+
+
+    QEventLoop loop;
+    QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+    loop.exec();
+
+    if (reply->error() == QModbusDevice::NoError) {
+        qDebug() << "success set mode =" << v;
+    }
+    else {
+        qDebug() << "set mode failed :" << reply->errorString();
+    }
+
+    reply->deleteLater();
+
+}
+
 void clientWorker::writeSV1(double targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
         qDebug() << "Modbus is not connect";
@@ -774,10 +816,15 @@ void clientWorker::set_FanPower(bool v)
     power = v;
     f_FanCtrl = true;
 }
-void clientWorker::set_Mode(bool v)
+void clientWorker::set_Mode1(bool v)
 {
     m_mode1 = v;
-    f_setMode = true;
+    f_setMode1 = true;
+}
+void clientWorker::set_Mode2(bool v)
+{
+    m_mode2 = v;
+    f_setMode2 = true;
 }
 void clientWorker::set_5000HoldingRegister(bool t,int addr,double v)
 {
@@ -880,7 +927,7 @@ void clientWorker::set_Fan9Open(bool v)
 }
 void clientWorker::init_flag()
 {
-    f_setMode = false;
+    f_setMode1 = false;
     f_STO = false;
     f_setFAN = false;
     f_setSV1 = false;
@@ -1000,14 +1047,23 @@ void clientWorker::poll()
         m_Open9 = false;
     }
 
-    if(f_setMode)
+    if(f_setMode1)
     {
         set6022Mode_1(m_mode1);
-        f_setMode = false;
+        f_setMode1 = false;
+    }
+    if (f_setMode2)
+    {
+        set6022Mode_2(m_mode1);
+        f_setMode2 = false;
     }
     if (m_mode1)
     {
         writeHoldingRegisters(25, MV1, 17);
+    }
+    if(m_mode2)
+    {
+        writeHoldingRegisters(42, MV2, 1);
     }
     if (f_setFAN)
     {
@@ -1053,7 +1109,7 @@ void clientWorker::poll()
 
     Read6022PV1();
     Read6022PV2();
-
+    Read6022MV();
     //init_flag();
     m_pollTimer->start(); // 全部讀寫完後，才開啟下一次計時
 }

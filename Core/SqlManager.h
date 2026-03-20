@@ -43,6 +43,11 @@ public:
     int readFrequency(QString* errMsg = nullptr) const;
     bool setReadFrequency(int value, QString* errMsg = nullptr);
 
+    // Alarm history helpers
+    bool insertAlarm(const QDateTime& occurrence, const QString& reason, QString* errMsg = nullptr);
+    bool insertAlarm(const QString& reason, QString* errMsg = nullptr);
+    bool getAlarmHistory(qint64 from, qint64 to, QJsonArray* out, QString* errMsg = nullptr);
+
 private:
     explicit SqlManager(QObject* parent = nullptr);
     void startWorkerThread();

@@ -555,6 +555,112 @@ bool SqlManager::queryRangeJson(qint64 from, qint64 to, QJsonArray* out, QString
     });
 }
 
+bool SqlManager::insertAlarm(const QDateTime& occurrence, const QString& reason, QString* errMsg)
+{
+    return runOnThread([this, occurrence, reason, errMsg]() {
+        QString key = monthKey(occurrence.date());
+        QSqlDatabase db = openDataDb(key);
+        if (!db.isValid() || !db.isOpen())
+        {
+            if (errMsg) *errMsg = "db open failed";
+            return false;
+        }
+
+        if (!ensureDataSchema(db))
+        {
+            if (errMsg) *errMsg = "ensure schema failed";
+            return false;
+        }
+
+        QSqlQuery query(db);
+        query.prepare("INSERT INTO alarm_history (occurrence_time, reason) VALUES (:ts, :reason)");
+        query.bindValue(":ts", occurrence.toSecsSinceEpoch());
+        query.bindValue(":reason", reason);
+
+        if (!query.exec())
+        {
+            if (errMsg) *errMsg = query.lastError().text();
+            return false;
+        }
+        return true;
+    });
+}
+
+bool SqlManager::insertAlarm(const QString& reason, QString* errMsg)
+{
+    return insertAlarm(QDateTime::currentDateTime(), reason, errMsg);
+}
+
+bool SqlManager::getAlarmHistory(qint64 from, qint64 to, QJsonArray* out, QString* errMsg)
+{
+    return runOnThread([this, from, to, out, errMsg]() {
+        if (!out)
+        {
+            if (errMsg) *errMsg = "output array is null";
+            return false;
+        }
+        *out = QJsonArray();
+        if (to < from)
+        {
+            if (errMsg) *errMsg = "to < from";
+            return false;
+        }
+
+        QDate startDate = QDateTime::fromSecsSinceEpoch(from).date();
+        QDate endDate = QDateTime::fromSecsSinceEpoch(to).date();
+
+        QDate iter = QDate(startDate.year(), startDate.month(), 1);
+        QDate endIter = QDate(endDate.year(), endDate.month(), 1);
+
+        while (iter <= endIter)
+        {
+            QString key = monthKey(iter);
+            QString filePath = dataFileForKey(key);
+            QFileInfo fi(filePath);
+            if (!fi.exists())
+            {
+                iter = iter.addMonths(1);
+                continue;
+            }
+
+            QSqlDatabase db = openDataDb(key);
+            if (!db.isValid() || !db.isOpen())
+            {
+                if (errMsg) *errMsg = "db open failed";
+                return false;
+            }
+            if (!ensureDataSchema(db))
+            {
+                if (errMsg) *errMsg = "ensure schema failed";
+                return false;
+            }
+
+            QSqlQuery query(db);
+            query.prepare("SELECT id, occurrence_time, reason FROM alarm_history WHERE occurrence_time >= :from AND occurrence_time <= :to ORDER BY occurrence_time");
+            query.bindValue(":from", from);
+            query.bindValue(":to", to);
+            if (!query.exec())
+            {
+                if (errMsg) *errMsg = query.lastError().text();
+                return false;
+            }
+
+            while (query.next())
+            {
+                QJsonObject obj;
+                obj.insert("id", query.value(0).toLongLong());
+                obj.insert("occurrence_time", query.value(1).toLongLong());
+                obj.insert("reason", query.value(2).toString());
+                out->append(obj);
+            }
+
+            iter = iter.addMonths(1);
+        }
+
+        return true;
+    });
+}
+
 QVector<QVariantList> SqlManager::fetchSensorData(const QDate& date, int limit)
 {
     return runOnThread([this, date, limit]() {
@@ -707,6 +813,18 @@ bool SqlManager::ensureDataSchema(QSqlDatabase& db) const
         if (!query.exec("CREATE INDEX IF NOT EXISTS idx_sensor_data_ts ON sensor_data(timestamp)"))
         {
             qWarning() << "Failed to ensure data index:" << query.lastError().text();
+            return false;
+        }
+
+        if (!query.exec("CREATE TABLE IF NOT EXISTS alarm_history (id INTEGER PRIMARY KEY, occurrence_time INTEGER, reason VARCHAR(255))"))
+        {
+            qWarning() << "Failed to ensure alarm history schema:" << query.lastError().text();
+            return false;
+        }
+
+        if (!query.exec("CREATE INDEX IF NOT EXISTS idx_alarm_history_time ON alarm_history(occurrence_time)"))
+        {
+            qWarning() << "Failed to ensure alarm history index:" << query.lastError().text();
             return false;
         }
     }
