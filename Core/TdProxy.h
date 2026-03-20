@@ -156,6 +156,7 @@ class TdProxy : public QObject
     Q_PROPERTY(bool fan7SwitchOn READ getFan7SwitchOn WRITE setFan7SwitchOn NOTIFY fan7SwitchOnChanged)
     Q_PROPERTY(bool fan8SwitchOn READ getFan8SwitchOn WRITE setFan8SwitchOn NOTIFY fan8SwitchOnChanged)
     Q_PROPERTY(bool fan9SwitchOn READ getFan9SwitchOn WRITE setFan9SwitchOn NOTIFY fan9SwitchOnChanged)
+    Q_PROPERTY(bool fanEmergencySwitchOn READ getFanEmergencySwitchOn WRITE setFanEmergencySwitchOn NOTIFY fanEmergencySwitchOnChanged)
 
     // =========================
     // 按鈕狀態
@@ -179,9 +180,10 @@ class TdProxy : public QObject
     // 網路設定數值欄位
     // =========================
     Q_PROPERTY(QString ipAddress READ getIpAddress WRITE setIpAddress NOTIFY ipAddressChanged)
-    Q_PROPERTY(QString subnetMask READ getSubnetMask WRITE setSubnetMask NOTIFY subnetMaskChanged)
-    Q_PROPERTY(QString defaultGateway READ getDefaultGateway WRITE setDefaultGateway NOTIFY defaultGatewayChanged)
-    Q_PROPERTY(QString dnsServer READ getDnsServer WRITE setDnsServer NOTIFY dnsServerChanged)
+    //擷取頻率
+    Q_PROPERTY(int captureFreq READ getCaptureFreq WRITE setCaptureFreq NOTIFY captureFreqChanged)
+    //模式選擇: 0-連動 1-單機
+    Q_PROPERTY(int modeSelect READ getModeSelect WRITE setModeSelect NOTIFY modeSelectChanged)
 
 
 public:
@@ -819,6 +821,12 @@ public:
         m_fan9SwitchOn = value;
         emit fan9SwitchOnChanged(m_fan9SwitchOn);
     }
+    Q_INVOKABLE bool getFanEmergencySwitchOn() const { return m_fanEmergencySwitchOn; }
+    Q_INVOKABLE void setFanEmergencySwitchOn(bool value)
+    {
+        m_fanEmergencySwitchOn = value;
+        emit fanEmergencySwitchOnChanged(m_fanEmergencySwitchOn);
+    }
 
     // =========================
     // 按鈕狀態
@@ -924,33 +932,23 @@ public:
         emit ipAddressChanged(m_ipAddress);
     }
     // =========================
-    // 子網遮罩
+    // 擷取頻率
     // =========================
-    Q_INVOKABLE QString getSubnetMask() const { return m_subnetMask; }
-    Q_INVOKABLE void setSubnetMask(const QString &value)
+    Q_INVOKABLE int getCaptureFreq() const { return m_captureFreq; }
+    Q_INVOKABLE void setCaptureFreq( int value)
     {
-        m_subnetMask = value;
-        emit subnetMaskChanged(m_subnetMask);
+        m_captureFreq = value;
+        emit captureFreqChanged(m_captureFreq);
     }
 
     // =========================
-    // 預設閘道
+    // 模式選擇
     // =========================
-    Q_INVOKABLE QString getDefaultGateway() const { return m_defaultGateway; }
-    Q_INVOKABLE void setDefaultGateway(const QString &value)
+    Q_INVOKABLE int getModeSelect() const { return m_modeSelect; }
+    Q_INVOKABLE void setModeSelect(int value)
     {
-        m_defaultGateway = value;
-        emit defaultGatewayChanged(m_defaultGateway);
-    }
-
-    // =========================
-    // DNS伺服器
-    // =========================
-    Q_INVOKABLE QString getDnsServer() const { return m_dnsServer; }
-    Q_INVOKABLE void setDnsServer(const QString &value)
-    {
-        m_dnsServer = value;
-        emit dnsServerChanged(m_dnsServer);
+        m_modeSelect = value;
+        emit modeSelectChanged(m_modeSelect);
     }
 
 
@@ -1058,6 +1056,7 @@ public:
     void fan7SwitchOnChanged(bool value);
     void fan8SwitchOnChanged(bool value);
     void fan9SwitchOnChanged(bool value);
+    void fanEmergencySwitchOnChanged(bool value);
 
     void confirmOutValveButtonChanged(bool value);
     void confirmReturnValveButtonChanged(bool value);
@@ -1075,9 +1074,9 @@ public:
     void fan9ConfirmButtonChanged(bool value);
 
     void ipAddressChanged(QString value);
-    void subnetMaskChanged(QString value);
-    void defaultGatewayChanged(QString value);
-    void dnsServerChanged(QString value);
+    void captureFreqChanged(int value);
+    void modeSelectChanged(int value);
+
 private:
     // =========================
     // 成員變數
@@ -1186,6 +1185,7 @@ private:
     bool m_fan7SwitchOn = false;
     bool m_fan8SwitchOn = false;
     bool m_fan9SwitchOn = false;
+    bool m_fanEmergencySwitchOn = false;
 
     bool m_confirmOutValveButton = false;
     bool m_confirmReturnValveButton = false;
@@ -1203,9 +1203,9 @@ private:
     bool m_fan9ConfirmButton = false;
 
     QString m_ipAddress = "00.00.00.00";
-    QString m_subnetMask = "00.00.00.00";
-    QString m_defaultGateway = "0.0.0.0";
-    QString m_dnsServer = "0.0.0.0";
+//擷取頻率
+    int m_captureFreq = 0;
+    int m_modeSelect = 0;//0-連動 1-單機
 };
 
 
