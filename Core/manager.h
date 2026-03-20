@@ -62,6 +62,7 @@ signals:
     void _PV2(QVector <quint16> result);
     void _MV(QVector <quint16> result);
 private:
+    bool normal = true;
     bool m_PID1 = false;
     bool m_PID2 = false;
     quint16 p1 = 0.0;

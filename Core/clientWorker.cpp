@@ -79,7 +79,9 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
 {
     if (state == QModbusDevice::ConnectedState) {
         qDebug() << "clientWorker" << "connected.";
-        if (m_pollTimer && !m_pollTimer->isActive())
+        Fan_PowerControl(true);
+        writeSingleCoil(14, true);
+        if (m_pollTimer && !m_pollTimer->isActive())       
             m_pollTimer->start(50);
     }
     else if (state == QModbusDevice::UnconnectedState) {
@@ -139,7 +141,7 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
     }
 }
 
-void clientWorker::WriteSingleCoil(int slave, int address, bool value)
+void clientWorker::MotorControl(bool v)
 {
     // slave = 站號
     // address = modbus寫入位置
@@ -147,13 +149,14 @@ void clientWorker::WriteSingleCoil(int slave, int address, bool value)
     QModbusTcpClient* client =  m_5000 ;
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
-    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, address, 1);
-    writeUnit.setValue(0, value);
+    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 12, 1);
+    writeUnit.setValue(0, v);
+
     QEventLoop loop;
     QTimer timeoutTimer;
     timeoutTimer.setSingleShot(true);
 
-    if (auto reply = client->sendWriteRequest(writeUnit, slave)) {
+    if (auto reply = client->sendWriteRequest(writeUnit, 1)) {
         connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
         connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
@@ -162,7 +165,7 @@ void clientWorker::WriteSingleCoil(int slave, int address, bool value)
 
         if (timeoutTimer.isActive()) {
             if (reply->error() == QModbusDevice::NoError) {
-                qDebug() << "success " << "write :" << address << "value:" << value;
+                qDebug() << "success ";
             }
             else {
                 qDebug() << "failed:" << reply->errorString();
@@ -175,7 +178,43 @@ void clientWorker::WriteSingleCoil(int slave, int address, bool value)
         reply->deleteLater();
     }
 }
+void clientWorker::Fan_PowerControl(bool v)
+{
+    // slave = 站號
+    // address = modbus寫入位置
+    // value = 寫入的值
+    QModbusTcpClient* client = m_5000;
+    if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
+    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 11, 1);
+    writeUnit.setValue(0, v);
+
+    QEventLoop loop;
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+
+    if (auto reply = client->sendWriteRequest(writeUnit, 1)) {
+        connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+        connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+        timeoutTimer.start(1000); // 1秒寫入逾時
+        loop.exec();
+
+        if (timeoutTimer.isActive()) {
+            if (reply->error() == QModbusDevice::NoError) {
+                qDebug() << "success ";
+            }
+            else {
+                qDebug() << "failed:" << reply->errorString();
+            }
+        }
+        else {
+            qDebug() << "timeout";
+            reply->deleteLater();
+        }
+        reply->deleteLater();
+    }
+}
 void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int number)
 {
     
@@ -513,7 +552,6 @@ void clientWorker::set6022Mode_1(bool v)
     }
 
     // 1. 根據 ADAM-6022 手冊計算數值
-    // mode 地址 41000 -> Offset 1019
 
     uint16_t highWord = static_cast<uint16_t>((v >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(v & 0xFFFF);
@@ -726,10 +764,20 @@ void clientWorker::writePID2(double p, double i, double d) {
     reply->deleteLater();
 }
 
+void clientWorker::set_MotorRun(bool v)
+{
+    motor = v;
+    f_MotorCtrl = true;
+}
+void clientWorker::set_FanPower(bool v)
+{
+    power = v;
+    f_FanCtrl = true;
+}
 void clientWorker::set_Mode(bool v)
 {
-    f_setMode = true;
     m_mode1 = v;
+    f_setMode = true;
 }
 void clientWorker::set_5000HoldingRegister(bool t,int addr,double v)
 {
@@ -758,32 +806,32 @@ void clientWorker::set_Reset()
 }
 void clientWorker::set_SV1(double v)
 {
-    f_setSV1 = true;
     SV1 = v;
+    f_setSV1 = true;
 }
 void clientWorker::set_SV2(double v) 
 {
-    f_setSV2 = true;
     SV2 = v;
+    f_setSV2 = true;
 }
 void clientWorker::set_PID1(double p, double i, double d)
 {
-    f_setPID1 = true;
     p1 = p; 
     i1 = i;
     d1 = d;
+    f_setPID1 = true;
 }
 void clientWorker::set_PID2(double p, double i, double d)
 {
-    f_setPID2 = true;
     p2 = p;
     i2 = i;
     d2 = d;
+    f_setPID2 = true;
 }
 void clientWorker::set_Fan(double v)
 {
+    m_setALL = v * 40.95;
     f_setFAN = true;
-    m_setALL = v*40.95;
 }
 void clientWorker::set_Fan1Open(bool v)
 {
@@ -860,6 +908,16 @@ void clientWorker::poll()
             });
         f_Reset = false;
 
+    }
+    if (f_MotorCtrl)
+    {
+        MotorControl(motor);
+        f_MotorCtrl = false;
+    }
+    if (f_FanCtrl)
+    {
+        Fan_PowerControl(power);
+        f_FanCtrl = false;
     }
     if(m_Open1)
     {
@@ -956,7 +1014,7 @@ void clientWorker::poll()
         writeHoldingRegisters(25, m_setALL, 17);
         f_setFAN = false;
     }
-    if (f_write5000 && m5000_addr!=99999 && m5000_value!=99999)//確保不會使用到尚未寫入的數值,每次寫入完 將2個值設為99999
+    if (f_write5000 && m5000_addr!=99999 && m5000_value!=99999)//確保不會使用到錯誤的數值,每次寫入完 將2個值設為99999
     {
         QMutexLocker locker(&m_lock);
         bool _t= m5000_target;

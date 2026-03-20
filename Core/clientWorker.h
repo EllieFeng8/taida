@@ -28,6 +28,8 @@ public:
     void writeSingleCoil(int address, bool value);
 
     //¼g¤J
+    void set_MotorRun(bool v);
+    void set_FanPower(bool v);
     void set_Fan1Open(bool v);
     void set_Fan2Open(bool v);
     void set_Fan3Open(bool v);
@@ -55,7 +57,9 @@ public:
     void writePID2( double p, double i, double d);
     void writeHoldingRegisters(int address, double value, int number);
     void WriteSingleHoldingRegisters(bool target ,int slave, int address, int value);
-    void WriteSingleCoil( int slave, int address, bool value);
+    void MotorControl(bool v);
+    void Fan_PowerControl(bool v);
+
 
     //Åª¨ú
     void Read5000HoldingRegisters( int slave, int startAddress, int number); 
@@ -99,6 +103,8 @@ private:
     bool m5000_target = false;
     int m5000_addr=0;
     double m5000_value = 0;
+
+
     bool m_Open1 = false;
     bool m_Open2 = false;
     bool m_Open3 = false;
@@ -129,6 +135,8 @@ private:
     double i2 = 0.0;
     double d1 = 0.0;
     double d2 = 0.0;
+    bool motor = false;
+    bool power = false;
     double m_setALL = 0.0;
     bool f_setMode = false;
     bool f_STO = false;
@@ -139,4 +147,6 @@ private:
     bool f_setPID2 = false;
     bool f_write5000 = false;
     bool f_setFAN = false;
+    bool f_FanCtrl = false;
+    bool f_MotorCtrl = false;
 };

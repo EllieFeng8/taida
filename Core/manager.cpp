@@ -45,30 +45,57 @@ void Manager::init()
 				break;
 			case 32:  
 				this->WriteHoldingRegister(true, 25, value*40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false); 
+					}, Qt::QueuedConnection);
 				break;
 			case 33:  
 				this->WriteHoldingRegister(true, 26, value*40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 34:  
 				this->WriteHoldingRegister(true, 27, value*40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 39:  
 				this->WriteHoldingRegister(true, 32, value*40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 40:  
 				this->WriteHoldingRegister(true, 33, value * 40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 41:  
 				this->WriteHoldingRegister(true, 34, value * 40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 42:  
 				this->WriteHoldingRegister(true, 35, value * 40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 47:  
 				this->WriteHoldingRegister(true, 40, value * 40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 48: 
 				this->WriteHoldingRegister(true, 41, value * 40.95);
+				QMetaObject::invokeMethod(m_clientWorker, [this]() {
+					m_clientWorker->set_Mode(false);
+					}, Qt::QueuedConnection);
 				break;
 			case 49:
 				this->WriteHoldingRegister(true, 42, value * 40.95);
@@ -227,6 +254,23 @@ void Manager::init()
 	// 當 Client 讀到資料發出 m_5000data 訊號時，自動呼叫 Server 的更新函數
 	connect(m_clientWorker, &clientWorker::m_5000Coil, this, [this](const QVector<quint16>& data,const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
 		emit Coil(data);//傳送給Core 
+		
+		if(data[0]==1&& normal)
+		{
+			QMetaObject::invokeMethod(
+				m_clientWorker, [this] { m_clientWorker->set_FanPower(false); },
+				Qt::QueuedConnection
+			);
+			normal = false;
+		}
+		else if(data[0]==0 && !normal)
+		{
+			QMetaObject::invokeMethod(
+				m_clientWorker, [this] { m_clientWorker->set_FanPower(true); },
+				Qt::QueuedConnection
+			);
+			normal = true;
+		}
 		});
 	connect(m_clientWorker, &clientWorker::m_5000Coil, m_serverWorker, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
 		m_serverWorker->updateInputRegisters(0, datainput); //將input的部分 傳入InputRegisters (從0開始)
@@ -487,7 +531,7 @@ void Manager::WriteHoldingRegister(bool t,int addr, double value)
 }
 void Manager::set_Fan1Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan1  " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan1Open(v); },
 		Qt::QueuedConnection
@@ -495,7 +539,7 @@ void Manager::set_Fan1Open(bool v)
 }
 void Manager::set_Fan2Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan2 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan2Open(v); },
 		Qt::QueuedConnection
@@ -503,7 +547,7 @@ void Manager::set_Fan2Open(bool v)
 }
 void Manager::set_Fan3Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan3 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan3Open(v); },
 		Qt::QueuedConnection
@@ -511,7 +555,7 @@ void Manager::set_Fan3Open(bool v)
 }
 void Manager::set_Fan4Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan4 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan4Open(v); },
 		Qt::QueuedConnection
@@ -519,7 +563,7 @@ void Manager::set_Fan4Open(bool v)
 }
 void Manager::set_Fan5Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan5 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan5Open(v); },
 		Qt::QueuedConnection
@@ -527,7 +571,7 @@ void Manager::set_Fan5Open(bool v)
 }
 void Manager::set_Fan6Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan6 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan6Open(v); },
 		Qt::QueuedConnection
@@ -535,7 +579,7 @@ void Manager::set_Fan6Open(bool v)
 }
 void Manager::set_Fan7Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan7 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan7Open(v); },
 		Qt::QueuedConnection
@@ -543,7 +587,7 @@ void Manager::set_Fan7Open(bool v)
 }
 void Manager::set_Fan8Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan8 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan8Open(v); },
 		Qt::QueuedConnection
@@ -551,7 +595,7 @@ void Manager::set_Fan8Open(bool v)
 }
 void Manager::set_Fan9Open(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
+	qDebug() << "set Fan9 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan9Open(v); },
 		Qt::QueuedConnection
