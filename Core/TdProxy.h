@@ -951,7 +951,11 @@ public:
         emit modeSelectChanged(m_modeSelect);
     }
 
-
+    Q_INVOKABLE void hitSettingBtn()
+    {
+        qDebug() << "set check";
+        emit settingBtnChanged();
+    }
 
 
     signals:
@@ -1076,6 +1080,8 @@ public:
     void ipAddressChanged(QString value);
     void captureFreqChanged(int value);
     void modeSelectChanged(int value);
+
+    void settingBtnChanged();
 
 private:
     // =========================

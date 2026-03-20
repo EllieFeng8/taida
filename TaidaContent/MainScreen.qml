@@ -341,6 +341,7 @@ MainScreenUI {
         fansallSetTextInput.focus = false
     }
     setBtnMouseArea.onClicked: {
+        Td.hitSettingBtn();
         connectSet.visible = true
     }
 

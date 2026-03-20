@@ -271,7 +271,7 @@ Rectangle {
                         //x: 0
                         // anchors.left: _text_4.left
                         // anchors.topMargin: 10
-
+                        checked: Td.modeSelect === 0 ? true : false
                         font.family: "Noto Sans TC"
                         font.bold: false
                         font.pointSize: 12
@@ -286,12 +286,7 @@ Rectangle {
 
                     RadioButton {
                         id: radioButton2
-                        //x: 0
-                        // anchors.top: radioButton.top
-                        // anchors.left: radioButton.right
-                        // anchors.leftMargin: 40
-                        // font.styleName: "Bold"
-                        // font.capitalization: Font.MixedCase
+                        checked: Td.modeSelect === 1 ? true : false
 
                         font.family: "Noto Sans TC"
                         font.bold: false
