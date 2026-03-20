@@ -77,6 +77,7 @@ class TdProxy : public QObject
     // =========================
     Q_PROPERTY(double motorFrequency READ getMotorFrequency WRITE setMotorFrequency NOTIFY motorFrequencyChanged)
     Q_PROPERTY(double motorFrequencyP READ getMotorFrequencyP WRITE setMotorFrequencyP NOTIFY motorFrequencyPChanged)
+    Q_PROPERTY(bool motorReset READ getMotorReset  WRITE setMotorReset  NOTIFY motorResetChanged)
     Q_PROPERTY(double currentWaterFlow READ getCurrentWaterFlow WRITE setCurrentWaterFlow NOTIFY currentWaterFlowChanged)
 
     Q_PROPERTY(double heatExchange READ getHeatExchange WRITE setHeatExchange NOTIFY heatExchangeChanged)
@@ -409,6 +410,12 @@ public:
     {
         m_motorFrequencyP = value;
         emit motorFrequencyPChanged(m_motorFrequencyP);
+    }
+    Q_INVOKABLE bool getMotorReset () const { return m_motorReset ; }
+    Q_INVOKABLE void setMotorReset (bool value)
+    {
+        m_motorReset  = value;
+        emit motorResetChanged(m_motorReset );
     }
 
     Q_INVOKABLE double getCurrentWaterFlow() const { return m_currentWaterFlow; }
@@ -987,6 +994,7 @@ public:
 
     void motorFrequencyChanged(double value);
     void motorFrequencyPChanged(double value);
+    void motorResetChanged(bool value);
     void currentWaterFlowChanged(double value);
     void heatExchangeChanged(double value);
     // void heatExchangePChanged(double value);
@@ -1077,7 +1085,7 @@ public:
     double m_inWaterTemp = 0;
     double m_inWaterPressure = 0;
 
-    double m_outWaterTemp = 20;
+    double m_outWaterTemp = 0;
     double m_outWaterPressure = 0;
 
     double m_returnWaterTemp = 0;
@@ -1091,8 +1099,8 @@ public:
     double m_inletAirTemp = 0;
     double m_inletAirHumidity = 0;
 
-    double m_outletAirTemp = 10;
-    double m_outWaterTargetTemp = 100;
+    double m_outletAirTemp = 0;
+    double m_outWaterTargetTemp = 0;
     double m_outWaterTargetTempP = 0;
 
     double m_outValveOpening = 0;
@@ -1111,6 +1119,7 @@ public:
 
     double m_motorFrequency = 0;
     double m_motorFrequencyP = 0;
+    bool m_motorReset = false;
     double m_currentWaterFlow = 0;
     double m_heatExchange = 0;
     // double m_heatExchangeP = 0;

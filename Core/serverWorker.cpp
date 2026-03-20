@@ -3,7 +3,11 @@
 ServerWorker::ServerWorker(QObject* parent) : QObject(parent) {}
 
 ServerWorker::~ServerWorker() {
-    if (m_server) m_server->disconnectDevice();
+    if (m_server) {
+        m_server->disconnectDevice(); // 中斷所有連線
+        delete m_server;
+        m_server = nullptr;
+    }
 }
 
 void ServerWorker::init()
@@ -12,6 +16,8 @@ void ServerWorker::init()
 
     // 設定暫存器範圍：HoldingRegisters 從位址 0 開始，共 100 筆
     QModbusDataUnitMap reg;
+    reg.insert(QModbusDataUnit::Coils,
+        { QModbusDataUnit::Coils, 0, 20 });
     reg.insert(QModbusDataUnit::InputRegisters,
         { QModbusDataUnit::InputRegisters, 0, 30 });
     reg.insert(QModbusDataUnit::HoldingRegisters,
@@ -22,12 +28,25 @@ void ServerWorker::init()
     m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_serverPort);
     m_server->setServerAddress(m_slaveId);
     //m_server->connectDevice();
+
+    connect(m_server, &QModbusServer::dataWritten, this, &ServerWorker::onDataWritten);
+
     if (!m_server->connectDevice()) {
         qDebug() << "FAILED  Modbus Server :" << m_server->errorString();
     }
     else {
         qDebug() << "Modbus Server is START , Port:" << m_serverPort;
     }
+}
+
+void ServerWorker::updateCoils(int startAddr, const bool data)
+{
+    //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+
+    // 將 ClientWorker 讀到的資料同步到 Server 
+
+    //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
+    m_server->setData(QModbusDataUnit::Coils, startAddr, data);
 }
 
 void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& data)
@@ -71,4 +90,22 @@ void ServerWorker::updateInputRegister(int startAddr, const quint16 data)
 
     //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
     m_server->setData(QModbusDataUnit::InputRegisters, startAddr, data);
+}
+
+void ServerWorker::onDataWritten(QModbusDataUnit::RegisterType table, int address, int size) {
+
+    for (int i = 0; i < size; ++i) {
+        int currentAddr = address + i;
+        quint16 value;
+
+        // 從 Server 的內部資料表讀取該位址的新數值
+        if (m_server->data(table, currentAddr, &value)) {
+            //qDebug() << " server :  set " << table
+            //    << " addr:" << currentAddr
+            //    << " new value:" << value;
+
+            // 建議：發送一個帶有位址與數值的自定義訊號給 Manager
+            emit modbusDataChanged(table, currentAddr, value);
+        }
+    }
 }

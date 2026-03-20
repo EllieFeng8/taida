@@ -6,7 +6,20 @@ Core& Core::instance()
     static Core inst; // 建立唯一的靜態實例
     return inst;      // 回傳該實例的引用
 }
+Core::~Core()
+{
+    // 釋放 Manager 物件 (這會進一步觸發 Manager 的解構式停止執行緒)
+    if (m_manager) {
+        delete m_manager;
+        m_manager = nullptr;
+    }
 
+    // 釋放 TdProxy 物件
+    if (m_proxy) {
+        delete m_proxy;
+        m_proxy = nullptr;
+    }
+}
 void Core::init()
 {
     m_sqlManager = SqlManager::instance();
@@ -27,6 +40,7 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
     QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, m_manager, &Manager::set_mode1);
 
+    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, m_manager, &Manager::set_sv);
     QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_sv2);
     QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
@@ -45,15 +59,27 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::fan9TargetRpmChanged, m_manager, &Manager::fan9TargetRpm);
     QObject::connect(m_proxy, &TdProxy::returnValveOpeningChanged, m_manager, &Manager::returnValveOpening);
 
+    QObject::connect(m_proxy, &TdProxy::fan1SwitchOnChanged, m_manager, &Manager::set_Fan1Open);
+    QObject::connect(m_proxy, &TdProxy::fan2SwitchOnChanged, m_manager, &Manager::set_Fan2Open);
+    QObject::connect(m_proxy, &TdProxy::fan3SwitchOnChanged, m_manager, &Manager::set_Fan3Open);
+    QObject::connect(m_proxy, &TdProxy::fan4SwitchOnChanged, m_manager, &Manager::set_Fan4Open);
+    QObject::connect(m_proxy, &TdProxy::fan5SwitchOnChanged, m_manager, &Manager::set_Fan5Open);
+    QObject::connect(m_proxy, &TdProxy::fan6SwitchOnChanged, m_manager, &Manager::set_Fan6Open);
+    QObject::connect(m_proxy, &TdProxy::fan7SwitchOnChanged, m_manager, &Manager::set_Fan7Open);
+    QObject::connect(m_proxy, &TdProxy::fan8SwitchOnChanged, m_manager, &Manager::set_Fan8Open);
+    QObject::connect(m_proxy, &TdProxy::fan9SwitchOnChanged, m_manager, &Manager::set_Fan9Open);
 
-    
+    QObject::connect(m_proxy, &TdProxy::fanAllTargetRpmChanged, m_manager, &Manager::set_allFan);
+
+    QObject::connect(m_proxy, &TdProxy::motorResetChanged, m_manager, &Manager::set_Reset);
+
 }
 
 void Core::Coil_Data(QVector <quint16> result)
 {
     for (int i = 0; i < result.size(); ++i)
     {
-        qDebug() << "value" << i << " = " << result[i];
+        //qDebug() << "value" << i << " = " << result[i];
         //updateProxyProperty(i, result[i]);
 
     }
@@ -81,8 +107,8 @@ void Core::pidPV2(QVector <quint16> result)
 {
     double pv = result[0];
     double sv = result[1];
-    m_proxy->setOutWaterTargetTempP(pv);
-    m_proxy->setOutWaterTargetTemp(sv);
+    m_proxy->setOutletAirTemp(pv);
+    //m_proxy->setOutWaterTargetTemp(sv);
 }
 void Core::PID1(QVector <quint16> result)
 {
@@ -123,41 +149,118 @@ void Core::updateProxyProperty(int index, quint16 value)
     if (!m_proxy) return;
     switch (index) {
 
-    case 0:  m_proxy->setInWaterTemp(value/655.35); break; //入水溫度
-    case 1:  m_proxy->setInWaterPressure(value/65.535); break; //入水壓力
-    case 2:  m_proxy->setReturnWaterTemp(value/655.35); break;//回水口溫度
-    case 3:  m_proxy->setReturnWaterPressure(value/65.535); break; //回水口壓力
-    case 4:  m_proxy->setOutWaterTemp(value/655.35); break; //出水口溫度
-    case 5:  m_proxy->setOutWaterPressure(value/65.535); break; //出水口壓力
-    case 6:  m_proxy->setCondenserLeft1Temp(value/655.35); break; //冷排溼度計-1
-    case 7:  m_proxy->setCondenserLeft2Temp(value/655.35); break; //冷排溼度計-2
-    case 8:  m_proxy->setCondenserRight1Temp(value/655.35); break; //冷排溼度計-3
-    case 9:  m_proxy->setCondenserRight2Temp(value/655.35); break; //冷排溼度計-4
-    case 10: m_proxy->setInletAirTemp(value/655.35); break; //入風口溫度
-    case 11: m_proxy->setInletAirHumidity(value/655.35); break; //入風口濕度
-    case 12: m_proxy->setCurrentWaterFlow(value); break;// 流量計
-    case 13: m_proxy->setOutValveOpeningP(value); break; //出水電動閥位置回授
-    case 14: m_proxy->setReturnValveOpeningP(value); break; //回水電動閥位置回授
+    case 0:
+        if (value == v_0) { return; }
+        v_0 = value;
+        m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //入水溫度
+    case 1: 
+        if (value == v_1) { return; }
+        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //入水壓力
+    case 2:
+        if (value == v_2) { return; }
+        v_2 = value; 
+        m_proxy->setReturnWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break;//回水口溫度
+    case 3:
+        if (value == v_3) { return; }
+        v_3 = value; 
+        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //回水口壓力
+    case 4:
+        if (value == v_4) { return; }
+        v_4 = value; 
+        m_proxy->setOutWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //出水口溫度
+    case 5:
+        if (value == v_5) { return; }
+        v_5 = value; 
+        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //出水口壓力
+    case 6: 
+        if (value == v_6) { return; }
+        v_6 = value; 
+        m_proxy->setCondenserLeft1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-1
+    case 7:
+        if (value == v_7) { return; }
+        v_7 = value; 
+        m_proxy->setCondenserLeft2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-2
+    case 8:
+        if (value == v_8) { return; }
+        v_8 = value; 
+        m_proxy->setCondenserRight1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-3
+    case 9: 
+        if (value == v_9) { return; }
+        v_9 = value; 
+        m_proxy->setCondenserRight2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-4
+    case 10:
+        if (value == v_10) { return; }
+        v_10 = value; 
+        m_proxy->setInletAirTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //入風口溫度
+    case 11:
+        if (value == v_11) { return; }
+        v_11 = value; 
+        m_proxy->setInletAirHumidity(qRound((value / 655.35) * 10.0) / 10.0); break; //入風口濕度
+    case 12:
+        if (value == v_12) { return; }
+        v_12 = value; 
+        m_proxy->setCurrentWaterFlow(value); break;// 流量計
+    case 13:
+        if (value == v_13) { return; }
+        v_13 = value; 
+        m_proxy->setOutValveOpeningP(qRound((value / 655.35) * 10.0) / 10.0); break; //出水電動閥位置回授
+    case 14:
+        if (value == v_14) { return; }
+        v_14 = value;
+        m_proxy->setReturnValveOpeningP(qRound((value / 655.35) * 10.0) / 10.0); break; //回水電動閥位置回授
     case 15: break; //風扇自動速率
-    case 16: m_proxy->setMotorFrequencyP(value); break; //循環水泵速率輸出
-    case 17: m_proxy->setFan1TargetRpmP(value); break; //風扇1
-    case 18: m_proxy->setFan2TargetRpmP(value); break; //風扇2
-    case 19: m_proxy->setFan3TargetRpmP(value); break; //風扇3
+    case 16: 
+        if (value == v_16) { return; }
+        v_16 = value; 
+        m_proxy->setMotorFrequencyP(value / 40.95); break; //循環水泵速率輸出
+    case 17: 
+        if (value == v_17) { return; }
+        v_17 = value; 
+        m_proxy->setFan1TargetRpmPercent(value/40.95); break; //風扇1
+    case 18: 
+        if (value == v_18) { return; }
+        v_18 = value;
+        m_proxy->setFan2TargetRpmPercent(value/40.95); break; //風扇2
+    case 19: 
+        if (value == v_19) { return; }
+        v_19 = value; 
+        m_proxy->setFan3TargetRpmPercent(value/40.95); break; //風扇3
     case 20: break; //
     case 21: break; //
     case 22: break; //
     case 23: break; //
-    case 24: m_proxy->setFan4TargetRpmP(value); break; //風扇4
-    case 25: m_proxy->setFan5TargetRpmP(value); break; //風扇5
-    case 26: m_proxy->setFan6TargetRpmP(value); break; //風扇6
-    case 27: m_proxy->setFan7TargetRpmP(value); break; //風扇7
+    case 24: 
+        if (value == v_24) { return; }
+        v_24 = value; 
+        m_proxy->setFan4TargetRpmPercent(value/40.95); break; //風扇4
+    case 25:
+        if (value == v_25) { return; }
+        v_25 = value;
+        m_proxy->setFan5TargetRpmPercent(value/40.95); break; //風扇5
+    case 26: 
+        if (value == v_26) { return; }
+        v_26 = value; 
+        m_proxy->setFan6TargetRpmPercent(value / 40.95); break; //風扇6
+    case 27:
+        if (value == v_27) { return; }
+        v_27 = value; 
+        m_proxy->setFan7TargetRpmPercent(value / 40.95); break; //風扇7
     case 28: break; //
     case 29: break; //
     case 30: break; //
     case 31: break; //
-    case 32: m_proxy->setFan8TargetRpmP(value); break; //風扇8
-    case 33: m_proxy->setFan9TargetRpmP(value); break; //風扇9
-    case 34: m_proxy->setReturnValveOpeningP(value); break; //回水閥開度
+    case 32:
+        if (value == v_32) { return; }
+        v_32 = value; 
+        m_proxy->setFan8TargetRpmPercent(value / 40.95); break; //風扇8
+    case 33:
+        if (value == v_33) { return; }
+        v_33 = value; 
+        m_proxy->setFan9TargetRpmPercent(value / 40.95); break; //風扇9
+    case 34:
+        if (value == v_34) { return; }
+        v_34 = value; 
+        m_proxy->setReturnValveOpeningP(value / 40.95); break; //回水閥開度
     case 35: break; //Null
 
     default: break;

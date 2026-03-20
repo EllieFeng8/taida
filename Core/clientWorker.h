@@ -3,6 +3,7 @@
 #include <qobject>
 #include <Qvector>
 #include <QTimer>
+#include <QMutex>
 #include <qvariant>
 #include <QModbusTcpClient>
 #include <QModbusReply>
@@ -27,19 +28,35 @@ public:
     void writeSingleCoil(int address, bool value);
 
     //¼g¤J
+    void set_Fan1Open(bool v);
+    void set_Fan2Open(bool v);
+    void set_Fan3Open(bool v);
+    void set_Fan4Open(bool v);
+    void set_Fan5Open(bool v);
+    void set_Fan6Open(bool v);
+    void set_Fan7Open(bool v);
+    void set_Fan8Open(bool v);
+    void set_Fan9Open(bool v);
+
+    void set_Mode(bool v);
+    void set_STO(bool v);
+    void set_Reset();
     void set_SV1(double v);
     void set_SV2(double v);
     void set_PID1(double p,double i,double d);
     void set_PID2(double p, double i, double d);
     void set_Fan(double v);
-    void write5000(int addr, double v);
+    void set_5000HoldingRegister(bool t,int addr, double v);
     
+    void set6022Mode_1(bool v);
     void writeSV1(double targetSV);
     void writeSV2(double targetSV);
     void writePID1( double p, double i, double d);
     void writePID2( double p, double i, double d);
     void writeHoldingRegisters(int address, double value, int number);
     void WriteSingleHoldingRegisters(bool target ,int slave, int address, int value);
+    void WriteSingleCoil( int slave, int address, bool value);
+
     //Åª¨ú
     void Read5000HoldingRegisters( int slave, int startAddress, int number); 
 
@@ -70,6 +87,7 @@ signals:
 
 private:
     WriteRequest m_pendingWrite;
+    QMutex m_lock;
     QModbusTcpClient* m_5000 = nullptr;
     QModbusTcpClient* m_6022 = nullptr;
     QTimer* m_pollTimer = nullptr;
@@ -78,6 +96,29 @@ private:
     int m_port = 502;
     QString m_ip2 = "192.168.1.202";
     int m_port2 = 502;
+    bool m5000_target = false;
+    int m5000_addr=0;
+    double m5000_value = 0;
+    bool m_Open1 = false;
+    bool m_Open2 = false;
+    bool m_Open3 = false;
+    bool m_Open4 = false;
+    bool m_Open5 = false;
+    bool m_Open6 = false;
+    bool m_Open7 = false;
+    bool m_Open8 = false;
+    bool m_Open9 = false;
+    bool fan1_open = false;
+    bool fan2_open = false;
+    bool fan3_open = false;
+    bool fan4_open = false;
+    bool fan5_open = false;
+    bool fan6_open = false;
+    bool fan7_open = false;
+    bool fan8_open = false;
+    bool fan9_open = false;
+
+    bool m_STO = false;
     double MV1 = 0.0;
     double MV2 = 0.0;
     double SV1 = 0.0;
@@ -89,6 +130,9 @@ private:
     double d1 = 0.0;
     double d2 = 0.0;
     double m_setALL = 0.0;
+    bool f_setMode = false;
+    bool f_STO = false;
+    bool f_Reset = false;
     bool f_setSV1 = false;
     bool f_setSV2 = false;
     bool f_setPID1 = false;

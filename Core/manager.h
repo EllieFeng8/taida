@@ -24,6 +24,8 @@ public:
     void set_PID(double p, double i, double d);
     void set_PID2(double p, double i, double d);
 
+    void WriteHoldingRegister(bool t, int add, double value);
+
     void motorFrequency(double v);
     void fan1TargetRpm(double v);
     void fan2TargetRpm(double v);
@@ -35,6 +37,20 @@ public:
     void fan8TargetRpm(double v);
     void fan9TargetRpm(double v);
     void returnValveOpening(double v);
+
+
+    void set_Fan1Open(bool v);
+    void set_Fan2Open(bool v);
+    void set_Fan3Open(bool v);
+    void set_Fan4Open(bool v);
+    void set_Fan5Open(bool v);
+    void set_Fan6Open(bool v);
+    void set_Fan7Open(bool v);
+    void set_Fan8Open(bool v);
+    void set_Fan9Open(bool v);
+    void set_allFan(double v);
+    void set_Estop(bool v);
+    void set_Reset(bool v);
 signals:
     void Coil(QVector <quint16> result);
     void HodingRegister(QVector <quint16> result);
@@ -48,7 +64,12 @@ signals:
 private:
     bool m_PID1 = false;
     bool m_PID2 = false;
-
+    quint16 p1 = 0.0;
+    quint16 p2 = 0.0;
+    quint16 i1 = 0.0;
+    quint16 i2 = 0.0;
+    quint16 d1 = 0.0;
+    quint16 d2 = 0.0;
     quint16 PID_AO1;
     quint16 PID_AO2;
     clientWorker* m_clientWorker = nullptr;
