@@ -79,9 +79,16 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
 {
     if (state == QModbusDevice::ConnectedState) {
         qDebug() << "clientWorker" << "connected.";
-        Fan_PowerControl(true);
+        writeSingleCoil(12, false);
         writeSingleCoil(14, true);
-        writeSingleCoil(12, true);
+        QTimer::singleShot(1000, this,
+            [=]()
+            {
+ 
+                Fan_PowerControl(true);
+
+                writeSingleCoil(12, true);
+            });   
 
         if (m_pollTimer && !m_pollTimer->isActive())       
             m_pollTimer->start(50);
@@ -503,7 +510,7 @@ void clientWorker::writeSingleCoil(int address, bool value)
 
     // 處理寫入結果
     if (reply->error() == QModbusDevice::NoError) {
-
+        qDebug() << "set coil = " << value;
     }
     else {
         qDebug() << "Worker" << "write single coil error:" << address << reply->errorString();
@@ -584,6 +591,41 @@ void clientWorker::set6022Mode_1(bool v)
 
     reply->deleteLater();
 
+}
+
+void clientWorker::set_MV(double value) // 假設傳入的是 16bit 數值
+{
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
+        qDebug() << "Modbus is not connected";
+        return;
+    }
+
+
+
+    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 11, 1);
+    writeUnit.setValue(0, value); // 直接設定 16-bit 數值
+
+    // 發送請求 (Server ID 預設為 1)
+    QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
+
+    if (!reply) {
+        qDebug() << "Send request failed:" << m_6022->errorString();
+        return;
+    }
+
+    // 使用 EventLoop 等待非同步結果 (同步化處理)
+    QEventLoop loop;
+    QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() == QModbusDevice::NoError) {
+        qDebug() << "Successfully wrote AO 1 value:" << value;
+    }
+    else {
+        qDebug() << "Write failed:" << reply->errorString();
+    }
+
+    reply->deleteLater();
 }
 
 void clientWorker::set6022Mode_2(bool v)
@@ -861,6 +903,11 @@ void clientWorker::set_SV2(double v)
     SV2 = v;
     f_setSV2 = true;
 }
+void clientWorker::set_AO1(double v)
+{
+    AO1 = v;
+    f_setAO1 = true;
+}
 void clientWorker::set_PID1(double p, double i, double d)
 {
     p1 = p; 
@@ -942,8 +989,25 @@ void clientWorker::poll()
 
     if(f_STO)
     {
-        writeSingleCoil(14, m_STO);
-        f_STO = false;
+        if (m_STO)
+        {
+            writeSingleCoil(14, m_STO);
+            QTimer::singleShot(1000, this,
+                [=]()
+                {
+                    writeSingleCoil(12, true);
+                });
+        }
+        else
+        {
+            writeSingleCoil(14, m_STO);
+                        QTimer::singleShot(1000, this,
+                [=]()
+                {
+                    writeSingleCoil(12, false);
+                });
+        }
+            f_STO = false;
     }
     if (f_Reset)
     {
@@ -1102,6 +1166,11 @@ void clientWorker::poll()
     {
         writePID2(p2, i2, d2);
         f_setPID2 = false;
+    }
+    if (f_setAO1)
+    {
+        set_MV(AO1);
+        f_setAO1 = false;
     }
 
     ReadCoils(1, 0, 15);

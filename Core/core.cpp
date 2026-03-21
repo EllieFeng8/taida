@@ -1,5 +1,5 @@
 #include "core.h"
-
+#include <QNetworkInterface>
 
 Core& Core::instance()
 {
@@ -24,6 +24,17 @@ Core::~Core()
 void Core::init()
 {
     m_sqlManager = SqlManager::instance();
+    if (!m_restManager)
+    {
+        m_restManager = new RESTManager(m_sqlManager, this);
+    }
+    bool ok = false;
+    int port = 8080;
+
+    if (!m_restManager->start(static_cast<quint16>(port)))
+    {
+        return;
+    }
     m_proxy = new TdProxy(this);
     m_manager = new Manager(this);
     m_sqlManager->initialize();
@@ -31,18 +42,53 @@ void Core::init()
     senserData.fill(172);
     QObject::connect(m_manager, &Manager::Coil, this, &Core::Coil_Data);
     QObject::connect(m_manager, &Manager::HodingRegister, this, &Core::HodingRegister_Data);
+    QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
+    QObject::connect(m_manager, &Manager::update_switch, this, [=](int index, bool v)
+        {
+            if (index == 1) 
+            {
+                m_proxy->setFanPidMonitorOn(v);
+            }
+            else if (index == 2) {
+                m_proxy->setOutValvePidOn(v);
+            }
+            else if (index == 4) {
+                m_proxy->setMotorFrequencySwitchOn(v);
+            }
+            else if (index == 5) {
+                m_proxy->setMotorReset(v);
+            }
+        });
+
+    QObject::connect(m_manager, &Manager::update_PID ,this, [=](int index, quint16 p, quint16 i, quint16 d) 
+        {
+            if (index == 1) {
+                m_proxy->setFanPidP(p);
+                m_proxy->setFanPidI(i);
+                m_proxy->setFanPidD(d);
+            }
+            else if (index == 2) {
+                m_proxy->setOutValveP(p);
+                m_proxy->setOutValveI(i);
+                m_proxy->setOutValveD(d);
+
+            }
+        });
+
+
     QObject::connect(m_manager, &Manager::_PV1, this, &Core::pidPV1);
     QObject::connect(m_manager, &Manager::_PV2, this, &Core::pidPV2);
     QObject::connect(m_manager, &Manager::_PID1, this, &Core::PID1);
     QObject::connect(m_manager, &Manager::_PID2, this, &Core::PID2);
-
+    QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
+    QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_AO1);
 
     
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
     QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, m_manager, &Manager::set_mode1);
 
     QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, m_manager, &Manager::set_sv);
-    QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_sv2);
+    QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, m_manager, &Manager::set_sv2);
     QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
 
@@ -71,9 +117,46 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::fan9SwitchOnChanged, m_manager, &Manager::set_Fan9Open);
 
     QObject::connect(m_proxy, &TdProxy::fanAllTargetRpmChanged, m_manager, &Manager::set_allFan);
+    QObject::connect(m_proxy, &TdProxy::fanEmergencySwitchOnChanged, m_manager, &Manager::set_FanPower);
 
     QObject::connect(m_proxy, &TdProxy::motorResetChanged, m_manager, &Manager::set_Reset);
+    QObject::connect(m_proxy, &TdProxy::modeSelectChanged, m_manager,&Manager::set_server);
+    QObject::connect(m_proxy, &TdProxy::captureFreqChanged, this, [=](int v) 
+        {
+            m_sqlManager->setReadFrequency(v);
+        });
 
+
+    QStringList ips;
+    const auto all = QNetworkInterface::allAddresses();
+
+    for (const QHostAddress& addr : all)
+    {
+        // 1. 基本過濾：排除回環位址 (127.0.0.1) 且只抓 IPv4
+        if (addr.isLoopback() || addr.protocol() != QAbstractSocket::IPv4Protocol)
+            continue;
+
+        QString ipStr = addr.toString();
+
+        // 2. 核心邏輯：篩選以 "192." 開頭的位址
+        if (ipStr.startsWith("192."))
+        {
+            ips << ipStr;
+
+            m_proxy->setIpAddress(ipStr);
+        }
+    }
+
+    if (ips.isEmpty())
+    {
+        //qInfo() << "找不到 192 開頭的 IPv4 位址";
+    }
+    else
+    {
+        qInfo() << "符合條件的 IP 位址:" << ips;
+    }
+    int freq = m_sqlManager->readFrequency();
+    m_proxy->setCaptureFreq(freq);
 }
 
 void Core::Coil_Data(QVector <quint16> result)
@@ -266,6 +349,116 @@ void Core::updateProxyProperty(int index, quint16 value)
 
     default: break;
 }
+}
+
+void Core::updateProxyProperty2(int index, quint16 value)
+{
+    switch (index)
+    {
+    case 1:
+
+        m_proxy->setMotorFrequency(value); break;
+    case 2:
+        if (value == 0)
+        {
+            m_proxy->setFan1SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan1SwitchOn(true);
+        }
+        m_proxy->setFan1TargetRpm(value); break;
+    case 3:
+        if (value == 0)
+        {
+            m_proxy->setFan2SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan2SwitchOn(true);
+        }
+        m_proxy->setFan2TargetRpm(value); break;
+    case 4:
+        if (value == 0)
+        {
+            m_proxy->setFan3SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan3SwitchOn(true);
+        }
+        m_proxy->setFan3TargetRpm(value); break;
+    case 5:
+        if (value == 0)
+        {
+            m_proxy->setFan4SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan4SwitchOn(true);
+        }
+        m_proxy->setFan4TargetRpm(value); break;
+    case 6:
+        if (value == 0)
+        {
+            m_proxy->setFan5SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan5SwitchOn(true);
+        }
+        m_proxy->setFan5TargetRpm(value); break;
+    case 7:
+        if (value == 0)
+        {
+            m_proxy->setFan6SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan6SwitchOn(true);
+        }
+        m_proxy->setFan6TargetRpm(value); break;
+    case 8:
+        if (value == 0)
+        {
+            m_proxy->setFan7SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan7SwitchOn(true);
+        }
+        m_proxy->setFan7TargetRpm(value); break;
+    case 9:
+        if (value == 0)
+        {
+            m_proxy->setFan8SwitchOn(false);
+        }
+        else
+        {
+            m_proxy->setFan8SwitchOn(true);
+        }
+        m_proxy->setFan8TargetRpm(value); break;
+    case 10:
+        if (value == 0)
+        {
+            m_proxy->setFan9SwitchOn(false);
+        }
+        else 
+        {
+            m_proxy->setFan9SwitchOn(true);
+        }
+        m_proxy->setFan9TargetRpm(value); break;
+    case 11:
+        m_proxy->setReturnValveOpening(value); break;
+    case 12:
+        m_proxy->setOutValveOpening(value); break;
+    case 15: 
+        m_proxy->setOutWaterTargetTemp(value); break; 
+    case 16:
+        m_proxy->setTargetPressureDiff(value); break;
+    default:
+        break;
+    }
 }
 
 void Core::saveProductionSettings()

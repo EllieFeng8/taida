@@ -28,6 +28,7 @@ public:
     void writeSingleCoil(int address, bool value);
 
     //寫入
+    void set_MV(double v);
     void set_MotorRun(bool v);
     void set_FanPower(bool v);
     void set_Fan1Open(bool v);
@@ -40,6 +41,7 @@ public:
     void set_Fan8Open(bool v);
     void set_Fan9Open(bool v);
 
+
     void set_Mode1(bool v);
     void set_Mode2(bool v);
     void set_STO(bool v);
@@ -48,6 +50,7 @@ public:
     void set_SV2(double v);
     void set_PID1(double p,double i,double d);
     void set_PID2(double p, double i, double d);
+    void set_AO1(double v);
     void set_Fan(double v);
     void set_5000HoldingRegister(bool t,int addr, double v);
     
@@ -107,7 +110,6 @@ private:
     int m5000_addr=0;
     double m5000_value = 0;
 
-
     bool m_Open1 = false;
     bool m_Open2 = false;
     bool m_Open3 = false;
@@ -128,6 +130,7 @@ private:
     bool fan9_open = false;
 
     bool m_STO = false;
+    double AO1 = 0.0;
     double MV1 = 0.0;
     double MV2 = 0.0;
     double SV1 = 0.0;
@@ -152,5 +155,6 @@ private:
     bool f_write5000 = false;
     bool f_setFAN = false;
     bool f_FanCtrl = false;
-    bool f_MotorCtrl = false;
+    bool f_MotorCtrl = false; //
+    bool f_setAO1 = false; //出水閥開度
 };

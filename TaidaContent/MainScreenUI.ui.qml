@@ -4021,15 +4021,15 @@ Rectangle {
                                     // height: 20
                                     // width: 40
                                     scale: 0.8
-                                    source: fansEmergency ? "assets/emergencyon.png" : "assets/emergencyoff.png"
+                                    source: Td.fanEmergencySwitchOn ? "assets/emergencyon.png" : "assets/emergencyoff.png"
                                     layer.enabled: true
 
                                 }
                             }
 
                             onClicked: {
-                                fansEmergency = !fansEmergency
-                                if(fansEmergency === true) {
+                                Td.fanEmergencySwitchOn = !Td.fanEmergencySwitchOn
+                                if(Td.fanEmergencySwitchOn === true) {
                                     Td.fan1SwitchOn = false
                                     Td.fan2SwitchOn = false
                                     Td.fan3SwitchOn = false

@@ -6,6 +6,8 @@
 #include "TdProxy.h"
 #include "SqlManager.h"
 #include "RESTManager.h"
+#include <QRandomGenerator>
+
 class Core : public QObject
 {
     Q_OBJECT
@@ -31,6 +33,8 @@ private:
     explicit Core(QObject* parent = nullptr){}
     ~Core();
     void updateProxyProperty(int index, quint16 value);
+    void updateProxyProperty2(int index, quint16 value);
+
     void saveProductionSettings();
 
     quint16 v_0;

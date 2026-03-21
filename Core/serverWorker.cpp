@@ -10,8 +10,15 @@ ServerWorker::~ServerWorker() {
     }
 }
 
-void ServerWorker::init()
+void ServerWorker::init(int port)
 {
+    if(m_server)
+    {
+        m_server->disconnectDevice();
+        m_server = nullptr;
+        status = false;
+        emit server_stat(status);
+    }
     m_server = new QModbusTcpServer(this);
 
     // 設定暫存器範圍：HoldingRegisters 從位址 0 開始，共 100 筆
@@ -25,7 +32,7 @@ void ServerWorker::init()
 
     m_server->setMap(reg);
     m_server->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
-    m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_serverPort);
+    m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
     m_server->setServerAddress(m_slaveId);
     //m_server->connectDevice();
 
@@ -35,7 +42,9 @@ void ServerWorker::init()
         qDebug() << "FAILED  Modbus Server :" << m_server->errorString();
     }
     else {
-        qDebug() << "Modbus Server is START , Port:" << m_serverPort;
+        qDebug() << "Modbus Server is START , Port:" << port;
+        status = true;
+        emit server_stat(status);
     }
 }
 

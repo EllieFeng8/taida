@@ -34,6 +34,7 @@ target_link_libraries(Core
         Qt${QT_VERSION_MAJOR}::Concurrent
         Qt${QT_VERSION_MAJOR}::SerialBus
         Qt${QT_VERSION_MAJOR}::Sql
+        Qt${QT_VERSION_MAJOR}::HttpServer
 
         #        Qt${QT_VERSION_MAJOR}::OpcUa
 )

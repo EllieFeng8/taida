@@ -17,7 +17,7 @@ public:
     void init();
     void set_mode1(bool v);
     void set_mode2(bool v);
-
+    void set_server(int port);
     void set_sv(int v);
     void set_sv2(int v);
 
@@ -37,8 +37,8 @@ public:
     void fan8TargetRpm(double v);
     void fan9TargetRpm(double v);
     void returnValveOpening(double v);
-
-
+    void set_FanPower(bool v);
+    void set_motor(bool v);
     void set_Fan1Open(bool v);
     void set_Fan2Open(bool v);
     void set_Fan3Open(bool v);
@@ -49,6 +49,7 @@ public:
     void set_Fan8Open(bool v);
     void set_Fan9Open(bool v);
     void set_allFan(double v);
+    void set_AO1(double v);
     void set_Estop(bool v);
     void set_Reset(bool v);
 signals:
@@ -61,7 +62,11 @@ signals:
     void _PV1(QVector <quint16> result);
     void _PV2(QVector <quint16> result);
     void _MV(QVector <quint16> result);
+    void updateToUi(int index,quint16 v);
+    void update_PID(int index, quint16 p,quint16 i,quint16 d);
+    void update_switch(int index, bool v);
 private:
+    bool server_OK = false;
     bool normal = true;
     bool m_PID1 = false;
     bool m_PID2 = false;
