@@ -19,9 +19,20 @@ public:
 
 public slots:
     //proxy
+    void set_PID_click();
     void set_PID(double v);
     void set_PID2(double v);
     //manager
+    void onPVdata(QVector <quint16> result)
+    {
+        double pv0 = result[0]/65.535;
+        double pv3 = result[3] /655.35;
+
+        m_proxy->setPressureDiff(qRound(pv0 * 100.0) / 100.0);
+        senserData[17] = pv0;
+        m_proxy->setOutletAirTemp(qRound(pv3 * 100.0) / 100.0);
+        senserData[16] = pv3;
+    }
     void Coil_Data(QVector <quint16> result);
     void HodingRegister_Data(QVector <quint16> result);
     void pidPV1(QVector <quint16> result);

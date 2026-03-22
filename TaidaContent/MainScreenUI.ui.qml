@@ -341,7 +341,7 @@ Rectangle {
 
                             Text {
                                 id: _text_3
-                                x: -38
+                                x: 5
                                 y: 0
 
                                 height: 28
@@ -351,10 +351,11 @@ Rectangle {
                                 font.family: "Inter"
                                 font.pixelSize: 20
                                 font.weight: Font.Bold
-                                horizontalAlignment: Text.AlignRight
+                                horizontalAlignment: Text.AlignCenter
                                 lineHeight: 28
                                 lineHeightMode: Text.FixedHeight
                                 text: Td.inWaterTemp
+                                //text:"66.5"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -1761,6 +1762,7 @@ Rectangle {
 
                             height: 20
                             width: 89.05
+                            visible:false
 
                             Image {
                                 id: correctionSwitch
@@ -3202,6 +3204,7 @@ Rectangle {
 
                             height: 20
                             width: 174
+                            
 
                             Item {
                                 id: correction2
@@ -3210,6 +3213,7 @@ Rectangle {
                                 // y: 2
                                 height: 20
                                 width: 89.05
+                                visible:false
 
                                 Image {
                                     id: correction2Switch
@@ -3766,6 +3770,10 @@ Rectangle {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
+                                    
+                                       
+                                       
+                                    
                                 }
                             }
                         }

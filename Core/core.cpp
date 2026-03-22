@@ -38,10 +38,41 @@ void Core::init()
     m_proxy = new TdProxy(this);
     m_manager = new Manager(this);
     m_sqlManager->initialize();
-    senserData.resize(35);
-    senserData.fill(172);
+    senserData.resize(40);
+    senserData.fill(0);
     QObject::connect(m_manager, &Manager::Coil, this, &Core::Coil_Data);
     QObject::connect(m_manager, &Manager::HodingRegister, this, &Core::HodingRegister_Data);
+    QObject::connect(m_manager, &Manager::update_savedata, this, [=](QVector<quint16> result)
+        {
+            QDateTime now = QDateTime::currentDateTime();
+
+            m_sqlManager->saveSensorData(now, senserData, result);
+        });
+    QObject::connect(m_manager, &Manager::update_input, this, [=](QVector<quint16> result) 
+        {
+            for (int i = 0; i < result.size(); ++i)
+            {
+                if (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 9 || i == 10 || i == 11 || i==13 || i == 14 || i == 15)
+                {
+                    senserData[i] = qRound(result[i] / 655.35 * 100.0) / 100.0;
+                }
+                else if (i == 12) {
+                    senserData[i] = qRound((result[i] / 655.35 * 8) * 100.0) / 100.0;
+                }
+                else 
+                {
+                    senserData[i] = qRound(result[i] / 65.535 * 100.0) / 100.0;
+                }
+            }
+
+          
+           double rawHeat = (((senserData[6] + senserData[7] + senserData[8] + senserData[9]) / 4-senserData[16]) * senserData[12] * 4186) / 60000 * 998.5;
+           senserData[19] = qRound(rawHeat * 100.0) / 100.0;
+           m_proxy->setHeatExchange(senserData[19]);
+            //QDateTime now = QDateTime::currentDateTime();
+            //m_sqlManager->saveSensorData(now,senserData );
+        });
+
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
     QObject::connect(m_manager, &Manager::update_switch, this, [=](int index, bool v)
         {
@@ -55,12 +86,12 @@ void Core::init()
             else if (index == 4) {
                 m_proxy->setMotorFrequencySwitchOn(v);
             }
-            else if (index == 5) {
-                m_proxy->setMotorReset(v);
+            else if (index == 3) {
+                m_proxy->setFanEmergencySwitchOn(v);
             }
         });
 
-    QObject::connect(m_manager, &Manager::update_PID ,this, [=](int index, quint16 p, quint16 i, quint16 d) 
+    QObject::connect(m_manager, &Manager::update_PID ,this, [=](int index, double p, double i, double d)
         {
             if (index == 1) {
                 m_proxy->setFanPidP(p);
@@ -75,11 +106,16 @@ void Core::init()
             }
         });
 
+    QObject::connect(m_manager, &Manager::R_PV, this, &Core::onPVdata);
 
     QObject::connect(m_manager, &Manager::_PV1, this, &Core::pidPV1);
     QObject::connect(m_manager, &Manager::_PV2, this, &Core::pidPV2);
     QObject::connect(m_manager, &Manager::_PID1, this, &Core::PID1);
     QObject::connect(m_manager, &Manager::_PID2, this, &Core::PID2);
+    //QObject::connect(m_manager, &Manager::_MV, this, [=](QVector<quint16> v) {
+        //m_proxy->setOutValveOpeningP(v[1]);
+        //});
+
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
     QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_AO1);
 
@@ -87,9 +123,10 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
     QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, m_manager, &Manager::set_mode1);
 
-    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, m_manager, &Manager::set_sv);
-    QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, m_manager, &Manager::set_sv2);
-    QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
+    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv(v*10); });
+    QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
+    QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
+    //QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
 
     
@@ -176,23 +213,27 @@ void Core::HodingRegister_Data(QVector <quint16> result)
     {
         //qDebug() << "value" << i << " = " << result[i];
         updateProxyProperty(i, result[i]);
-        senserData[i] = result[i];
+        //senserData[i] = result[i];
     }
-    QDateTime now = QDateTime::currentDateTime();
-    m_sqlManager->saveSensorData(now,senserData );
+    
 }
 
 void Core::pidPV1(QVector <quint16> result)
 {
-    double v = result[0];
-    m_proxy->setPressureDiff(v);
+   // double sv = result[0];
+   // m_proxy->setTargetPressureDiff(qRound(sv / 10));
+    //double v = result[0];
+    //m_proxy->setPressureDiff(qRound(v * 100.0) / 100.0);
+    //senserData[17] = v*40.96;
 }
 void Core::pidPV2(QVector <quint16> result)
 {
-    double pv = result[0];
-    double sv = result[1];
-    m_proxy->setOutletAirTemp(pv);
-    //m_proxy->setOutWaterTargetTemp(sv);
+    //double pv = result[0];  
+    double sv = result[0];
+    //m_proxy->setOutletAirTemp(qRound(pv * 100.0) / 100.0);
+    //senserData[16] = pv*40.96;
+
+    m_proxy->setOutWaterTargetTempP(qRound(sv/100));
 }
 void Core::PID1(QVector <quint16> result)
 {
@@ -219,14 +260,21 @@ void Core::set_PID(double v)
     double Pid = m_proxy->m_fanPidP;
     double pId = m_proxy->m_fanPidI;
     double piD= m_proxy->m_fanPidD;
-    m_manager->set_PID(Pid,pId,piD);
+    m_manager->set_PID(Pid*1000,pId*1000,piD*1000);
+}
+void Core::set_PID_click()
+{
+    double Pid = m_proxy->m_fanPidP;
+    double pId = m_proxy->m_fanPidI;
+    double piD = m_proxy->m_fanPidD;
+    m_manager->set_PID(Pid * 1000, pId * 1000, piD * 1000);
 }
 void Core::set_PID2(double v)
-{
+{   
     double Pid = m_proxy->m_outValveP;
     double pId = m_proxy->m_outValveI;
     double piD = m_proxy->m_outValveD;
-    m_manager->set_PID2(Pid, pId, piD);
+    m_manager->set_PID2(Pid*1000, pId * 1000, piD * 1000);
 }
 void Core::updateProxyProperty(int index, quint16 value)
 {
@@ -283,7 +331,7 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 12:
         if (value == v_12) { return; }
         v_12 = value; 
-        m_proxy->setCurrentWaterFlow(value); break;// 流量計
+        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
     case 13:
         if (value == v_13) { return; }
         v_13 = value; 
@@ -296,18 +344,22 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 16: 
         if (value == v_16) { return; }
         v_16 = value; 
-        m_proxy->setMotorFrequencyP(qRound((value / 40.95) * 10.0) / 10.0); break; //循環水泵速率輸出
+        m_proxy->setMotorFrequencyP(qRound((value / 40.95*0.6) * 10.0) / 10.0); break; //循環水泵速率輸出
     case 17: 
         if (value == v_17) { return; }
         v_17 = value; 
+        m_proxy->setFan1TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan1TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇1
+
     case 18: 
         if (value == v_18) { return; }
         v_18 = value;
+        m_proxy->setFan2TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan2TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇2
     case 19: 
         if (value == v_19) { return; }
         v_19 = value; 
+        m_proxy->setFan3TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan3TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇3
     case 20: break; //
     case 21: break; //
@@ -316,18 +368,23 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 24: 
         if (value == v_24) { return; }
         v_24 = value; 
+        m_proxy->setFan4TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan4TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇4
+        
     case 25:
         if (value == v_25) { return; }
         v_25 = value;
+        m_proxy->setFan5TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan5TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇5
     case 26: 
         if (value == v_26) { return; }
         v_26 = value; 
+        m_proxy->setFan6TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan6TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇6
     case 27:
         if (value == v_27) { return; }
         v_27 = value; 
+        m_proxy->setFan7TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan7TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇7
     case 28: break; //
     case 29: break; //
@@ -336,10 +393,12 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 32:
         if (value == v_32) { return; }
         v_32 = value; 
+        m_proxy->setFan8TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan8TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇8
     case 33:
         if (value == v_33) { return; }
         v_33 = value; 
+        m_proxy->setFan9TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
         m_proxy->setFan9TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //風扇9
     case 34:
         if (value == v_34) { return; }
@@ -357,7 +416,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
     {
     case 1:
 
-        m_proxy->setMotorFrequency(value); break;
+        m_proxy->setMotorFrequency(qRound((value / 40.95*0.6) * 10.0) / 10.0); break;
     case 2:
         if (value == 0)
         {
@@ -367,7 +426,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan1SwitchOn(true);
         }
-        m_proxy->setFan1TargetRpm(value); break;
+        m_proxy->setFan1TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 3:
         if (value == 0)
         {
@@ -377,7 +436,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan2SwitchOn(true);
         }
-        m_proxy->setFan2TargetRpm(value); break;
+        m_proxy->setFan2TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 4:
         if (value == 0)
         {
@@ -387,7 +446,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan3SwitchOn(true);
         }
-        m_proxy->setFan3TargetRpm(value); break;
+        m_proxy->setFan3TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 5:
         if (value == 0)
         {
@@ -397,7 +456,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan4SwitchOn(true);
         }
-        m_proxy->setFan4TargetRpm(value); break;
+        m_proxy->setFan4TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 6:
         if (value == 0)
         {
@@ -407,7 +466,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan5SwitchOn(true);
         }
-        m_proxy->setFan5TargetRpm(value); break;
+        m_proxy->setFan5TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 7:
         if (value == 0)
         {
@@ -417,7 +476,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan6SwitchOn(true);
         }
-        m_proxy->setFan6TargetRpm(value); break;
+        m_proxy->setFan6TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 8:
         if (value == 0)
         {
@@ -427,7 +486,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan7SwitchOn(true);
         }
-        m_proxy->setFan7TargetRpm(value); break;
+        m_proxy->setFan7TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 9:
         if (value == 0)
         {
@@ -437,7 +496,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan8SwitchOn(true);
         }
-        m_proxy->setFan8TargetRpm(value); break;
+        m_proxy->setFan8TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 10:
         if (value == 0)
         {
@@ -447,15 +506,15 @@ void Core::updateProxyProperty2(int index, quint16 value)
         {
             m_proxy->setFan9SwitchOn(true);
         }
-        m_proxy->setFan9TargetRpm(value); break;
+        m_proxy->setFan9TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 11:
-        m_proxy->setReturnValveOpening(value); break;
+        m_proxy->setReturnValveOpening(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 12:
-        m_proxy->setOutValveOpening(value); break;
+        m_proxy->setOutValveOpening(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 15: 
-        m_proxy->setOutWaterTargetTemp(value); break; 
+        m_proxy->setOutWaterTargetTemp(qRound((value) * 10.0) / 10.0); break;
     case 16:
-        m_proxy->setTargetPressureDiff(value); break;
+        m_proxy->setTargetPressureDiff(qRound((value) * 10.0) / 10.0); break;
     default:
         break;
     }

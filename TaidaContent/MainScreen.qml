@@ -42,7 +42,7 @@ MainScreenUI {
         fansPTxtInput.focus = false
         fansITxtInput.focus = false
         fansDTxtInput.focus = false
-
+ Td.fanPidSet();
     console.log("fans pid:",Td.fanPidP,Td.fanPidI,Td.fanPidD)
     }
 

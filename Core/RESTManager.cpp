@@ -245,6 +245,25 @@ void RESTManager::setupRoutes()
 
     m_httpServer.route("/api/sensor/range", QHttpServerRequest::Method::Options, optionsHandler);
 
+    // GET holding range
+    m_httpServer.route("/api/holding/range", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest& req) {
+        QUrlQuery q(req.query());
+        qint64 from = 0, to = 0;
+        if (!parseIntExpr(q.queryItemValue("from"), from) || !parseIntExpr(q.queryItemValue("to"), to) || to < from)
+        {
+            return errResp(400, "invalid from/to");
+        }
+        QJsonArray out;
+        QString errMsg;
+        if (!m_sql->queryHoldingRangeJson(from, to, &out, &errMsg))
+        {
+            return errResp(500, errMsg);
+        }
+        return jsonResp(out);
+    });
+
+    m_httpServer.route("/api/holding/range", QHttpServerRequest::Method::Options, optionsHandler);
+
     // GET device sn
     m_httpServer.route("/api/device/sn", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest&) {
         QString sn = loadDeviceSn();
@@ -272,6 +291,25 @@ void RESTManager::setupRoutes()
 
     m_httpServer.route("/api/sensor/last", QHttpServerRequest::Method::Options, optionsHandler);
 
+    // GET last holding registers
+    m_httpServer.route("/api/holding/last", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest&) {
+        auto rows = m_sql->fetchHoldingRegisters(QDate::currentDate(), 1);
+        if (rows.isEmpty())
+        {
+            return errResp(404, "no data");
+        }
+        const QVariantList& r = rows.first();
+        QJsonObject obj;
+        obj.insert("ts", r.value(0).toLongLong());
+        for (int i = 1; i < r.size(); ++i)
+        {
+            obj.insert(QString("h%1").arg(i), QJsonValue::fromVariant(r.at(i)));
+        }
+        return jsonResp(obj);
+    });
+
+    m_httpServer.route("/api/holding/last", QHttpServerRequest::Method::Options, optionsHandler);
+
     // GET range by datetime (ISO string)
     m_httpServer.route("/api/sensor/rangeDateTime", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest& req) {
         QUrlQuery q(req.query());
@@ -294,6 +332,29 @@ void RESTManager::setupRoutes()
     });
 
     m_httpServer.route("/api/sensor/rangeDateTime", QHttpServerRequest::Method::Options, optionsHandler);
+
+    // GET holding range by datetime (ISO string)
+    m_httpServer.route("/api/holding/rangeDateTime", QHttpServerRequest::Method::Get, [this](const QHttpServerRequest& req) {
+        QUrlQuery q(req.query());
+        qint64 from = 0, to = 0;
+        if (!parseDateTimeIso(q.queryItemValue("from"), from) || !parseDateTimeIso(q.queryItemValue("to"), to))
+        {
+            return errResp(400, "invalid datetime");
+        }
+        if (to < from)
+        {
+            return errResp(400, "to < from");
+        }
+        QJsonArray out;
+        QString errMsg;
+        if (!m_sql->queryHoldingRangeJson(from, to, &out, &errMsg))
+        {
+            return errResp(500, errMsg);
+        }
+        return jsonResp(out);
+    });
+
+    m_httpServer.route("/api/holding/rangeDateTime", QHttpServerRequest::Method::Options, optionsHandler);
 }
 
 bool RESTManager::parseIntExpr(const QString& text, qint64& outVal)

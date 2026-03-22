@@ -7,10 +7,12 @@
 #include <qvariant>
 #include <QModbusTcpClient>
 #include <QModbusReply>
-struct WriteRequest {
-    QModbusClient* targetDevice; // m_5000 或 m_6022
+#include <QQueue>
+
+struct HoldingRegisterRequest {
+    bool target;
     int address;
-    QVector<uint16_t> values;    // 存放要寫入的一或多個值
+    double value; // 原本傳 double，但底層 WriteSingleHoldingRegisters 用 int，建議統一
 };
 
 class clientWorker : public QObject
@@ -57,8 +59,8 @@ public:
     void set6022Mode_1(bool v);
     void set6022Mode_2(bool v);
 
-    void writeSV1(double targetSV);
-    void writeSV2(double targetSV);
+    void writeSV1(float targetSV);
+    void writeSV2(float targetSV);
     void writePID1( double p, double i, double d);
     void writePID2( double p, double i, double d);
     void writeHoldingRegisters(int address, double value, int number);
@@ -69,11 +71,11 @@ public:
 
     //讀取
     void Read5000HoldingRegisters( int slave, int startAddress, int number); 
-
+    void read_test();
     void Read6022PV1(); //第一組PV 
     void Read6022PV2(); //第二組PV
     void Read6022MV(); //PID 輸出
-
+    //void readtest();
     void ReadPID1(); //第一組PID
     void ReadPID2(); //第二組PID 
     void ReadCoils( int slave, int startAddress, int number); 
@@ -87,6 +89,7 @@ signals:
     void m_5000Coil(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
     void m_5000HodingRegister(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
     
+    void R_PV(QVector <quint16> result);
     void m_6022PV1(QVector <quint16> result);
     void m_6022SV1(QVector <quint16> result);
     void m_6022PV2(QVector <quint16> result);
@@ -96,7 +99,7 @@ signals:
     void m_6022PID2(QVector <quint16> result);
 
 private:
-    WriteRequest m_pendingWrite;
+    QQueue<HoldingRegisterRequest> m_writeQueue; // 新增佇列
     QMutex m_lock;
     QModbusTcpClient* m_5000 = nullptr;
     QModbusTcpClient* m_6022 = nullptr;

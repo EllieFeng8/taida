@@ -14,6 +14,7 @@ public:
     explicit Manager(QObject* parent = nullptr);
     ~Manager();
 
+
     void init();
     void set_mode1(bool v);
     void set_mode2(bool v);
@@ -58,13 +59,16 @@ signals:
     void Adam6022Data(QVector <quint16> result);
     void _PID1(QVector <quint16> result);
     void _PID2(QVector <quint16> result);
-
+    void R_PV(QVector <quint16> result);
     void _PV1(QVector <quint16> result);
     void _PV2(QVector <quint16> result);
     void _MV(QVector <quint16> result);
     void updateToUi(int index,quint16 v);
-    void update_PID(int index, quint16 p,quint16 i,quint16 d);
+    void update_PID(int index, double p, double i, double d);
     void update_switch(int index, bool v);
+    void update_input(QVector <quint16> result);
+    void update_savedata(QVector <quint16> result);
+
 private:
     bool server_OK = false;
     bool normal = true;

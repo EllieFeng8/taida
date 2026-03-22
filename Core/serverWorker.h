@@ -5,7 +5,7 @@
 #include <QModbusDataUnit>
 #include <QVector>
 #include <QDebug>
-
+#include <qmutex.h>
 class ServerWorker : public QObject
 {
     Q_OBJECT
@@ -13,9 +13,10 @@ public:
     explicit ServerWorker(QObject* parent = nullptr);
     ~ServerWorker();
     QModbusTcpServer* m_server = nullptr;
-
+    QVector<quint16> SaveData;
     void init(int port); // 初始化 Server
     //void connectDevice();
+    QVector<quint16> getSavedata();
 signals:
     void modbusDataChanged(QModbusDataUnit::RegisterType table, int address, quint16 value);
     void server_stat(bool v);
@@ -32,6 +33,7 @@ public slots:
 
 
 private:
+    QMutex lock;
     const int m_serverPort = 502; // 建議先用 5020 測試
     const int m_slaveId = 1;
     bool status = false;

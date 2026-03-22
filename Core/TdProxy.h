@@ -952,7 +952,9 @@ public:
     }
 
 
-
+    Q_INVOKABLE void fanPidSet() {
+        emit fanPidSetSignal();
+    }
 
     signals:
     void inWaterTempChanged(double value);
@@ -1076,6 +1078,7 @@ public:
     void ipAddressChanged(QString value);
     void captureFreqChanged(int value);
     void modeSelectChanged(int value);
+    void fanPidSetSignal();
 
 public:
     // =========================

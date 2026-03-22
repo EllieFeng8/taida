@@ -242,7 +242,7 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
                 for (int i = 0; i < reply->result().valueCount(); i++)
                 {
                     result.append(reply->result().value(i));
-                    if (i < 15)
+                    if (i < 16)
                     {
                         result_in.append(reply->result().value(i));
                     }
@@ -343,7 +343,7 @@ void clientWorker::Read6022PV1()
     // startAddress = modbus 起始位置
     // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
     if (!m_6022) return;
-    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1043, 4);
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1019, 2);
     QEventLoop loop;
     QVector <quint16> result;
     result.resize(2);
@@ -354,11 +354,11 @@ void clientWorker::Read6022PV1()
 
                 quint16 reg0 = res.value(0);
                 quint16 reg1 = res.value(1);
-                quint16 reg2 = res.value(2);
-                quint16 reg3 = res.value(3);
-                result[0]= (static_cast<int32_t>(reg1) << 16) | (reg0 & 0xFFFF);
-                result[1]= (static_cast<int32_t>(reg3) << 16) | (reg2 & 0xFFFF);
+                quint32 rel = ((static_cast<int32_t>(reg0) << 16) | static_cast<int32_t>(reg1));
+                result[0]= rel/10;
+
                 emit m_6022PV1(result);
+                qDebug() << "loop-0 SV*1000 = " << rel;
 
             }
             else {
@@ -376,11 +376,11 @@ void clientWorker::Read6022PV2()
     // startAddress = modbus 起始位置
     // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
     if (!m_6022) return;
-    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1299, 4);
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1275, 2);
     QEventLoop loop;
 
     QVector <quint16> result;
-    result.resize(2);
+    result.resize(1);
     if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
         QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
             if (reply->error() == QModbusDevice::NoError) {
@@ -388,12 +388,42 @@ void clientWorker::Read6022PV2()
 
                 quint16 reg0 = res.value(0);
                 quint16 reg1 = res.value(1);
-                quint16 reg2 = res.value(2);
-                quint16 reg3 = res.value(3);
-                result[0] = (static_cast<int32_t>(reg1) << 16) | (reg0 & 0xFFFF);
-                result[1] = (static_cast<int32_t>(reg3) << 16) | (reg2 & 0xFFFF);
-
+                quint32 rel = ((static_cast<int32_t>(reg0) << 16) | static_cast<int32_t>(reg1));
+                result[0] = rel/10;
+                qDebug() << "loop-1 SV*1000 = " << rel;
                 emit m_6022PV2(result);
+
+            }
+            else {
+                qDebug() << "Modbus read error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+}
+
+void clientWorker::read_test()
+{
+    // slave = 站號
+    // startAddress = modbus 起始位置
+    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
+    if (!m_6022) return;
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0, 4);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                const QModbusDataUnit res = reply->result();
+                for (int i = 0; i < res.valueCount(); i++)
+                {
+                    result.append(res.value(i));
+                }
+                qDebug() << "PV0 = " << result[0] << "&&&" << " PV3 = " << result[3];
+
+                emit R_PV(result);
 
             }
             else {
@@ -525,7 +555,7 @@ void clientWorker::writeHoldingRegisters(int address, double value, int number)
     {
         return;
     }
-    qDebug() << "set all fan value = " << value;
+    //qDebug() << "set all fan value = " << value;
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, address, number);
     for (int i = 0; i < 17; ++i) {
         writeUnit.setValue(i, value);
@@ -567,8 +597,11 @@ void clientWorker::set6022Mode_1(bool v)
 
 
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 999, 2);
-    writeUnit.setValue(0, highWord);
-    writeUnit.setValue(1, lowWord);
+    
+    //writeUnit.setValue(0, highWord);
+    //writeUnit.setValue(1, lowWord);
+    writeUnit.setValue(0, 0);
+    writeUnit.setValue(1, v ? 1 : 2);
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
@@ -583,7 +616,7 @@ void clientWorker::set6022Mode_1(bool v)
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set mode =" << v;
+        qDebug() << "success set 6022 Loop-0  Mode  = " << v;
     }
     else {
         qDebug() << "set mode failed :" << reply->errorString();
@@ -642,8 +675,8 @@ void clientWorker::set6022Mode_2(bool v)
 
 
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1255, 2);
-    writeUnit.setValue(0, highWord);
-    writeUnit.setValue(1, lowWord);
+    writeUnit.setValue(0, 0);
+    writeUnit.setValue(1, v ? 1:2);
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
@@ -658,7 +691,7 @@ void clientWorker::set6022Mode_2(bool v)
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set mode =" << v;
+        qDebug() << "success set 6022 Loop-1  Mode  = " << v;
     }
     else {
         qDebug() << "set mode failed :" << reply->errorString();
@@ -668,7 +701,7 @@ void clientWorker::set6022Mode_2(bool v)
 
 }
 
-void clientWorker::writeSV1(double targetSV) {
+void clientWorker::writeSV1(float targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
         qDebug() << "Modbus is not connect";
         return;
@@ -677,7 +710,7 @@ void clientWorker::writeSV1(double targetSV) {
     // 1. 根據 ADAM-6022 手冊計算數值
     // SV 地址 41020 -> Offset 1019
     // 假設小數位數為 3，需乘以 1000
-    int32_t rawValue = static_cast<int32_t>(targetSV * 1000);
+    int32_t rawValue = static_cast<int32_t>(targetSV );
     uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
 
@@ -709,7 +742,7 @@ void clientWorker::writeSV1(double targetSV) {
 
 }
 
-void clientWorker::writeSV2(double targetSV) {
+void clientWorker::writeSV2(float targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
         qDebug() << "Modbus is not connect";
         return;
@@ -718,7 +751,7 @@ void clientWorker::writeSV2(double targetSV) {
     // 1. 根據 ADAM-6022 手冊計算數值
     // SV 地址 41020 -> Offset 1019
     // 假設小數位數為 3，需乘以 1000
-    int32_t rawValue = static_cast<int32_t>(targetSV * 1000);
+    int32_t rawValue = static_cast<int32_t>(targetSV );
     uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
 
@@ -756,15 +789,15 @@ void clientWorker::writePID1(double p, double i, double d) {
         return;
     }
 
-    int32_t P = static_cast<int32_t>(p * 1000);
+    int32_t P = static_cast<int32_t>(p );
     uint16_t highWord_P = static_cast<uint16_t>((P >> 16) & 0xFFFF);
     uint16_t lowWord_P = static_cast<uint16_t>(P & 0xFFFF);
 
-    int32_t I = static_cast<int32_t>(i * 1000);
+    int32_t I = static_cast<int32_t>(i );
     uint16_t highWord_I = static_cast<uint16_t>((I >> 16) & 0xFFFF);
     uint16_t lowWord_I = static_cast<uint16_t>(I & 0xFFFF);
 
-    int32_t D = static_cast<int32_t>(d * 1000);
+    int32_t D = static_cast<int32_t>(d );
     uint16_t highWord_D = static_cast<uint16_t>((D >> 16) & 0xFFFF);
     uint16_t lowWord_D = static_cast<uint16_t>(D & 0xFFFF);
 
@@ -805,15 +838,15 @@ void clientWorker::writePID2(double p, double i, double d) {
         return;
     }
 
-    int32_t P = static_cast<int32_t>(p * 1000);
+    int32_t P = static_cast<int32_t>(p );
     uint16_t highWord_P = static_cast<uint16_t>((P >> 16) & 0xFFFF);
     uint16_t lowWord_P = static_cast<uint16_t>(P & 0xFFFF);
 
-    int32_t I = static_cast<int32_t>(i * 1000);
+    int32_t I = static_cast<int32_t>(i );
     uint16_t highWord_I = static_cast<uint16_t>((I >> 16) & 0xFFFF);
     uint16_t lowWord_I = static_cast<uint16_t>(I & 0xFFFF);
 
-    int32_t D = static_cast<int32_t>(d * 1000);
+    int32_t D = static_cast<int32_t>(d );
     uint16_t highWord_D = static_cast<uint16_t>((D >> 16) & 0xFFFF);
     uint16_t lowWord_D = static_cast<uint16_t>(D & 0xFFFF);
 
@@ -868,14 +901,16 @@ void clientWorker::set_Mode2(bool v)
     m_mode2 = v;
     f_setMode2 = true;
 }
-void clientWorker::set_5000HoldingRegister(bool t,int addr,double v)
+void clientWorker::set_5000HoldingRegister(bool t, int addr, double v)
 {
-    m5000_target = t;
-    m5000_addr = addr;
-    m5000_value = v;
 
-    f_write5000 = true;
+    HoldingRegisterRequest req;
+    req.target = t;
+    req.address = addr;
+    req.value =v; 
 
+    m_writeQueue.enqueue(req); // 加入佇列
+    // 不需要再設定 f_write5000，後面直接檢查 Queue 是否為空
 }
 void clientWorker::set_STO(bool v)
 {
@@ -1127,24 +1162,26 @@ void clientWorker::poll()
     }
     if(m_mode2)
     {
-        writeHoldingRegisters(42, MV2, 1);
+        //writeHoldingRegisters(42, MV2, 1);
     }
     if (f_setFAN)
     {
         writeHoldingRegisters(25, m_setALL, 17);
         f_setFAN = false;
     }
-    if (f_write5000 && m5000_addr!=99999 && m5000_value!=99999)//確保不會使用到錯誤的數值,每次寫入完 將2個值設為99999
-    {
-        QMutexLocker locker(&m_lock);
-        bool _t= m5000_target;
-        int _addr = m5000_addr;
-        double _value = m5000_value;
-        WriteSingleHoldingRegisters(_t,1,_addr, _value);
-        m5000_addr = 99999;
-        m5000_value = 99999;
-        f_write5000 = false;
-    }
+   
+        while (!m_writeQueue.isEmpty())
+        {
+            HoldingRegisterRequest req = m_writeQueue.dequeue();
+
+            // 釋放鎖定再執行 Modbus 通訊 (避免 Block 其它執行緒太久)
+            // 因為 WriteSingleHoldingRegisters 裡面有 QEventLoop，會暫停在這裡直到通訊完成
+
+
+            WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
+
+        }
+    
     if (f_setSV1)
     {
         writeSV1(SV1);
@@ -1175,7 +1212,7 @@ void clientWorker::poll()
 
     ReadCoils(1, 0, 15);
     Read5000HoldingRegisters( 1, 8, 35);
-
+    read_test();
     Read6022PV1();
     Read6022PV2();
     Read6022MV();

@@ -1,5 +1,5 @@
 #include "ServerWorker.h"
-
+#include <QMutexLocker>
 ServerWorker::ServerWorker(QObject* parent) : QObject(parent) {}
 
 ServerWorker::~ServerWorker() {
@@ -12,6 +12,7 @@ ServerWorker::~ServerWorker() {
 
 void ServerWorker::init(int port)
 {
+    SaveData.resize(100);
     if(m_server)
     {
         m_server->disconnectDevice();
@@ -48,6 +49,15 @@ void ServerWorker::init(int port)
     }
 }
 
+QVector<quint16>  ServerWorker::getSavedata()
+{
+    QMutexLocker m_lock(&lock);
+    QVector<quint16> data = SaveData;
+    data.detach();
+    return data;
+
+}
+
 void ServerWorker::updateCoils(int startAddr, const bool data)
 {
     //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
@@ -74,11 +84,12 @@ void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>&
 {
     {
         //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
-
+        QMutexLocker m_lock(&lock);
         // 將 ClientWorker 讀到的資料同步到 Server 
         for (int i = 0; i < data.size(); ++i) {
             //qDebug() << "set HoldingRegisters";
             m_server->setData(QModbusDataUnit::HoldingRegisters, startAddr + i, data[i]);
+            SaveData[startAddr + i] = data[i];
         }
     }
 }
@@ -87,9 +98,12 @@ void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
         //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
         // 將 ClientWorker 讀到的資料同步到 Server 
+    QMutexLocker m_lock(&lock);
 
         //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
         m_server->setData(QModbusDataUnit::HoldingRegisters, startAddr, data);   
+        SaveData[startAddr] = data;
+
 }
 void ServerWorker::updateInputRegister(int startAddr, const quint16 data)
 {
@@ -114,6 +128,7 @@ void ServerWorker::onDataWritten(QModbusDataUnit::RegisterType table, int addres
             //    << " new value:" << value;
 
             // 建議：發送一個帶有位址與數值的自定義訊號給 Manager
+            //qDebug() << table << " set " << currentAddr << " = " << value;
             emit modbusDataChanged(table, currentAddr, value);
         }
     }

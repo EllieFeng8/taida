@@ -12,6 +12,7 @@
 #include <QThread>
 #include <type_traits>
 #include <QString>
+#include <QtGlobal>
 
 class SqlManager : public QObject
 {
@@ -27,8 +28,9 @@ public:
 
     bool initialize();
 
-    bool saveSensorData(const QDateTime& timestamp, const QVector<double>& readings);
+    bool saveSensorData(const QDateTime& timestamp, const QVector<double>& readings, const QVector<quint16>& holdings = {});
     QVector<QVariantList> fetchSensorData(const QDate& date, int limit = 10);
+    QVector<QVariantList> fetchHoldingRegisters(const QDate& date, int limit = 10);
     bool setSensorName(int index, const QString& name);
     QString sensorName(int index);
     QStringList sensorNames();
@@ -40,6 +42,7 @@ public:
     bool insertOneSampleJson(const QJsonObject& obj, QString* errMsg = nullptr);
     bool insertBatchSamplesJson(const QJsonArray& items, int* inserted = nullptr, QString* errMsg = nullptr);
     bool queryRangeJson(qint64 from, qint64 to, QJsonArray* out, QString* errMsg = nullptr);
+    bool queryHoldingRangeJson(qint64 from, qint64 to, QJsonArray* out, QString* errMsg = nullptr);
     int readFrequency(QString* errMsg = nullptr) const;
     bool setReadFrequency(int value, QString* errMsg = nullptr);
 

@@ -21,7 +21,8 @@ SqlManager* SqlManager::s_instance = nullptr;
 
 namespace
 {
-    constexpr int kSensorCount = 20;
+    constexpr int kSensorCount = 40;
+    constexpr int kHoldingCount = 100;
     const char* kSettingsConnection = "settings";
 }
 
@@ -75,6 +76,85 @@ bool SqlManager::setReadFrequency(int value, QString* errMsg)
         {
             if (errMsg) *errMsg = query.lastError().text();
             return false;
+        }
+        return true;
+    });
+}
+
+bool SqlManager::queryHoldingRangeJson(qint64 from, qint64 to, QJsonArray* out, QString* errMsg)
+{
+    return runOnThread([this, from, to, out, errMsg]() {
+        if (!out)
+        {
+            if (errMsg) *errMsg = "output array is null";
+            return false;
+        }
+        *out = QJsonArray();
+        if (to < from)
+        {
+            if (errMsg) *errMsg = "to < from";
+            return false;
+        }
+
+        QDate startDate = QDateTime::fromSecsSinceEpoch(from).date();
+        QDate endDate = QDateTime::fromSecsSinceEpoch(to).date();
+
+        QDate iter = QDate(startDate.year(), startDate.month(), 1);
+        QDate endIter = QDate(endDate.year(), endDate.month(), 1);
+
+        while (iter <= endIter)
+        {
+            QString key = monthKey(iter);
+            QString filePath = dataFileForKey(key);
+            QFileInfo fi(filePath);
+            if (!fi.exists())
+            {
+                iter = iter.addMonths(1);
+                continue;
+            }
+
+            QSqlDatabase db = openDataDb(key);
+            if (!db.isValid() || !db.isOpen())
+            {
+                if (errMsg) *errMsg = "db open failed";
+                return false;
+            }
+            if (!ensureDataSchema(db))
+            {
+                if (errMsg) *errMsg = "ensure schema failed";
+                return false;
+            }
+
+            QStringList columns;
+            columns << "timestamp";
+            for (int i = 0; i < kHoldingCount; ++i)
+            {
+                columns << QString("h%1").arg(i + 1);
+            }
+
+            QSqlQuery query(db);
+            query.prepare(QString("SELECT %1 FROM holding_register WHERE timestamp >= :from AND timestamp <= :to ORDER BY timestamp")
+                              .arg(columns.join(", ")));
+            query.bindValue(":from", from);
+            query.bindValue(":to", to);
+            if (!query.exec())
+            {
+                if (errMsg) *errMsg = query.lastError().text();
+                return false;
+            }
+
+            while (query.next())
+            {
+                QJsonObject obj;
+                obj.insert("ts", query.value(0).toLongLong());
+                for (int i = 0; i < kHoldingCount; ++i)
+                {
+                    obj.insert(QString("h%1").arg(i + 1), QJsonValue::fromVariant(query.value(i + 1)));
+                }
+                out->append(obj);
+            }
+
+            iter = iter.addMonths(1);
         }
         return true;
     });
@@ -211,9 +291,9 @@ bool SqlManager::initialize()
     });
 }
 
-bool SqlManager::saveSensorData(const QDateTime& timestamp, const QVector<double>& readings)
+bool SqlManager::saveSensorData(const QDateTime& timestamp, const QVector<double>& readings, const QVector<quint16>& holdings)
 {
-    return runOnThread([this, timestamp, readings]() {
+    return runOnThread([this, timestamp, readings, holdings]() {
         QString key = monthKey(timestamp.date());
         QSqlDatabase db = openDataDb(key);
         if (!db.isValid() || !db.isOpen())
@@ -260,6 +340,44 @@ bool SqlManager::saveSensorData(const QDateTime& timestamp, const QVector<double
         {
             qWarning() << "Failed to insert sensor data:" << query.lastError().text();
             return false;
+        }
+
+        // insert holding registers if provided
+        if (!holdings.isEmpty())
+        {
+            QStringList hCols;
+            QStringList hPlaceholders;
+            hCols << "timestamp";
+            hPlaceholders << ":ts";
+            for (int i = 0; i < kHoldingCount; ++i)
+            {
+                hCols << QString("h%1").arg(i + 1);
+                hPlaceholders << QString(":h%1").arg(i + 1);
+            }
+
+            QSqlQuery hQuery(db);
+            hQuery.prepare(QString("INSERT INTO holding_register (%1) VALUES (%2)")
+                               .arg(hCols.join(", "))
+                               .arg(hPlaceholders.join(", ")));
+            hQuery.bindValue(":ts", timestamp.toSecsSinceEpoch());
+            for (int i = 0; i < kHoldingCount; ++i)
+            {
+                QString ph = QString(":h%1").arg(i + 1);
+                if (i < holdings.size())
+                {
+                    hQuery.bindValue(ph, static_cast<int>(holdings.at(i)));
+                }
+                else
+                {
+                    hQuery.bindValue(ph, QVariant());
+                }
+            }
+
+            if (!hQuery.exec())
+            {
+                qWarning() << "Failed to insert holding registers:" << hQuery.lastError().text();
+                return false;
+            }
         }
 
         return true;
@@ -711,6 +829,56 @@ QVector<QVariantList> SqlManager::fetchSensorData(const QDate& date, int limit)
     });
 }
 
+QVector<QVariantList> SqlManager::fetchHoldingRegisters(const QDate& date, int limit)
+{
+    return runOnThread([this, date, limit]() {
+        QVector<QVariantList> rows;
+        QString key = monthKey(date);
+        QSqlDatabase db = openDataDb(key);
+        if (!db.isValid() || !db.isOpen())
+        {
+            qWarning() << "Data database is not open for key" << key;
+            return rows;
+        }
+
+        if (!ensureDataSchema(db))
+        {
+            return rows;
+        }
+
+        QStringList columns;
+        columns << "timestamp";
+        for (int i = 0; i < kHoldingCount; ++i)
+        {
+            columns << QString("h%1").arg(i + 1);
+        }
+
+        int count = limit > 0 ? limit : 10;
+        QString sql = QString("SELECT %1 FROM holding_register ORDER BY timestamp DESC LIMIT %2")
+                          .arg(columns.join(", "))
+                          .arg(count);
+
+        QSqlQuery query(db);
+        if (!query.exec(sql))
+        {
+            qWarning() << "Failed to fetch holding registers:" << query.lastError().text();
+            return rows;
+        }
+
+        while (query.next())
+        {
+            QVariantList row;
+            for (int i = 0; i < columns.size(); ++i)
+            {
+                row << query.value(i);
+            }
+            rows << row;
+        }
+
+        return rows;
+    });
+}
+
 QString SqlManager::dataFilePathForMonth(const QDate& date) const
 {
     return runOnThread([this, date]() { return dataFileForKey(monthKey(date)); });
@@ -776,6 +944,21 @@ bool SqlManager::ensureSettingsDb()
             qWarning() << "Failed to ensure app settings schema:" << query.lastError().text();
             return false;
         }
+
+        // defaults for sensor names
+        QSqlQuery qDefaults(db);
+        qDefaults.prepare("INSERT OR IGNORE INTO sensor_config (sensor_key, sensor_name) VALUES "
+                          "('s1','inletWaterTemp'),('s2','inletWaterPressure'),('s3','returnWaterTemp'),"
+                          "('s4','returnWaterPressure'),('s5','outletWaterTemp'),('s6','outletWaterPressure'),"
+                          "('s7','coolingL1'),('s8','coolingL2'),('s9','coolingR1'),('s10','coolingR2'),"
+                          "('s11','inletAirTemp'),('s12','inletAirHumidity'),('s13','flowRate'),('s14','outletWaterPV'),"
+                          "('s15','returnWaterPV'),('s16','fanAutoSpeed'),('s17','outletAirTemp'),('s18','pressureDifference'),"
+                          "('s19','TBD'),('s20','heatExchange')");
+        if (!qDefaults.exec())
+        {
+            qWarning() << "Failed to insert default sensor config:" << qDefaults.lastError().text();
+            return false;
+        }
     }
 
     // ensure default read frequency exists
@@ -813,6 +996,26 @@ bool SqlManager::ensureDataSchema(QSqlDatabase& db) const
         if (!query.exec("CREATE INDEX IF NOT EXISTS idx_sensor_data_ts ON sensor_data(timestamp)"))
         {
             qWarning() << "Failed to ensure data index:" << query.lastError().text();
+            return false;
+        }
+
+        QStringList hCols;
+        hCols << "timestamp INTEGER NOT NULL";
+        for (int i = 0; i < kHoldingCount; ++i)
+        {
+            hCols << QString("h%1 INTEGER").arg(i + 1);
+        }
+
+        QString createHolding = QString("CREATE TABLE IF NOT EXISTS holding_register (%1)").arg(hCols.join(", "));
+        if (!query.exec(createHolding))
+        {
+            qWarning() << "Failed to ensure holding register schema:" << query.lastError().text();
+            return false;
+        }
+
+        if (!query.exec("CREATE INDEX IF NOT EXISTS idx_holding_register_ts ON holding_register(timestamp)"))
+        {
+            qWarning() << "Failed to ensure holding register index:" << query.lastError().text();
             return false;
         }
 
