@@ -53,8 +53,8 @@ void clientWorker::init()
         m_5000 = new QModbusTcpClient(this);
         m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
         m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port);
-        m_5000->setTimeout(1000);
-        m_5000->setNumberOfRetries(2);
+        m_5000->setTimeout(500);
+        //m_5000->setNumberOfRetries(2);
         connect(m_5000, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_5000, &QModbusTcpClient::errorOccurred,
@@ -66,8 +66,8 @@ void clientWorker::init()
         m_6022 = new QModbusTcpClient(this);
         m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip2);
         m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port2);
-        m_6022->setTimeout(1000);
-        m_6022->setNumberOfRetries(2);
+        m_6022->setTimeout(500);
+      /*  m_6022->setNumberOfRetries(2);*/
         connect(m_6022, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_6022, &QModbusTcpClient::errorOccurred,
@@ -92,21 +92,33 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
 
         if (m_pollTimer && !m_pollTimer->isActive())       
             m_pollTimer->start(50);
+        emit connected();
     }
     else if (state == QModbusDevice::UnconnectedState) {
-        qDebug() << "clientWorker" <<  "disconnected.";
+        qDebug() << "clientWorker" << "disconnected.";
 
-        if (m_pollTimer && m_pollTimer->isActive())
-            m_pollTimer->stop();
 
-        if (m_reconnectTimer)
-            m_reconnectTimer->start();
+
     }
 }
 
 void clientWorker::onErrorOccurred(QModbusDevice::Error error)
 {
     qDebug() << error;
+}
+
+void clientWorker::reconnectDevices()
+{
+    // 如果不是正在連線或已連線，就發起連線請求
+    if (m_5000 && m_5000->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-5000 is offline, attempting to reconnect...";
+        m_5000->connectDevice();
+    }
+
+    if (m_6022 && m_6022->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6022 is offline, attempting to reconnect...";
+        m_6022->connectDevice();
+    }
 }
 
 void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int address, int value)
@@ -358,7 +370,7 @@ void clientWorker::Read6022PV1()
                 result[0]= rel/10;
 
                 emit m_6022PV1(result);
-                qDebug() << "loop-0 SV*1000 = " << rel;
+                qDebug() << "loop-0 SV*1000 = " << result[0];
 
             }
             else {
@@ -1021,8 +1033,17 @@ void clientWorker::init_flag()
 void clientWorker::poll()
 {
     m_pollTimer->stop(); // 暫停計時器，避免重入
+    bool is5000Connected = (m_5000 && m_5000->state() == QModbusDevice::ConnectedState);
+    bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
 
-    if(f_STO)
+    if (!is5000Connected || !is6022Connected) {
+        qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
+        reconnectDevices();
+        // 斷線時，加長下次 poll 的間隔（例如 2秒），避免過度頻繁重試
+        m_pollTimer->start(2000);
+        return;
+    }
+    if (f_STO)
     {
         if (m_STO)
         {
@@ -1036,13 +1057,13 @@ void clientWorker::poll()
         else
         {
             writeSingleCoil(14, m_STO);
-                        QTimer::singleShot(1000, this,
+            QTimer::singleShot(1000, this,
                 [=]()
                 {
                     writeSingleCoil(12, false);
                 });
         }
-            f_STO = false;
+        f_STO = false;
     }
     if (f_Reset)
     {
@@ -1063,11 +1084,12 @@ void clientWorker::poll()
     if (f_FanCtrl)
     {
         Fan_PowerControl(power);
+        writeHoldingRegisters(25, 0, 17);
         f_FanCtrl = false;
     }
-    if(m_Open1)
+    if (m_Open1)
     {
-        if(!fan1_open)
+        if (!fan1_open)
         {
             WriteSingleHoldingRegisters(true, 1, 25, 0);
         }
@@ -1146,7 +1168,7 @@ void clientWorker::poll()
         m_Open9 = false;
     }
 
-    if(f_setMode1)
+    if (f_setMode1)
     {
         set6022Mode_1(m_mode1);
         f_setMode1 = false;
@@ -1160,7 +1182,7 @@ void clientWorker::poll()
     {
         writeHoldingRegisters(25, MV1, 17);
     }
-    if(m_mode2)
+    if (m_mode2)
     {
         //writeHoldingRegisters(42, MV2, 1);
     }
@@ -1169,19 +1191,19 @@ void clientWorker::poll()
         writeHoldingRegisters(25, m_setALL, 17);
         f_setFAN = false;
     }
-   
-        while (!m_writeQueue.isEmpty())
-        {
-            HoldingRegisterRequest req = m_writeQueue.dequeue();
 
-            // 釋放鎖定再執行 Modbus 通訊 (避免 Block 其它執行緒太久)
-            // 因為 WriteSingleHoldingRegisters 裡面有 QEventLoop，會暫停在這裡直到通訊完成
+    while (!m_writeQueue.isEmpty())
+    {
+        HoldingRegisterRequest req = m_writeQueue.dequeue();
+
+        // 釋放鎖定再執行 Modbus 通訊 (避免 Block 其它執行緒太久)
+        // 因為 WriteSingleHoldingRegisters 裡面有 QEventLoop，會暫停在這裡直到通訊完成
 
 
-            WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
+        WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
 
-        }
-    
+    }
+
     if (f_setSV1)
     {
         writeSV1(SV1);
@@ -1196,7 +1218,7 @@ void clientWorker::poll()
     }
     if (f_setPID1)
     {
-        writePID1(p1,i1,d1);
+        writePID1(p1, i1, d1);
         f_setPID1 = false;
     }
     if (f_setPID2)
@@ -1211,11 +1233,13 @@ void clientWorker::poll()
     }
 
     ReadCoils(1, 0, 15);
-    Read5000HoldingRegisters( 1, 8, 35);
+    Read5000HoldingRegisters(1, 8, 35);
     read_test();
     Read6022PV1();
     Read6022PV2();
     Read6022MV();
+
+
     //init_flag();
     m_pollTimer->start(); // 全部讀寫完後，才開啟下一次計時
 }

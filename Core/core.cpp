@@ -44,9 +44,24 @@ void Core::init()
     QObject::connect(m_manager, &Manager::HodingRegister, this, &Core::HodingRegister_Data);
     QObject::connect(m_manager, &Manager::update_savedata, this, [=](QVector<quint16> result)
         {
-            QDateTime now = QDateTime::currentDateTime();
+            
 
-            m_sqlManager->saveSensorData(now, senserData, result);
+            // 判斷時間差是否大於等於設定的 n 秒
+            if (QDateTime::currentDateTime().currentMSecsSinceEpoch() - m_lastSaveTime >= m_sqlManager->readFrequency())
+            {
+               
+                QDateTime now = QDateTime::currentDateTime();
+                m_lastSaveTime = now.currentMSecsSinceEpoch();
+                // --- 關鍵：使用 QtConcurrent 避免卡住 UI ---
+                // 注意：確保 saveSensorData 內部的資料庫連接是該線程私有的
+                m_sqlManager->saveSensorData(now, senserData, result);
+
+                //qDebug() << "：" << now.toString("hh:mm:ss");
+            }
+            else
+            {
+                // 時間還沒到，可以選擇跳過，或僅更新 UI 顯示
+            }
         });
     QObject::connect(m_manager, &Manager::update_input, this, [=](QVector<quint16> result) 
         {
@@ -181,6 +196,7 @@ void Core::init()
             ips << ipStr;
 
             m_proxy->setIpAddress(ipStr);
+            m_manager->ip = ipStr;
         }
     }
 

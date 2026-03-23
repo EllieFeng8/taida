@@ -39,6 +39,8 @@ public slots:
     void pidPV2(QVector <quint16> result);
     void PID1(QVector <quint16> result);
     void PID2(QVector <quint16> result);
+signals:
+    void ip(QString ip);
 private:
 
     explicit Core(QObject* parent = nullptr){}
@@ -75,7 +77,7 @@ private:
     quint16 v_32;
     quint16 v_33;
     quint16 v_34;
-
+    qint64 m_lastSaveTime = 0;
     QVector <double> senserData;
 
     SqlManager* m_sqlManager;

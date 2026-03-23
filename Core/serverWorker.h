@@ -4,6 +4,7 @@
 #include <QModbusTcpServer>
 #include <QModbusDataUnit>
 #include <QVector>
+#include <QVariant>
 #include <QDebug>
 #include <qmutex.h>
 class ServerWorker : public QObject
@@ -14,7 +15,7 @@ public:
     ~ServerWorker();
     QModbusTcpServer* m_server = nullptr;
     QVector<quint16> SaveData;
-    void init(int port); // 初始化 Server
+    void init(int port,QVariant ip); // 初始化 Server
     //void connectDevice();
     QVector<quint16> getSavedata();
 signals:

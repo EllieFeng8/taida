@@ -10,7 +10,7 @@ ServerWorker::~ServerWorker() {
     }
 }
 
-void ServerWorker::init(int port)
+void ServerWorker::init(int port,QVariant ip)
 {
     SaveData.resize(100);
     if(m_server)
@@ -32,7 +32,7 @@ void ServerWorker::init(int port)
         { QModbusDataUnit::HoldingRegisters, 0, 80 });
 
     m_server->setMap(reg);
-    m_server->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
+    m_server->setConnectionParameter(QModbusDevice::NetworkAddressParameter, ip);
     m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
     m_server->setServerAddress(m_slaveId);
     //m_server->connectDevice();
@@ -43,7 +43,7 @@ void ServerWorker::init(int port)
         qDebug() << "FAILED  Modbus Server :" << m_server->errorString();
     }
     else {
-        qDebug() << "Modbus Server is START , Port:" << port;
+        qDebug() << "Modbus Server is START ,ip: " << ip <<" Port:" << port;
         status = true;
         emit server_stat(status);
     }

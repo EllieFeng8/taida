@@ -24,7 +24,6 @@ Manager::~Manager()
 void Manager::init()
 {
 
-
 	m_clientThread = new QThread(this);
 	m_clientWorker = new clientWorker();
 	m_clientWorker->moveToThread(m_clientThread);
@@ -36,7 +35,7 @@ void Manager::init()
 	m_serverWorker->moveToThread(m_serverThread);
 	connect(m_serverThread, &QThread::started, this, [=]() {QMetaObject::invokeMethod(
 		m_serverWorker, [this]{
-			m_serverWorker->init(502); 
+			m_serverWorker->init(502,ip);
 		},Qt::QueuedConnection
 			); });
 	connect(m_serverWorker, &ServerWorker::modbusDataChanged, this, [this](QModbusDataUnit::RegisterType table, int address, quint16 value) {
@@ -352,6 +351,7 @@ void Manager::init()
 		});
 	// 將 Client 讀到的資料「接」給 Server 
 	// 當 Client 讀到資料發出 m_5000data 訊號時，自動呼叫 Server 的更新函數
+		connect(m_clientWorker, &clientWorker::connected, this, [this]() { normal = true; });
 
 		connect(m_clientWorker, &clientWorker::m_5000Coil, this, [this](const QVector<quint16>& data,const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
 		emit Coil(data);//傳送給Core 
@@ -372,6 +372,7 @@ void Manager::init()
 			);
 			normal = true;
 		}
+		
 		});
 		connect(m_clientWorker, &clientWorker::R_PV, this, [this](const QVector<quint16>& data) {
 			if (server_OK) {
@@ -779,7 +780,7 @@ void Manager::set_server(int value)
 		QMetaObject::invokeMethod(
 			m_serverWorker, [this]
 			{
-				m_serverWorker->init(502); },
+				m_serverWorker->init(502,ip); },
 				Qt::QueuedConnection
 				);
 	}
@@ -787,7 +788,7 @@ void Manager::set_server(int value)
 		QMetaObject::invokeMethod(
 			m_serverWorker, [this]
 			{
-				m_serverWorker->init(503); },
+				m_serverWorker->init(502,"127.0.0.1"); },
 				Qt::QueuedConnection
 				);
 }

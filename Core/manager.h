@@ -14,7 +14,7 @@ public:
     explicit Manager(QObject* parent = nullptr);
     ~Manager();
 
-
+    QString ip;
     void init();
     void set_mode1(bool v);
     void set_mode2(bool v);

@@ -26,7 +26,7 @@ public:
     void init();
     void init_flag();
     void poll();
-
+    void reconnectDevices();
     void writeSingleCoil(int address, bool value);
 
     //¼g¤J
@@ -86,6 +86,7 @@ public:
     bool m_mode2 = false;
 
 signals:
+    void connected();
     void m_5000Coil(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
     void m_5000HodingRegister(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
     
