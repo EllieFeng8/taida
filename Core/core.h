@@ -49,7 +49,7 @@ private:
     void updateProxyProperty2(int index, quint16 value);
 
     void saveProductionSettings();
-
+    void loadProductionSettings();
     quint16 v_0;
     quint16 v_1;
     quint16 v_2;

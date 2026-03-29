@@ -8,6 +8,8 @@ Core& Core::instance()
 }
 Core::~Core()
 {
+    saveProductionSettings();
+
     // 釋放 Manager 物件 (這會進一步觸發 Manager 的解構式停止執行緒)
     if (m_manager) {
         delete m_manager;
@@ -19,7 +21,6 @@ Core::~Core()
         delete m_proxy;
         m_proxy = nullptr;
     }
-    //saveProductionSettings();
 }
 void Core::init()
 {
@@ -122,6 +123,7 @@ void Core::init()
         });
 
     QObject::connect(m_manager, &Manager::R_PV, this, &Core::onPVdata);
+    QObject::connect(m_manager, &Manager::server_on, this, [this]() { this->loadProductionSettings(); });
 
     QObject::connect(m_manager, &Manager::_PV1, this, &Core::pidPV1);
     QObject::connect(m_manager, &Manager::_PV2, this, &Core::pidPV2);
@@ -173,6 +175,7 @@ void Core::init()
 
     QObject::connect(m_proxy, &TdProxy::motorResetChanged, m_manager, &Manager::set_Reset);
     QObject::connect(m_proxy, &TdProxy::modeSelectChanged, m_manager,&Manager::set_server);
+
     QObject::connect(m_proxy, &TdProxy::captureFreqChanged, this, [=](int v) 
         {
             m_sqlManager->setReadFrequency(v);
@@ -210,6 +213,7 @@ void Core::init()
     }
     int freq = m_sqlManager->readFrequency();
     m_proxy->setCaptureFreq(freq);
+
 }
 
 void Core::Coil_Data(QVector <quint16> result)
@@ -253,9 +257,9 @@ void Core::pidPV2(QVector <quint16> result)
 }
 void Core::PID1(QVector <quint16> result)
 {
-    double p = result[0];
-    double i = result[1];
-    double d = result[2];
+    double p = result[0]/1000;
+    double i = result[1]/1000;
+    double d = result[2]/1000;
     m_proxy->setFanPidPP(p);
     m_proxy->setFanPidIP(i);
     m_proxy->setFanPidDP(d);
@@ -263,9 +267,9 @@ void Core::PID1(QVector <quint16> result)
 }
 void Core::PID2(QVector <quint16> result)
 {
-    double p = result[0];
-    double i = result[1];
-    double d = result[2];
+    double p = result[0]/1000;
+    double i = result[1]/1000;
+    double d = result[2]/1000;
     m_proxy->setOutValvePP(p);
     m_proxy->setOutValveIP(i);
     m_proxy->setOutValveDP(d);
@@ -539,7 +543,7 @@ void Core::updateProxyProperty2(int index, quint16 value)
 void Core::saveProductionSettings()
 {
     QSettings settings("production.ini", QSettings::IniFormat);
-
+    settings.setValue("Production/ServerMode", m_proxy->m_modeSelect);
     settings.setValue("Production/Hz", m_proxy->m_motorFrequency);
     settings.setValue("Production/fan1", m_proxy->m_fan1TargetRpm);
     settings.setValue("Production/fan2", m_proxy->m_fan2TargetRpm);
@@ -551,10 +555,47 @@ void Core::saveProductionSettings()
     settings.setValue("Production/fan8", m_proxy->m_fan8TargetRpm);
     settings.setValue("Production/fan9", m_proxy->m_fan9TargetRpm);
     settings.setValue("Production/returnWaterOpen", m_proxy->m_returnValveOpening);
-    settings.setValue("Production/pressdiff", m_proxy->m_pressureDiff);
+    settings.setValue("Production/targetPressureDiff", m_proxy->m_targetPressureDiff);
     settings.setValue("Production/outAirTemp", m_proxy->m_outWaterTargetTemp);
+    settings.setValue("Production/P1", m_proxy->m_fanPidP);
+    settings.setValue("Production/I1", m_proxy->m_fanPidI);
+    settings.setValue("Production/D1", m_proxy->m_fanPidD);
+    settings.setValue("Production/P2", m_proxy->m_outValveP);
+    settings.setValue("Production/I2", m_proxy->m_outValveI);
+    settings.setValue("Production/D2", m_proxy->m_outValveD);
+    settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
+    settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
 
 
     settings.sync();
+}
+void Core::loadProductionSettings()
+{
+    QSettings settings("production.ini", QSettings::IniFormat);
+
+    // 讀取數值，若檔案不存在則使用預設值 0.0
+    m_proxy->setMotorFrequency(settings.value("Production/Hz", 0).toDouble());
+    m_proxy->setFan1TargetRpm(settings.value("Production/fan1", 0).toDouble());
+    m_proxy->setFan2TargetRpm(settings.value("Production/fan2", 0).toDouble());
+    m_proxy->setFan3TargetRpm(settings.value("Production/fan3", 0).toDouble());
+    m_proxy->setFan4TargetRpm(settings.value("Production/fan4", 0).toDouble());
+    m_proxy->setFan5TargetRpm(settings.value("Production/fan5", 0).toDouble());
+    m_proxy->setFan6TargetRpm(settings.value("Production/fan6", 0).toDouble());
+    m_proxy->setFan7TargetRpm(settings.value("Production/fan7", 0).toDouble());
+    m_proxy->setFan8TargetRpm(settings.value("Production/fan8", 0).toDouble());
+    m_proxy->setFan9TargetRpm(settings.value("Production/fan9", 0).toDouble());
+    m_proxy->setFan1TargetRpm(settings.value("Production/fan1", 0).toDouble());
+    m_proxy->setTargetPressureDiff(settings.value("Production/targetPressureDiff", 0).toDouble());
+    m_proxy->setReturnValveOpening(settings.value("Production/returnWaterOpen", 0).toDouble());
+    m_proxy->setOutWaterTargetTemp(settings.value("Production/outAirTemp", 0).toDouble());
+    m_proxy->setFanPidP(settings.value("Production/P1", 0).toDouble());
+    m_proxy->setFanPidI(settings.value("Production/I1", 0).toDouble());
+    m_proxy->setFanPidD(settings.value("Production/D1", 0).toDouble());
+    m_proxy->setOutValveP(settings.value("Production/P2", 0).toDouble());
+    m_proxy->setOutValveI(settings.value("Production/I2", 0).toDouble());
+    m_proxy->setOutValveD(settings.value("Production/D2", 0).toDouble());
+    m_proxy->setFanEmergencySwitchOn(settings.value("Production/ESTOP", true).toBool());
+    m_proxy->setMotorFrequencySwitchOn(settings.value("Production/motorpower", true).toBool());
+
 }

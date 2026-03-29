@@ -41,6 +41,8 @@ void clientWorker::init()
         m_pollTimer = new QTimer(this);
         connect(m_pollTimer, &QTimer::timeout, this, &clientWorker::poll, Qt::DirectConnection);
         // DirectConnection 因為 timer 與 this 在同一 thread (保障)
+        if (!m_pollTimer->isActive())
+            m_pollTimer->start(50);
     }
 
     if (!m_reconnectTimer) {
@@ -90,8 +92,7 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
                 writeSingleCoil(12, true);
             });   
 
-        if (m_pollTimer && !m_pollTimer->isActive())       
-            m_pollTimer->start(50);
+
         emit connected();
     }
     else if (state == QModbusDevice::UnconnectedState) {
@@ -296,9 +297,13 @@ void clientWorker::ReadPID1()
                 quint16 I1 = res.value(3);
                 quint16 D0 = res.value(4);
                 quint16 D1 = res.value(5);
-                result[0] = (static_cast<int32_t>(P1) << 16) | (P0 & 0xFFFF);
-                result[1] = (static_cast<int32_t>(I1) << 16) | (I0 & 0xFFFF);
-                result[2] = (static_cast<int32_t>(D1) << 16) | (D0 & 0xFFFF);
+                quint32 P = ((static_cast<int32_t>(P0) << 16) | static_cast<int32_t>(P1));
+                quint32 I = ((static_cast<int32_t>(I0) << 16) | static_cast<int32_t>(I1));
+                quint32 D = ((static_cast<int32_t>(D0) << 16) | static_cast<int32_t>(D1));
+
+                result[0] = P;
+                result[1] = I;
+                result[2] = D;
 
                 emit m_6022PID1(result);
 
@@ -333,9 +338,13 @@ void clientWorker::ReadPID2()
                 quint16 I1 = res.value(3);
                 quint16 D0 = res.value(4);
                 quint16 D1 = res.value(5);
-                result[0] = (static_cast<int32_t>(P1) << 16) | (P0 & 0xFFFF);
-                result[1] = (static_cast<int32_t>(I1) << 16) | (I0 & 0xFFFF);
-                result[2] = (static_cast<int32_t>(D1) << 16) | (D0 & 0xFFFF);
+                quint32 P = ((static_cast<int32_t>(P0) << 16) | static_cast<int32_t>(P1));
+                quint32 I = ((static_cast<int32_t>(I0) << 16) | static_cast<int32_t>(I1));
+                quint32 D = ((static_cast<int32_t>(D0) << 16) | static_cast<int32_t>(D1));
+
+                result[0] = P;
+                result[1] = I;
+                result[2] = D;
 
                 emit m_6022PID2(result);
 

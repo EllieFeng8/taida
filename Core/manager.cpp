@@ -381,7 +381,7 @@ void Manager::init()
 			}
 			emit R_PV(data); });
 
-	connect(m_serverWorker, &ServerWorker::server_stat, this, [=](bool v) {server_OK = v; });
+		connect(m_serverWorker, &ServerWorker::server_stat, this, [=](bool v) {server_OK = v; emit server_on(); });
 	connect(m_clientWorker, &clientWorker::m_5000Coil, m_serverWorker, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
 		if (server_OK) {
 			m_serverWorker->updateInputRegisters(0, datainput); //將input的部分 傳入InputRegisters (從0開始)

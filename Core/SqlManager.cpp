@@ -322,7 +322,7 @@ bool SqlManager::saveSensorData(const QDateTime& timestamp, const QVector<double
                           .arg(columns.join(", "))
                           .arg(placeholders.join(", ")));
 
-        query.bindValue(":ts", timestamp.toSecsSinceEpoch());
+        query.bindValue(":ts", timestamp.toMSecsSinceEpoch());
         for (int i = 0; i < kSensorCount; ++i)
         {
             QString placeholder = QString(":s%1").arg(i + 1);

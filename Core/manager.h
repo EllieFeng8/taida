@@ -54,6 +54,7 @@ public:
     void set_Estop(bool v);
     void set_Reset(bool v);
 signals:
+    void server_on();
     void Coil(QVector <quint16> result);
     void HodingRegister(QVector <quint16> result);
     void Adam6022Data(QVector <quint16> result);
