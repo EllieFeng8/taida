@@ -622,7 +622,7 @@ void clientWorker::set6022Mode_1(bool v)
     //writeUnit.setValue(0, highWord);
     //writeUnit.setValue(1, lowWord);
     writeUnit.setValue(0, 0);
-    writeUnit.setValue(1, v ? 1 : 2);
+    writeUnit.setValue(1, v ? 1 : 0);
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
@@ -697,7 +697,7 @@ void clientWorker::set6022Mode_2(bool v)
 
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 1255, 2);
     writeUnit.setValue(0, 0);
-    writeUnit.setValue(1, v ? 1:2);
+    writeUnit.setValue(1, v ? 1:0);
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
