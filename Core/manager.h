@@ -5,7 +5,7 @@
 #include <qthread>
 #include "clientWorker.h"
 #include "serverWorker.h"
-
+#include "ms300.h"
 class Manager : public QObject
 {
     Q_OBJECT
@@ -88,4 +88,12 @@ private:
 
     ServerWorker* m_serverWorker = nullptr;
     QThread* m_serverThread = nullptr;
+
+    MS300* m_ms300 = nullptr;
+    QThread* m_ms300Thread = nullptr;
+    quint16 version_num1 = 0;
+    quint16 version_num2 = 14;
+    quint16 version_num3 = 10;
+    quint16 version_year = 2026;
+    quint16 version_date = 0402;
 };

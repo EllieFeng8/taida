@@ -1052,6 +1052,9 @@ void clientWorker::poll()
         m_pollTimer->start(2000);
         return;
     }
+    ReadCoils(1, 0, 15);
+    Read5000HoldingRegisters(1, 8, 35);
+    read_test();
     if (f_STO)
     {
         if (m_STO)
@@ -1241,9 +1244,6 @@ void clientWorker::poll()
         f_setAO1 = false;
     }
 
-    ReadCoils(1, 0, 15);
-    Read5000HoldingRegisters(1, 8, 35);
-    read_test();
     Read6022PV1();
     Read6022PV2();
     Read6022MV();

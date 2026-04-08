@@ -15,7 +15,8 @@ qt_add_qml_module(Core STATIC
         SqlManager.cpp
         RestManager.h
         RestManager.cpp
-
+        ms300.h
+        ms300.cpp
 )
 
 target_include_directories(Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

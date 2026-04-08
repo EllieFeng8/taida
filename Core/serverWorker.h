@@ -15,7 +15,7 @@ public:
     ~ServerWorker();
     QModbusTcpServer* m_server = nullptr;
     QVector<quint16> SaveData;
-    void init(int port,QVariant ip); // 初始化 Server
+    void init(int port,QVariant ip, quint16 v1, quint16 v2, quint16 v3, quint16 years,quint16 date); // 初始化 Server
     //void connectDevice();
     QVector<quint16> getSavedata();
 signals:

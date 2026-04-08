@@ -8,6 +8,12 @@ Manager::Manager(QObject* parent )
 
 Manager::~Manager()
 {
+	// 安全停止 Server 執行緒
+	if (m_ms300Thread) {
+		m_ms300Thread->quit();
+		m_ms300Thread->wait();
+	}
+
 	// 安全停止 Client 執行緒
 	if (m_clientThread) {
 		m_clientThread->quit();
@@ -23,6 +29,19 @@ Manager::~Manager()
 
 void Manager::init()
 {
+	m_ms300Thread = new QThread(this);
+	m_ms300 = new MS300();
+	m_ms300->moveToThread(m_ms300Thread);
+	connect(m_ms300Thread, &QThread::started, m_ms300, &MS300::initPort);
+	connect(m_ms300Thread, &QThread::finished, m_ms300, &QObject::deleteLater);
+
+	connect(m_ms300, &MS300::dataUpdated, this, [this](int v) 
+		{
+			if (server_OK) {
+				m_serverWorker->updateInputRegister(29, v);
+			}
+		});
+
 
 	m_clientThread = new QThread(this);
 	m_clientWorker = new clientWorker();
@@ -35,7 +54,7 @@ void Manager::init()
 	m_serverWorker->moveToThread(m_serverThread);
 	connect(m_serverThread, &QThread::started, this, [=]() {QMetaObject::invokeMethod(
 		m_serverWorker, [this]{
-			m_serverWorker->init(502,ip);
+			m_serverWorker->init(502,"127.0.0.1",version_num1,version_num2,version_num3,version_year,version_date);
 		},Qt::QueuedConnection
 			); });
 	connect(m_serverWorker, &ServerWorker::modbusDataChanged, this, [this](QModbusDataUnit::RegisterType table, int address, quint16 value) {
@@ -437,7 +456,7 @@ void Manager::init()
 		}
 		});
 
-
+	m_ms300Thread->start();
 
 	m_serverThread->start();
 
@@ -776,21 +795,21 @@ void Manager::set_allFan(double v)
 
 void Manager::set_server(int value)
 {
-	if (value == 0) {
-		QMetaObject::invokeMethod(
-			m_serverWorker, [this]
-			{
-				m_serverWorker->init(502,ip); },
-				Qt::QueuedConnection
-				);
-	}
-	else if (value == 1)
-		QMetaObject::invokeMethod(
-			m_serverWorker, [this]
-			{
-				m_serverWorker->init(502,"127.0.0.1"); },
-				Qt::QueuedConnection
-				);
+	//if (value == 0) {
+	//	QMetaObject::invokeMethod(
+	//		m_serverWorker, [this]
+	//		{
+	//			m_serverWorker->init(502,ip); },
+	//			Qt::QueuedConnection
+	//			);
+	//}
+	//else if (value == 1)
+	//	QMetaObject::invokeMethod(
+	//		m_serverWorker, [this]
+	//		{
+	//			m_serverWorker->init(502,"127.0.0.1"); },
+	//			Qt::QueuedConnection
+	//			);
 }
 void Manager::set_motor(bool v)
 {

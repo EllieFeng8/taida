@@ -42,7 +42,11 @@ public:
     bool insertOneSampleJson(const QJsonObject& obj, QString* errMsg = nullptr);
     bool insertBatchSamplesJson(const QJsonArray& items, int* inserted = nullptr, QString* errMsg = nullptr);
     bool queryRangeJson(qint64 from, qint64 to, QJsonArray* out, QString* errMsg = nullptr);
+    bool queryRangeJsonPaged(qint64 from, qint64 to, int page, int pageSize, QJsonArray* out, QString* errMsg = nullptr);
     bool queryHoldingRangeJson(qint64 from, qint64 to, QJsonArray* out, QString* errMsg = nullptr);
+    bool queryHoldingRangeJsonPaged(qint64 from, qint64 to, int page, int pageSize, QJsonArray* out, QString* errMsg = nullptr);
+    bool countSensorRange(qint64 from, qint64 to, qint64* total, QString* errMsg = nullptr);
+    bool countHoldingRange(qint64 from, qint64 to, qint64* total, QString* errMsg = nullptr);
     int readFrequency(QString* errMsg = nullptr) const;
     bool setReadFrequency(int value, QString* errMsg = nullptr);
 

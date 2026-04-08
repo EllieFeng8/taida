@@ -68,7 +68,7 @@ void Core::init()
         {
             for (int i = 0; i < result.size(); ++i)
             {
-                if (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 9 || i == 10 || i == 11 || i==13 || i == 14 || i == 15)
+                if (i == 0 || i == 2 || i == 4 || i == 6 || i==7 || i == 8 || i == 9 || i == 10 || i == 11 || i==13 || i == 14 || i == 15)
                 {
                     senserData[i] = qRound(result[i] / 655.35 * 100.0) / 100.0;
                 }
@@ -563,8 +563,8 @@ void Core::saveProductionSettings()
     settings.setValue("Production/P2", m_proxy->m_outValveP);
     settings.setValue("Production/I2", m_proxy->m_outValveI);
     settings.setValue("Production/D2", m_proxy->m_outValveD);
-    settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
-    settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
+    //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
+    //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
 
 

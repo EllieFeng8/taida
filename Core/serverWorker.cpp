@@ -10,7 +10,7 @@ ServerWorker::~ServerWorker() {
     }
 }
 
-void ServerWorker::init(int port,QVariant ip)
+void ServerWorker::init(int port,QVariant ip,quint16 v1, quint16 v2, quint16 v3, quint16 years,quint16 date)
 {
     SaveData.resize(100);
     if(m_server)
@@ -27,13 +27,13 @@ void ServerWorker::init(int port,QVariant ip)
     reg.insert(QModbusDataUnit::Coils,
         { QModbusDataUnit::Coils, 0, 20 });
     reg.insert(QModbusDataUnit::InputRegisters,
-        { QModbusDataUnit::InputRegisters, 0, 30 });
+        { QModbusDataUnit::InputRegisters, 0, 36 });
     reg.insert(QModbusDataUnit::HoldingRegisters,
         { QModbusDataUnit::HoldingRegisters, 0, 80 });
 
     m_server->setMap(reg);
-    m_server->setConnectionParameter(QModbusDevice::NetworkAddressParameter, ip);
-    m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
+    m_server->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
+    m_server->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
     m_server->setServerAddress(m_slaveId);
     //m_server->connectDevice();
 
@@ -46,6 +46,7 @@ void ServerWorker::init(int port,QVariant ip)
         qDebug() << "Modbus Server is START ,ip: " << ip <<" Port:" << port;
         status = true;
         emit server_stat(status);
+        updateInputRegisters(31, { v1,v2,v3,years,date });
     }
 }
 
