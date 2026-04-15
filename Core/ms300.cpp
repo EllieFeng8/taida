@@ -6,7 +6,7 @@ MS300::MS300(QObject* parent) : QObject(parent) {}
 
 void MS300::initPort() {
     m_modbus = new QModbusRtuSerialClient(this);
-    m_modbus->setConnectionParameter(QModbusDevice::SerialPortNameParameter, "COM3");
+    m_modbus->setConnectionParameter(QModbusDevice::SerialPortNameParameter, "COM2");
     m_modbus->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, QSerialPort::Baud9600);
     m_modbus->setConnectionParameter(QModbusDevice::SerialParityParameter, QSerialPort::NoParity);
     m_modbus->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, QSerialPort::Data8);

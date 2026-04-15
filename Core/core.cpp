@@ -80,9 +80,9 @@ void Core::init()
                     senserData[i] = qRound(result[i] / 65.535 * 100.0) / 100.0;
                 }
             }
-
-          
-           double rawHeat = (((senserData[6] + senserData[7] + senserData[8] + senserData[9]) / 4-senserData[16]) * senserData[12] * 4186) / 60000 * 998.5;
+            
+          // (冷排平均溫度 - 出風溫度) * 流量 * 4186 / 60000 * 998   
+           double rawHeat = (((senserData[6] - senserData[7] + senserData[8] - senserData[9]) / 2) * senserData[12] * 4186) / 60000 * 998.5/1000;
            senserData[19] = qRound(rawHeat * 100.0) / 100.0;
            m_proxy->setHeatExchange(senserData[19]);
             //QDateTime now = QDateTime::currentDateTime();
