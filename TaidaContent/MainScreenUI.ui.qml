@@ -1626,7 +1626,7 @@ Rectangle {
                             font.weight: Font.Bold
                             horizontalAlignment: Text.AlignRight
 
-                            text: Number(Td.outWaterTargetTemp)
+                            text: Number(Td.outWaterTargetTemp).toFixed(2)
                             verticalAlignment: Text.AlignVCenter
                             validator: DoubleValidator {}
                         }
