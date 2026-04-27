@@ -278,11 +278,8 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
 }
 void clientWorker::ReadPID1()
 {
-    // slave = 站號
-    // startAddress = modbus 起始位置
-    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
     if (!m_6022) return;
-    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1073, 6);
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1061, 6);
     QEventLoop loop;
     QVector <quint16> result;
     result.resize(3);
@@ -300,7 +297,7 @@ void clientWorker::ReadPID1()
                 quint32 P = ((static_cast<int32_t>(P0) << 16) | static_cast<int32_t>(P1));
                 quint32 I = ((static_cast<int32_t>(I0) << 16) | static_cast<int32_t>(I1));
                 quint32 D = ((static_cast<int32_t>(D0) << 16) | static_cast<int32_t>(D1));
-
+                qDebug() << "PID loop0 =" << P <<"," << I << "," << D;
                 result[0] = P;
                 result[1] = I;
                 result[2] = D;
@@ -323,7 +320,7 @@ void clientWorker::ReadPID2()
     // startAddress = modbus 起始位置
     // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
     if (!m_6022) return;
-    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1327, 6);
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1317, 6);
     QEventLoop loop;
     QVector <quint16> result;
     result.resize(3);
@@ -345,6 +342,7 @@ void clientWorker::ReadPID2()
                 result[0] = P;
                 result[1] = I;
                 result[2] = D;
+                qDebug() << "PID loop1 =" << P << "," << I << "," << D;
 
                 emit m_6022PID2(result);
 
@@ -1187,7 +1185,7 @@ void clientWorker::poll()
     }
     if (f_setMode2)
     {
-        set6022Mode_2(m_mode1);
+        set6022Mode_2(m_mode2);
         f_setMode2 = false;
     }
     if (m_mode1)
@@ -1247,8 +1245,8 @@ void clientWorker::poll()
     Read6022PV1();
     Read6022PV2();
     Read6022MV();
-
-
+    ReadPID2();
+    ReadPID1();
     //init_flag();
     m_pollTimer->start(); // 全部讀寫完後，才開啟下一次計時
 }

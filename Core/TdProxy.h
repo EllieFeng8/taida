@@ -360,7 +360,7 @@ public:
     Q_INVOKABLE void setOutValveIP(double value)
     {
         m_outValveIP = value;
-        emit outValveIChanged(m_outValveIP);
+        emit outValveIPChanged(m_outValveIP);
     }
 
     Q_INVOKABLE double getOutValveDP() const { return m_outValveDP; }

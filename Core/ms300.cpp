@@ -39,7 +39,7 @@ void MS300::onPollTimeout()
                     // 3. 取得異常代碼數值
                     int errorCode = unit.value(0);
 
-                        qDebug() << "error ID:" << errorCode;
+                        //qDebug() << "error ID:" << errorCode;
                         emit dataUpdated(errorCode);
                 }
                 else {

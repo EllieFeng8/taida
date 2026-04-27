@@ -1640,7 +1640,7 @@ Rectangle {
                             font.weight: Font.Bold
                             horizontalAlignment: Text.AlignRight
 
-                            text: Number(Td.outWaterTargetTemp)
+                            text: Number(Td.outWaterTargetTemp).toFixed(2)
                             verticalAlignment: Text.AlignVCenter
                             validator: DoubleValidator {
                             }
@@ -2105,7 +2105,7 @@ Rectangle {
                                         // horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
-                                        text: Td.outValvePP
+                                        text: Number(Td.outValvePP)
                                         // text: "99.9"
                                         textFormat: Text.PlainText
                                         // verticalAlignment: Text.AlignVCenter
@@ -2229,7 +2229,7 @@ Rectangle {
                                         // horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
-                                        text: Td.outValveIP
+                                        text: Number(Td.outValveIP)
                                         textFormat: Text.PlainText
                                         // verticalAlignment: Text.AlignVCenter
                                     }
@@ -2342,7 +2342,7 @@ Rectangle {
                                         // horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
-                                        text: Td.outValveDP
+                                        text: Number(Td.outValveDP)
                                         textFormat: Text.PlainText
                                         // verticalAlignment: Text.AlignVCenter
                                     }

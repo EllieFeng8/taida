@@ -257,9 +257,9 @@ void Core::pidPV2(QVector <quint16> result)
 }
 void Core::PID1(QVector <quint16> result)
 {
-    double p = result[0]/1000;
-    double i = result[1]/1000;
-    double d = result[2]/1000;
+    double p = result[0]*1.0/1000;
+    double i = result[1] * 1.0 /1000;
+    double d = result[2] * 1.0 /1000;
     m_proxy->setFanPidPP(p);
     m_proxy->setFanPidIP(i);
     m_proxy->setFanPidDP(d);
@@ -267,9 +267,9 @@ void Core::PID1(QVector <quint16> result)
 }
 void Core::PID2(QVector <quint16> result)
 {
-    double p = result[0]/1000;
-    double i = result[1]/1000;
-    double d = result[2]/1000;
+    double p = result[0] * 1.0 /1000;
+    double i = result[1] * 1.0 /1000;
+    double d = result[2] * 1.0 /1000;
     m_proxy->setOutValvePP(p);
     m_proxy->setOutValveIP(i);
     m_proxy->setOutValveDP(d);

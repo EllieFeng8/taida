@@ -93,7 +93,7 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 0;
     quint16 version_num2 = 14;
-    quint16 version_num3 = 11;
+    quint16 version_num3 = 15;
     quint16 version_year = 2026;
-    quint16 version_date = 408;
+    quint16 version_date = 423;
 };
