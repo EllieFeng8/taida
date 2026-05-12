@@ -298,7 +298,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 20
                             lineHeightMode: Text.FixedHeight
-                            text: "入水數據"
+                            text: "設備入水"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -497,7 +497,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 20
                             lineHeightMode: Text.FixedHeight
-                            text: "出水數據"
+                            text: "設備出水"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -697,7 +697,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignLeft
                             lineHeight: 20
                             lineHeightMode: Text.FixedHeight
-                            text: "回水數據"
+                            text: "泵浦入水"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -2637,7 +2637,7 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             lineHeight: 16
                             lineHeightMode: Text.FixedHeight
-                            text: "確認回水參數"
+                            text: "確認參數"
                             textFormat: Text.PlainText
                             verticalAlignment: Text.AlignVCenter
                         }
