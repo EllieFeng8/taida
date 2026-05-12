@@ -56,7 +56,7 @@ void Core::init()
                 // --- 關鍵：使用 QtConcurrent 避免卡住 UI ---
                 // 注意：確保 saveSensorData 內部的資料庫連接是該線程私有的
                 m_sqlManager->saveSensorData(now, senserData, result);
-
+                saveProductionSettings();
                 //qDebug() << "：" << now.toString("hh:mm:ss");
             }
             else
@@ -597,5 +597,4 @@ void Core::loadProductionSettings()
     m_proxy->setOutValveD(settings.value("Production/D2", 0).toDouble());
     m_proxy->setFanEmergencySwitchOn(settings.value("Production/ESTOP", true).toBool());
     m_proxy->setMotorFrequencySwitchOn(settings.value("Production/motorpower", true).toBool());
-
 }
