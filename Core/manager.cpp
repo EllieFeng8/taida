@@ -532,11 +532,19 @@ void Manager::set_PID2(double p, double i, double d)
 }
 void Manager::set_AO1(double v)
 {
+	double percent = v; // 0~100
+
+	const double minValue = 4096.0 * 0.20; // 819
+	const double maxValue = 4096.0 * 0.95; // 3891
+
+	quint16 modbusValue =
+		minValue + (percent / 100.0) * (maxValue - minValue);
+
 	quint16 value = v * 40.96;
-	m_serverWorker->updateHoldingRegister(50, value);
+	m_serverWorker->updateHoldingRegister(50, modbusValue);
 
 	QMetaObject::invokeMethod(
-		m_clientWorker, [this,value] { m_clientWorker->set_AO1(value); },
+		m_clientWorker, [this, modbusValue] { m_clientWorker->set_AO1(modbusValue); },
 		Qt::QueuedConnection
 	);
 }
@@ -749,10 +757,18 @@ void Manager::fan9TargetRpm(double v)
 }
 void Manager::returnValveOpening(double v) 
 {
+	double percent = v; // 0~100
+
+	const double minValue = 4096.0 * 0.20; // 819
+	const double maxValue = 4096.0 * 0.95; // 3891
+
+	quint16 modbusValue =
+		minValue + (percent / 100.0) * (maxValue - minValue);
+
 	double value = v * 40.96;
 	QVector<quint16> data;
 	data.resize(1);
-	data[0] = value;
+	data[0] = modbusValue;
 	m_serverWorker->updateHoldingRegisters(49, data);
 	//m_serverWorker->updateCoils(11, true);
 	//QMetaObject::invokeMethod(

@@ -254,10 +254,36 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
             if (reply->error() == QModbusDevice::NoError) {
                 for (int i = 0; i < reply->result().valueCount(); i++)
                 {
+                    quint16 value = reply->result().value(i);
                     result.append(reply->result().value(i));
                     if (i < 16)
                     {
-                        result_in.append(reply->result().value(i));
+                        if (i == 13 || i == 14)
+                        {
+                            const double minValue = 65535.0 * 0.20; // 13107
+                            const double maxValue = 65535.0 * 0.95; // 62258
+
+                            double percent = 0.0;
+
+                            if (value <= minValue)
+                            {
+                                percent = 0.0;
+                            }
+                            else if (value >= maxValue)
+                            {
+                                percent = 100.0;
+                            }
+                            else
+                            {
+                                percent = ((value - minValue) / (maxValue - minValue)) * 100.0;
+                            }
+
+                            result_in.append(percent);
+                        }
+                        else
+                        {
+                            result_in.append(reply->result().value(i));
+                        }
                     }
                     else
                     {
