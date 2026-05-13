@@ -254,40 +254,40 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
             if (reply->error() == QModbusDevice::NoError) {
                 for (int i = 0; i < reply->result().valueCount(); i++)
                 {
-                    quint16 value = reply->result().value(i);
-                    result.append(reply->result().value(i));
-                    if (i < 16)
+                    double value = reply->result().value(i);
+
+                    // 13、14 做百分比換算
+                    if (i == 13 || i == 14)
                     {
-                        if (i == 13 || i == 14)
+                        const double minValue = 65535.0 * 0.20; // 13107
+                        const double maxValue = 65535.0 * 0.95; // 62258
+
+                        if (value <= minValue)
                         {
-                            const double minValue = 65535.0 * 0.20; // 13107
-                            const double maxValue = 65535.0 * 0.95; // 62258
-
-                            double percent = 0.0;
-
-                            if (value <= minValue)
-                            {
-                                percent = 0.0;
-                            }
-                            else if (value >= maxValue)
-                            {
-                                percent = 100.0;
-                            }
-                            else
-                            {
-                                percent = ((value - minValue) / (maxValue - minValue)) * 100.0;
-                            }
-
-                            result_in.append(percent);
+                            value = 0.0;
+                        }
+                        else if (value >= maxValue)
+                        {
+                            value = 100.0;
                         }
                         else
                         {
-                            result_in.append(reply->result().value(i));
+                            value =
+                                ((value - minValue) /
+                                    (maxValue - minValue)) * 100.0;
                         }
+                    }
+
+                    // 存入換算後的值
+                    result.append(value);
+
+                    if (i < 16)
+                    {
+                        result_in.append(value);
                     }
                     else
                     {
-                        result_out.append(reply->result().value(i));
+                        result_out.append(value);
                     }
                 }
                 MV1 = result[15]/16;
@@ -990,6 +990,7 @@ void clientWorker::set_SV2(double v)
 }
 void clientWorker::set_AO1(double v)
 {
+    qDebug() << "set AO1 = "<<v;
     AO1 = v;
     f_setAO1 = true;
 }
