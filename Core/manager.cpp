@@ -547,6 +547,11 @@ void Manager::motorFrequency(double v)
 	/*QVector<quint16> data;
 	data.resize(1);
 	data[0] = v;*/
+	if(_STO)
+	{
+		m_serverWorker->updateHoldingRegister(31, 0);
+		qDebug() << "set motorFrequency =" << value<< " BUT! STO ON set 0" ;
+	}
 	m_serverWorker->updateHoldingRegister(31,value);
 	//m_serverWorker->updateCoils(1, true);
 	//QMetaObject::invokeMethod(
@@ -561,8 +566,14 @@ void Manager::fan1TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(32, data);
-	//m_serverWorker->updateCoils(2, true);
+	if(_E_STOP)
+	{
+		qDebug() << "set fan1 but E_STOP ON";
+		m_serverWorker->updateHoldingRegisters(32, { 0 });
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(32, data);
+	}//m_serverWorker->updateCoils(2, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 25, value); },
 	//	Qt::QueuedConnection
@@ -575,7 +586,15 @@ void Manager::fan2TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(33, data);
+	if (_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(33, { 0 });
+		qDebug() << "set fan2 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(33, data);
+	}
 	//m_serverWorker->updateCoils(3, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 26, value); },
@@ -588,7 +607,14 @@ void Manager::fan3TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(34, data);
+	if (_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(34 ,{ 0 });
+		qDebug() << "set fan3 but E_STOP ON";
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(34, data);
+	}
 	//m_serverWorker->updateCoils(4, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 27, value); },
@@ -602,7 +628,14 @@ void Manager::fan4TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(39, data);
+	if (_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(39, { 0 });
+		qDebug() << "set fan4 but E_STOP ON";
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(39, data);
+	}
 	//m_serverWorker->updateCoils(5, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 32, value); },
@@ -615,7 +648,15 @@ void Manager::fan5TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(40, data);
+	if (_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(40, { 0 });
+		qDebug() << "set fan5 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(40, data);
+	}
 	//m_serverWorker->updateCoils(6, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 33, value); },
@@ -628,7 +669,15 @@ void Manager::fan6TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(41, data);
+	if (_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(41, { 0 });
+		qDebug() << "set fan6 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(41, data);
+	}
 	//m_serverWorker->updateCoils(7, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 34, value); },
@@ -641,7 +690,15 @@ void Manager::fan7TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(42, data);
+	if (!_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(42, { 0 });
+		qDebug() << "set fan7 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(42, data);
+	}
 	//m_serverWorker->updateCoils(8, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 35, value); },
@@ -655,7 +712,14 @@ void Manager::fan8TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(47, data);
+	if (!_E_STOP){
+		m_serverWorker->updateHoldingRegisters(47 ,{ 0 });
+		qDebug() << "set fan8 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(47, data);
+	}
 	//m_serverWorker->updateCoils(9, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 40, value); },
@@ -668,7 +732,15 @@ void Manager::fan9TargetRpm(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	m_serverWorker->updateHoldingRegisters(48, data);
+	if (!_E_STOP)
+	{
+		m_serverWorker->updateHoldingRegisters(48, { 0 });
+		qDebug() << "set fan9 but E_STOP ON";
+
+	}
+	else {
+		m_serverWorker->updateHoldingRegisters(48, data);
+	}
 	//m_serverWorker->updateCoils(10, true);
 	//QMetaObject::invokeMethod(
 	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 41, value); },
@@ -770,6 +842,7 @@ void Manager::set_Fan9Open(bool v)
 }
 void Manager::set_Estop(bool v)
 {
+	_STO = v;
 	qDebug() << "set E-stop: " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_STO(v); },
@@ -786,7 +859,7 @@ void Manager::set_Reset(bool v)
 }
 void Manager::set_allFan(double v)
 {
-	qDebug() << "set all Fan  ";
+	qDebug() << "set all Fan  ="<<v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this,v] { m_clientWorker->set_Fan(v); },
 		Qt::QueuedConnection
@@ -812,20 +885,30 @@ void Manager::set_server(int value)
 	//			);
 }
 void Manager::set_motor(bool v)
-{
+{//水泵STO
+	_STO = v;
 	quint16 value = v ? 1 : 0;
 	m_serverWorker->updateHoldingRegister(72, value);
 	qDebug() << "set motor ";
 	QMetaObject::invokeMethod(
-		m_clientWorker, [this, v] { m_clientWorker->set_STO(v); },
+		m_clientWorker, [this, v] 
+		{
+
+			m_clientWorker->set_STO(v);
+		
+		},
 		Qt::QueuedConnection
 	);
 }
 void Manager::set_FanPower(bool v)
 {
+	_E_STOP = v;
+	if (_E_STOP) {
+		set_allFan(0);
+	}
 	quint16 value = v ? 0 : 1;	//緊急停止開啟 = 馬達電源關閉
 	m_serverWorker->updateHoldingRegister(73, value);
-	qDebug() << "set motor ";
+	qDebug() << "set fan E_STOP " <<_E_STOP;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, value] { m_clientWorker->set_FanPower(value); },
 		Qt::QueuedConnection

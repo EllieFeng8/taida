@@ -69,8 +69,12 @@ signals:
     void update_switch(int index, bool v);
     void update_input(QVector <quint16> result);
     void update_savedata(QVector <quint16> result);
+    void STOset0();
+    void E_STOPset0();
 
 private:
+    bool _E_STOP = false;
+    bool _STO = false;
     bool server_OK = false;
     bool normal = true;
     bool m_PID1 = false;

@@ -161,4 +161,6 @@ private:
     bool f_FanCtrl = false;
     bool f_MotorCtrl = false; //
     bool f_setAO1 = false; //出水閥開度
+    bool m_isSTO = false;
+    bool m_isFanSTO = false;
 };

@@ -134,6 +134,14 @@ void Core::init()
         //});
 
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
+    QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, this, [this](bool v)
+        {
+            if (v) {
+                m_proxy->setMotorFrequency(0);
+            }
+        }
+    );
+
     QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_AO1);
 
     
@@ -172,6 +180,21 @@ void Core::init()
 
     QObject::connect(m_proxy, &TdProxy::fanAllTargetRpmChanged, m_manager, &Manager::set_allFan);
     QObject::connect(m_proxy, &TdProxy::fanEmergencySwitchOnChanged, m_manager, &Manager::set_FanPower);
+    QObject::connect(m_proxy, &TdProxy::fanEmergencySwitchOnChanged, this, [this](bool v)
+        {
+            if(v)
+            {
+                m_proxy->setFan1TargetRpm(0);
+                m_proxy->setFan2TargetRpm(0);
+                m_proxy->setFan3TargetRpm(0);
+                m_proxy->setFan4TargetRpm(0);
+                m_proxy->setFan5TargetRpm(0);
+                m_proxy->setFan6TargetRpm(0);
+                m_proxy->setFan7TargetRpm(0);
+                m_proxy->setFan8TargetRpm(0);
+                m_proxy->setFan9TargetRpm(0);
+            }
+        });
 
     QObject::connect(m_proxy, &TdProxy::motorResetChanged, m_manager, &Manager::set_Reset);
     QObject::connect(m_proxy, &TdProxy::modeSelectChanged, m_manager,&Manager::set_server);

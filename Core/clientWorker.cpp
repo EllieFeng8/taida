@@ -902,11 +902,13 @@ void clientWorker::writePID2(double p, double i, double d) {
 
 void clientWorker::set_MotorRun(bool v)
 {
+
     motor = v;
     f_MotorCtrl = true;
 }
 void clientWorker::set_FanPower(bool v)
 {
+   
     power = v;
     f_FanCtrl = true;
 }
@@ -927,12 +929,15 @@ void clientWorker::set_5000HoldingRegister(bool t, int addr, double v)
     req.target = t;
     req.address = addr;
     req.value =v; 
-
-    m_writeQueue.enqueue(req); // 加入佇列
+    if (!m_isSTO || m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
+    {
+        m_writeQueue.enqueue(req);
+    } // 加入佇列
     // 不需要再設定 f_write5000，後面直接檢查 Queue 是否為空
 }
 void clientWorker::set_STO(bool v)
 {
+    m_isSTO = v;
     f_STO = true;
     if (v) 
     {
@@ -1198,8 +1203,10 @@ void clientWorker::poll()
     }
     if (f_setFAN)
     {
-        writeHoldingRegisters(25, m_setALL, 17);
-        f_setFAN = false;
+        if (power) {
+            writeHoldingRegisters(25, m_setALL, 17);
+            f_setFAN = false;
+        }
     }
 
     while (!m_writeQueue.isEmpty())
@@ -1209,7 +1216,7 @@ void clientWorker::poll()
         // 釋放鎖定再執行 Modbus 通訊 (避免 Block 其它執行緒太久)
         // 因為 WriteSingleHoldingRegisters 裡面有 QEventLoop，會暫停在這裡直到通訊完成
 
-
+        
         WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
 
     }
