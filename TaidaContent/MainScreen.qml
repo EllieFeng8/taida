@@ -8,8 +8,8 @@ MainScreenUI {
     returnValveBtnMouseArea.onClicked: {
         Td.returnValveOpening = returnValveTxtInput.text
         returnValveTxtInput.focus = false
-        Td.returnValveValue = returnValveSetTxtInput.text
-        returnValveSetTxtInput.focus = false
+        // Td.returnValveValue = returnValveSetTxtInput.text
+        // returnValveSetTxtInput.focus = false
         console.log("回水:",Td.returnValveOpening,Td.returnValveValue)
     }
 
