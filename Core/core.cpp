@@ -41,6 +41,8 @@ void Core::init()
     m_sqlManager->initialize();
     senserData.resize(40);
     senserData.fill(0);
+    senserData2.resize(40);
+    senserData2.fill(0);
     QObject::connect(m_manager, &Manager::Coil, this, &Core::Coil_Data);
     QObject::connect(m_manager, &Manager::HodingRegister, this, &Core::HodingRegister_Data);
     QObject::connect(m_manager, &Manager::update_savedata, this, [=](QVector<quint16> result)
@@ -55,7 +57,7 @@ void Core::init()
                 m_lastSaveTime = now.currentMSecsSinceEpoch();
                 // --- 關鍵：使用 QtConcurrent 避免卡住 UI ---
                 // 注意：確保 saveSensorData 內部的資料庫連接是該線程私有的
-                m_sqlManager->saveSensorData(now, senserData, result);
+                m_sqlManager->saveSensorData(now, senserData2, result);
                 saveProductionSettings();
                 //qDebug() << "：" << now.toString("hh:mm:ss");
             }
@@ -80,13 +82,56 @@ void Core::init()
                     senserData[i] = qRound(result[i] / 65.535 * 100.0) / 100.0;
                 }
             }
+           
             
           // (冷排平均溫度 - 出風溫度) * 流量 * 4186 / 60000 * 998   
            double rawHeat = (((senserData[6] - senserData[7] + senserData[8] - senserData[9]) / 2) * senserData[12] * 4186) / 60000 * 998.5/1000;
-           senserData[19] = qRound(rawHeat * 100.0) / 100.0;
-           m_proxy->setHeatExchange(senserData[19]);
+           senserData[18] = qRound(rawHeat * 100.0) / 100.0;
+           m_proxy->setHeatExchange(senserData[18]);
             //QDateTime now = QDateTime::currentDateTime();
             //m_sqlManager->saveSensorData(now,senserData );
+           senserData2[0] = senserData[0];//入水溫
+           senserData2[1] = senserData[1];//入水壓
+           senserData2[2] = senserData[4];//出水溫
+           senserData2[3] = senserData[5];//出水壓
+           senserData2[4] = senserData[2];//回水溫
+           senserData2[5] = senserData[3];//回水壓
+           senserData2[6] = senserData[6];//盤管左入溫
+           senserData2[7] = senserData[7];//盤管左出溫
+           senserData2[8] = senserData[8];//盤管右入溫
+           senserData2[9] = senserData[9];//盤管右出溫
+           senserData2[10] = senserData[10];//入風溫
+           senserData2[11] = senserData[11];//入風濕
+           senserData2[12] = senserData[12];//流量計
+           senserData2[13] = m_proxy->getOutValveOpening();//出水閥SV 
+           senserData2[14] = senserData[13];//出水閥PV
+           senserData2[15] = m_proxy->getReturnValveOpening();//混水閥SV
+           senserData2[16] = senserData[14];//混水閥PV
+           senserData2[17] = mv1;//風扇SV
+           senserData2[18] = senserData[15];//風扇PV
+           senserData2[19] = senserData[16];//出風溫
+           senserData2[20] = m_proxy->getTargetPressureDiff();//壓差SV
+           senserData2[21] = senserData[17];//壓差PV
+           senserData2[22] = senserData[18];//熱交換
+           //senserData2[23] = senserData[0];//自動風扇
+           //senserData2[24] = senserData[0];//自動溫度
+           senserData2[25] = m_proxy->getMotorFrequency();//泵浦SV 
+           senserData2[26] = m_proxy->getMotorFrequencyP();//泵浦PV 
+        });
+    QObject::connect(m_manager, &Manager::pidcontrolFan, this, [this](double v) {
+        m_proxy->setFan1TargetRpm(v); 
+        m_proxy->setFan2TargetRpm(v); 
+        m_proxy->setFan3TargetRpm(v); 
+        m_proxy->setFan4TargetRpm(v); 
+        m_proxy->setFan5TargetRpm(v); 
+        m_proxy->setFan6TargetRpm(v); 
+        m_proxy->setFan7TargetRpm(v); 
+        m_proxy->setFan8TargetRpm(v); 
+        m_proxy->setFan9TargetRpm(v);
+        mv1 = v;
+        });
+    QObject::connect(m_manager, &Manager::pidcontroloutvalue, this, [this](double v) {
+        m_proxy->setOutValveOpening(qRound((v* 1) / 1));
         });
 
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
@@ -378,11 +423,11 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 13:
         if (value == v_13) { return; }
         v_13 = value; 
-        m_proxy->setOutValveOpeningP(qRound((value / 655.35) * 10.0) / 10.0); break; //出水電動閥位置回授
+        m_proxy->setOutValveOpeningP(qRound(value  * 10.0) / 10.0); break; //出水電動閥位置回授
     case 14:
         if (value == v_14) { return; }
         v_14 = value;
-        m_proxy->setReturnValveOpeningP(qRound((value / 655.35) * 10.0) / 10.0); break; //回水電動閥位置回授
+        m_proxy->setReturnValveOpeningP(qRound((value * 10.0) / 10.0)); break; //回水電動閥位置回授
     case 15: break; //風扇自動速率
     case 16: 
         if (value == v_16) { return; }
@@ -446,7 +491,7 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 34:
         if (value == v_34) { return; }
         v_34 = value; 
-        m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //回水閥開度
+        //m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //回水閥開度
     case 35: break; //Null
 
     default: break;

@@ -42,7 +42,7 @@ void clientWorker::init()
         connect(m_pollTimer, &QTimer::timeout, this, &clientWorker::poll, Qt::DirectConnection);
         // DirectConnection 因為 timer 與 this 在同一 thread (保障)
         if (!m_pollTimer->isActive())
-            m_pollTimer->start(50);
+            m_pollTimer->start(1000);
     }
 
     if (!m_reconnectTimer) {
@@ -1079,7 +1079,7 @@ void clientWorker::poll()
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
         reconnectDevices();
         // 斷線時，加長下次 poll 的間隔（例如 2秒），避免過度頻繁重試
-        m_pollTimer->start(2000);
+        m_pollTimer->start(1000);
         return;
     }
     ReadCoils(1, 0, 15);
@@ -1223,10 +1223,12 @@ void clientWorker::poll()
     if (m_mode1)
     {
         writeHoldingRegisters(25, MV1, 17);
+        emit pidcontrolFan(MV1/40.96);
     }
     if (m_mode2)
     {
         //writeHoldingRegisters(42, MV2, 1);
+        emit pidcontroloutvalue(MV2/40.96);
     }
     if (f_setFAN)
     {

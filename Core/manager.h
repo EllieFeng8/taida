@@ -71,6 +71,8 @@ signals:
     void update_savedata(QVector <quint16> result);
     void STOset0();
     void E_STOPset0();
+    void pidcontrolFan(double v);
+    void pidcontroloutvalue(double v);
 
 private:
     bool _E_STOP = false;

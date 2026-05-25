@@ -79,7 +79,8 @@ private:
     quint16 v_34;
     qint64 m_lastSaveTime = 0;
     QVector <double> senserData;
-
+    QVector <double> senserData2;
+    double mv1=0.0;
     SqlManager* m_sqlManager;
     RESTManager* m_restManager;
     Manager* m_manager = nullptr;

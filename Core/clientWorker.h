@@ -89,7 +89,8 @@ signals:
     void connected();
     void m_5000Coil(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
     void m_5000HodingRegister(QVector <quint16> result, QVector <quint16> input, QVector <quint16> output);
-    
+    void pidcontrolFan(double v);
+    void pidcontroloutvalue(double v);
     void R_PV(QVector <quint16> result);
     void m_6022PV1(QVector <quint16> result);
     void m_6022SV1(QVector <quint16> result);

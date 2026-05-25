@@ -67,57 +67,57 @@ void Manager::init()
 				break;
 			case 32:  
 				this->WriteHoldingRegister(true, 25, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false); 
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false); 
+				//	}, Qt::QueuedConnection);
 				break;
 			case 33:  
 				this->WriteHoldingRegister(true, 26, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 34:  
 				this->WriteHoldingRegister(true, 27, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 39:  
 				this->WriteHoldingRegister(true, 32, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 40:  
 				this->WriteHoldingRegister(true, 33, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 41:  
 				this->WriteHoldingRegister(true, 34, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 42:  
 				this->WriteHoldingRegister(true, 35, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 47:  
 				this->WriteHoldingRegister(true, 40, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 48: 
 				this->WriteHoldingRegister(true, 41, value);
-				QMetaObject::invokeMethod(m_clientWorker, [this]() {
-					m_clientWorker->set_Mode1(false);
-					}, Qt::QueuedConnection);
+				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
+				//	m_clientWorker->set_Mode1(false);
+				//	}, Qt::QueuedConnection);
 				break;
 			case 49:
 				this->WriteHoldingRegister(true, 42, value);
@@ -371,6 +371,8 @@ void Manager::init()
 	// 將 Client 讀到的資料「接」給 Server 
 	// 當 Client 讀到資料發出 m_5000data 訊號時，自動呼叫 Server 的更新函數
 		connect(m_clientWorker, &clientWorker::connected, this, [this]() { normal = true; });
+		connect(m_clientWorker, &clientWorker::pidcontrolFan, this, [this](double MV1) {emit pidcontrolFan(MV1); });
+		connect(m_clientWorker, &clientWorker::pidcontroloutvalue, this, [this](double MV2) {emit pidcontroloutvalue(MV2); });
 
 		connect(m_clientWorker, &clientWorker::m_5000Coil, this, [this](const QVector<quint16>& data,const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
 		emit Coil(data);//傳送給Core 
