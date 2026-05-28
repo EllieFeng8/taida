@@ -107,14 +107,14 @@ void Core::init()
            senserData2[14] = senserData[13];//出水閥PV
            senserData2[15] = m_proxy->getReturnValveOpening();//混水閥SV
            senserData2[16] = senserData[14];//混水閥PV
-           senserData2[17] = mv1;//風扇SV
-           senserData2[18] = senserData[15];//風扇PV
+           senserData2[17] = m_proxy->getFan1TargetRpm();//風扇SV
+           senserData2[18] = m_proxy->getFan1TargetRpmP();//風扇PV
            senserData2[19] = senserData[16];//出風溫
            senserData2[20] = m_proxy->getTargetPressureDiff();//壓差SV
            senserData2[21] = senserData[17];//壓差PV
            senserData2[22] = senserData[18];//熱交換
-           //senserData2[23] = senserData[0];//自動風扇
-           //senserData2[24] = senserData[0];//自動溫度
+           senserData2[23] = mode1;//風扇自動
+           senserData2[24] = mode2;//溫度自動
            senserData2[25] = m_proxy->getMotorFrequency();//泵浦SV 
            senserData2[26] = m_proxy->getMotorFrequencyP();//泵浦PV 
         });
@@ -191,7 +191,17 @@ void Core::init()
 
     
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
+    QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, this, [this](bool v){
+        mode1 = v ? 1 : 0;
+        }
+    );
+
     QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, m_manager, &Manager::set_mode1);
+    QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, this, [this](bool v) {
+        mode2 = v ? 1 : 0;
+
+        }
+    );
 
     QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv(v*10); });
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
