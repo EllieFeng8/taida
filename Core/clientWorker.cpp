@@ -54,7 +54,7 @@ void clientWorker::init()
     if (!m_5000) {
         m_5000 = new QModbusTcpClient(this);
         m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port);
+        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_5000->setTimeout(500);
         //m_5000->setNumberOfRetries(2);
         connect(m_5000, &QModbusTcpClient::stateChanged,
@@ -67,7 +67,7 @@ void clientWorker::init()
     if (!m_6022) {
         m_6022 = new QModbusTcpClient(this);
         m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip2);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port2);
+        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_6022->setTimeout(500);
       /*  m_6022->setNumberOfRetries(2);*/
         connect(m_6022, &QModbusTcpClient::stateChanged,
@@ -256,27 +256,7 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
                 {
                     double value = reply->result().value(i);
 
-                    // 13�B14 ���ʤ��񴫺�
-                    if (i == 13 || i == 14)
-                    {
-                        const double minValue = 65535.0 * 0.20; // 13107
-                        const double maxValue = 65535.0 * 0.95; // 62258
-
-                        if (value <= minValue)
-                        {
-                            value = 0.0;
-                        }
-                        else if (value >= maxValue)
-                        {
-                            value = 100.0;
-                        }
-                        else
-                        {
-                            value =
-                                ((value - minValue) /
-                                    (maxValue - minValue)) * 100.0;
-                        }
-                    }
+                    
 
                     // �s�J����᪺��
                     result.append(value);
@@ -955,7 +935,7 @@ void clientWorker::set_5000HoldingRegister(bool t, int addr, double v)
     req.target = t;
     req.address = addr;
     req.value =v; 
-    if (!m_isSTO || m_isFanSTO) //�p�G�bSTO���p�U �g�J���ƭȤ��i�Jqueue (���g�J)
+    if (!m_isSTO ) //�p�G�bSTO���p�U �g�J���ƭȤ��i�Jqueue (���g�J)
     {
         m_writeQueue.enqueue(req);
     } // �[�J��C
@@ -972,6 +952,19 @@ void clientWorker::set_STO(bool v)
     else if (!v)
     {
         m_STO = true;
+    }
+}
+void clientWorker::set_STO2(bool v)
+{
+    m_isSTO2 = v;
+    f_STO2 = true;
+    if (v)
+    {
+        m_STO2 = false;
+    }
+    else if (!v)
+    {
+        m_STO2 = true;
     }
 }
 void clientWorker::set_Reset()
@@ -1089,23 +1082,25 @@ void clientWorker::poll()
     {
         if (m_STO)
         {
-            writeSingleCoil(14, m_STO);
-            QTimer::singleShot(1000, this,
-                [=]()
-                {
-                    writeSingleCoil(12, true);
-                });
+            writeSingleCoil(12, true);
         }
         else
         {
-            writeSingleCoil(14, m_STO);
-            QTimer::singleShot(1000, this,
-                [=]()
-                {
-                    writeSingleCoil(12, false);
-                });
+            writeSingleCoil(12, false);
         }
         f_STO = false;
+    }
+    if (f_STO2)
+    {
+        if (m_STO2)
+        {
+            writeSingleCoil(14, m_STO2);
+        }
+        else
+        {
+            writeSingleCoil(14, m_STO2);
+        }
+        f_STO2 = false;
     }
     if (f_Reset)
     {

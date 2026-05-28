@@ -47,6 +47,8 @@ public:
     void set_Mode1(bool v);
     void set_Mode2(bool v);
     void set_STO(bool v);
+    void set_STO2(bool v);
+
     void set_Reset();
     void set_SV1(double v);
     void set_SV2(double v);
@@ -139,6 +141,8 @@ private:
     bool fan9_open = false;
 
     bool m_STO = false;
+    bool m_STO2 = false;
+
     double AO1 = 0.0;
     double MV1 = 0.0;
     double MV2 = 0.0;
@@ -156,6 +160,7 @@ private:
     bool f_setMode1 = false;
     bool f_setMode2 = false;
     bool f_STO = false;
+    bool f_STO2 = false;
     bool f_Reset = false;
     bool f_setSV1 = false;
     bool f_setSV2 = false;
@@ -167,5 +172,7 @@ private:
     bool f_MotorCtrl = false; //
     bool f_setAO1 = false; //�X���ֶ}��
     bool m_isSTO = false;
+    bool m_isSTO2 = false;
+
     bool m_isFanSTO = false;
 };
