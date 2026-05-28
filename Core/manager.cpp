@@ -40,8 +40,8 @@ void Manager::init()
 			if (server_OK) {
 				m_serverWorker->updateInputRegister(29, v);
 			}
-		});
-
+		}
+		);
 
 	m_clientThread = new QThread(this);
 	m_clientWorker = new clientWorker();
@@ -760,7 +760,7 @@ void Manager::fan9TargetRpm(double v)
 void Manager::returnValveOpening(double v) 
 {
 	double percent = v; // 0~100
-
+qDebug()<<"return openning= "<<v;
 	const double minValue = 4096.0 * 0.20; // 819
 	const double maxValue = 4096.0 * 0.95; // 3891
 

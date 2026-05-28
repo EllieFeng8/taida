@@ -12,7 +12,7 @@
 struct HoldingRegisterRequest {
     bool target;
     int address;
-    double value; // ­ì¥»¶Ç double¡A¦ý©³¼h WriteSingleHoldingRegisters ¥Î int¡A«ØÄ³²Î¤@
+    double value; // ï¿½ì¥»ï¿½ï¿½ doubleï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½h WriteSingleHoldingRegisters ï¿½ï¿½ intï¿½Aï¿½ï¿½Ä³ï¿½Î¤@
 };
 
 class clientWorker : public QObject
@@ -29,7 +29,7 @@ public:
     void reconnectDevices();
     void writeSingleCoil(int address, bool value);
 
-    //¼g¤J
+    //ï¿½gï¿½J
     void set_MV(double v);
     void set_MotorRun(bool v);
     void set_FanPower(bool v);
@@ -69,15 +69,15 @@ public:
     void Fan_PowerControl(bool v);
 
 
-    //Åª¨ú
+    //Åªï¿½ï¿½
     void Read5000HoldingRegisters( int slave, int startAddress, int number); 
     void read_test();
-    void Read6022PV1(); //²Ä¤@²ÕPV 
-    void Read6022PV2(); //²Ä¤G²ÕPV
-    void Read6022MV(); //PID ¿é¥X
+    void Read6022PV1(); //ï¿½Ä¤@ï¿½ï¿½PV 
+    void Read6022PV2(); //ï¿½Ä¤Gï¿½ï¿½PV
+    void Read6022MV(); //PID ï¿½ï¿½X
     //void readtest();
-    void ReadPID1(); //²Ä¤@²ÕPID
-    void ReadPID2(); //²Ä¤G²ÕPID 
+    void ReadPID1(); //ï¿½Ä¤@ï¿½ï¿½PID
+    void ReadPID2(); //ï¿½Ä¤Gï¿½ï¿½PID 
     void ReadCoils( int slave, int startAddress, int number); 
 
     void onStateChanged(QModbusDevice::State state);
@@ -101,15 +101,19 @@ signals:
     void m_6022PID2(QVector <quint16> result);
 
 private:
-    QQueue<HoldingRegisterRequest> m_writeQueue; // ·s¼W¦î¦C
+    QQueue<HoldingRegisterRequest> m_writeQueue; // ï¿½sï¿½Wï¿½ï¿½C
     QMutex m_lock;
     QModbusTcpClient* m_5000 = nullptr;
     QModbusTcpClient* m_6022 = nullptr;
     QTimer* m_pollTimer = nullptr;
     QTimer* m_reconnectTimer = nullptr;
+    // QString m_ip = "127.0.0.1";
     QString m_ip = "192.168.1.201";
+    // int m_port = 1502;
     int m_port = 502;
+    // QString m_ip2 = "127.0.0.1";
     QString m_ip2 = "192.168.1.202";
+    // int m_port2 = 2502;
     int m_port2 = 502;
     bool m5000_target = false;
     int m5000_addr=0;
@@ -161,7 +165,7 @@ private:
     bool f_setFAN = false;
     bool f_FanCtrl = false;
     bool f_MotorCtrl = false; //
-    bool f_setAO1 = false; //¥X¤ô»Ö¶}«×
+    bool f_setAO1 = false; //ï¿½Xï¿½ï¿½ï¿½Ö¶}ï¿½ï¿½
     bool m_isSTO = false;
     bool m_isFanSTO = false;
 };

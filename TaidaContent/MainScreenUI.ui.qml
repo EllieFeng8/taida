@@ -1902,7 +1902,7 @@ Rectangle {
                                     horizontalAlignment: Text.AlignLeft
                                     lineHeight: 16
                                     lineHeightMode: Text.FixedHeight
-                                    text: Td.outValvePidOn ? "PID ON" : "PID OFF"
+                                    text: Td.outValvePidOn ? "自動控出風溫" : "手動控出風溫"
                                     textFormat: Text.PlainText
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -3328,7 +3328,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignLeft
                                 lineHeight: 16
                                 lineHeightMode: Text.FixedHeight
-                                text: "PID 啟動監控"
+                                text: "自動控壓差"
                                 textFormat: Text.PlainText
                                 verticalAlignment: Text.AlignVCenter
                             }

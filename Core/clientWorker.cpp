@@ -9,7 +9,7 @@ clientWorker::clientWorker(QObject* parent)
 
 clientWorker::~clientWorker()
 {
-    // °±¤î¨ÃÄÀ©ñ­p®É¾¹
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pï¿½É¾ï¿½
     if (m_pollTimer) {
         m_pollTimer->stop();
         delete m_pollTimer;
@@ -21,7 +21,7 @@ clientWorker::~clientWorker()
         m_reconnectTimer = nullptr;
     }
 
-    // ¤¤Â_ Modbus ³s½u¨ÃÄÀ©ñª«¥ó
+    // ï¿½ï¿½ï¿½_ Modbus ï¿½sï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ñª«¥ï¿½
     if (m_5000) {
         m_5000->disconnectDevice();
         delete m_5000;
@@ -40,7 +40,7 @@ void clientWorker::init()
 
         m_pollTimer = new QTimer(this);
         connect(m_pollTimer, &QTimer::timeout, this, &clientWorker::poll, Qt::DirectConnection);
-        // DirectConnection ¦]¬° timer »P this ¦b¦P¤@ thread («O»Ù)
+        // DirectConnection ï¿½]ï¿½ï¿½ timer ï¿½P this ï¿½bï¿½Pï¿½@ thread (ï¿½Oï¿½ï¿½)
         if (!m_pollTimer->isActive())
             m_pollTimer->start(1000);
     }
@@ -110,7 +110,7 @@ void clientWorker::onErrorOccurred(QModbusDevice::Error error)
 
 void clientWorker::reconnectDevices()
 {
-    // ¦pªG¤£¬O¥¿¦b³s½u©Î¤w³s½u¡A´Nµo°_³s½u½Ð¨D
+    // ï¿½pï¿½Gï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½bï¿½sï¿½uï¿½Î¤wï¿½sï¿½uï¿½Aï¿½Nï¿½oï¿½_ï¿½sï¿½uï¿½Ð¨D
     if (m_5000 && m_5000->state() == QModbusDevice::UnconnectedState) {
         qDebug() << "ADAM-5000 is offline, attempting to reconnect...";
         m_5000->connectDevice();
@@ -124,16 +124,16 @@ void clientWorker::reconnectDevices()
 
 void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int address, int value)
 {
-    // ¦pªGtarget = true ¥NªíAdam5000
-    // ¦pªGtarget = false ¥NªíAdam6022
-    // slave = ¯¸¸¹
-    // address = modbus¼g¤J¦ì¸m
-    // value = ¼g¤Jªº­È
+    // ï¿½pï¿½Gtarget = true ï¿½Nï¿½ï¿½Adam5000
+    // ï¿½pï¿½Gtarget = false ï¿½Nï¿½ï¿½Adam6022
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // address = modbusï¿½gï¿½Jï¿½ï¿½m
+    // value = ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½
     qDebug() << "write HoldingRegister : " << address << " = " << value;
     QModbusTcpClient* client = target ? m_5000 : m_6022;
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
-    // 4. ·Ç³Æ Modbus ¼g¤J³æ¤¸ (¥²¶·¼g¤J 2 ­Ó¼È¦s¾¹)
+    // 4. ï¿½Ç³ï¿½ Modbus ï¿½gï¿½Jï¿½æ¤¸ (ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½J 2 ï¿½Ó¼È¦sï¿½ï¿½)
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, address, 1);
     writeUnit.setValue(0, value);
     QEventLoop loop;
@@ -144,7 +144,7 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
         connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
         connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-        timeoutTimer.start(1000); // 1¬í¼g¤J¹O®É
+        timeoutTimer.start(1000); // 1ï¿½ï¿½ï¿½gï¿½Jï¿½Oï¿½ï¿½
         loop.exec();
 
         if (timeoutTimer.isActive()) {
@@ -165,9 +165,9 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
 
 void clientWorker::MotorControl(bool v)
 {
-    // slave = ¯¸¸¹
-    // address = modbus¼g¤J¦ì¸m
-    // value = ¼g¤Jªº­È
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // address = modbusï¿½gï¿½Jï¿½ï¿½m
+    // value = ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½
     QModbusTcpClient* client =  m_5000 ;
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
@@ -182,7 +182,7 @@ void clientWorker::MotorControl(bool v)
         connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
         connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-        timeoutTimer.start(1000); // 1¬í¼g¤J¹O®É
+        timeoutTimer.start(1000); // 1ï¿½ï¿½ï¿½gï¿½Jï¿½Oï¿½ï¿½
         loop.exec();
 
         if (timeoutTimer.isActive()) {
@@ -202,9 +202,9 @@ void clientWorker::MotorControl(bool v)
 }
 void clientWorker::Fan_PowerControl(bool v)
 {
-    // slave = ¯¸¸¹
-    // address = modbus¼g¤J¦ì¸m
-    // value = ¼g¤Jªº­È
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // address = modbusï¿½gï¿½Jï¿½ï¿½m
+    // value = ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½
     QModbusTcpClient* client = m_5000;
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
@@ -219,7 +219,7 @@ void clientWorker::Fan_PowerControl(bool v)
         connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
         connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-        timeoutTimer.start(1000); // 1¬í¼g¤J¹O®É
+        timeoutTimer.start(1000); // 1ï¿½ï¿½ï¿½gï¿½Jï¿½Oï¿½ï¿½
         loop.exec();
 
         if (timeoutTimer.isActive()) {
@@ -240,9 +240,9 @@ void clientWorker::Fan_PowerControl(bool v)
 void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int number)
 {
     
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_5000) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, startAddress, number);
     QEventLoop loop;
@@ -256,7 +256,7 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
                 {
                     double value = reply->result().value(i);
 
-                    // 13¡B14 °µ¦Ê¤À¤ñ´«ºâ
+                    // 13ï¿½B14 ï¿½ï¿½ï¿½Ê¤ï¿½ï¿½ñ´«ºï¿½
                     if (i == 13 || i == 14)
                     {
                         const double minValue = 65535.0 * 0.20; // 13107
@@ -278,7 +278,7 @@ void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int num
                         }
                     }
 
-                    // ¦s¤J´«ºâ«áªº­È
+                    // ï¿½sï¿½Jï¿½ï¿½ï¿½ï¿½áªºï¿½ï¿½
                     result.append(value);
 
                     if (i < 16)
@@ -342,9 +342,9 @@ void clientWorker::ReadPID1()
 }
 void clientWorker::ReadPID2()
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_6022) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1317, 6);
     QEventLoop loop;
@@ -384,9 +384,9 @@ void clientWorker::ReadPID2()
 }
 void clientWorker::Read6022PV1()
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_6022) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1019, 2);
     QEventLoop loop;
@@ -417,9 +417,9 @@ void clientWorker::Read6022PV1()
 }
 void clientWorker::Read6022PV2()
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_6022) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1275, 2);
     QEventLoop loop;
@@ -451,9 +451,9 @@ void clientWorker::Read6022PV2()
 
 void clientWorker::read_test()
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_6022) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0, 4);
     QEventLoop loop;
@@ -483,9 +483,9 @@ void clientWorker::read_test()
 
 void clientWorker::Read6022MV()
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
     if (!m_6022) return;
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 10, 2);
     QEventLoop loop;
@@ -516,9 +516,9 @@ void clientWorker::Read6022MV()
 
 void clientWorker::ReadCoils( int slave, int startAddress, int number)
 {
-    // slave = ¯¸¸¹
-    // startAddress = modbus °_©l¦ì¸m
-    // number = Åª¨ú¼Æ¶q ¨Ò¦p nimber = 10 , ¥NªíÅª¨ú10µ§
+    // slave = ï¿½ï¿½ï¿½ï¿½
+    // startAddress = modbus ï¿½_ï¿½lï¿½ï¿½m
+    // number = Åªï¿½ï¿½ï¿½Æ¶q ï¿½Ò¦p nimber = 10 , ï¿½Nï¿½ï¿½Åªï¿½ï¿½10ï¿½ï¿½
         if (!m_5000) return;
         QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 11);
         QEventLoop loop;
@@ -566,24 +566,24 @@ void clientWorker::writeSingleCoil(int address, bool value)
         return;
     }
 
-    // «Ø¥ß DataUnit: Ãþ«¬¬° Coils, °_©l¦a§}¬° address, ¼Æ¶q¬° 1
+    // ï¿½Ø¥ï¿½ DataUnit: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Coils, ï¿½_ï¿½lï¿½aï¿½}ï¿½ï¿½ address, ï¿½Æ¶qï¿½ï¿½ 1
     QModbusDataUnit unit(QModbusDataUnit::Coils, address, 1);
-    unit.setValue(0, value ? 1 : 0); // ³]©w²Ä¤@­Ó(¤]¬O°ß¤@¤@­Ó)¼Æ­È
+    unit.setValue(0, value ? 1 : 0); // ï¿½]ï¿½wï¿½Ä¤@ï¿½ï¿½(ï¿½]ï¿½Oï¿½ß¤@ï¿½@ï¿½ï¿½)ï¿½Æ­ï¿½
 
-    // µo°e½Ð¨D
-    QModbusReply* reply = m_5000->sendWriteRequest(unit, 1); // 1 ¬° Server ID
+    // ï¿½oï¿½eï¿½Ð¨D
+    QModbusReply* reply = m_5000->sendWriteRequest(unit, 1); // 1 ï¿½ï¿½ Server ID
     if (!reply)
     {
         return;
     }
 
-    // 2. «Ø¥ß°Ï°ì EventLoop
+    // 2. ï¿½Ø¥ß°Ï°ï¿½ EventLoop
     QEventLoop loop;
     connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
     loop.exec();
 
-    // ³B²z¼g¤Jµ²ªG
+    // ï¿½Bï¿½zï¿½gï¿½Jï¿½ï¿½ï¿½G
     if (reply->error() == QModbusDevice::NoError) {
         qDebug() << "set coil = " << value;
     }
@@ -605,20 +605,20 @@ void clientWorker::writeHoldingRegisters(int address, double value, int number)
     for (int i = 0; i < 17; ++i) {
         writeUnit.setValue(i, value);
     }
-    // µo°e½Ð¨D
-    QModbusReply* reply = m_5000->sendWriteRequest(writeUnit, 1); // 1 ¬° Server ID
+    // ï¿½oï¿½eï¿½Ð¨D
+    QModbusReply* reply = m_5000->sendWriteRequest(writeUnit, 1); // 1 ï¿½ï¿½ Server ID
     if (!reply)
     {
         return;
     }
 
-    // 2. «Ø¥ß°Ï°ì EventLoop
+    // 2. ï¿½Ø¥ß°Ï°ï¿½ EventLoop
     QEventLoop loop;
     connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
     loop.exec();
 
-    // ³B²z¼g¤Jµ²ªG
+    // ï¿½Bï¿½zï¿½gï¿½Jï¿½ï¿½ï¿½G
     if (reply->error() == QModbusDevice::NoError) {
 
     }
@@ -635,7 +635,7 @@ void clientWorker::set6022Mode_1(bool v)
         return;
     }
 
-    // 1. ®Ú¾Ú ADAM-6022 ¤â¥U­pºâ¼Æ­È
+    // 1. ï¿½Ú¾ï¿½ ADAM-6022 ï¿½ï¿½Uï¿½pï¿½ï¿½Æ­ï¿½
 
     uint16_t highWord = static_cast<uint16_t>((v >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(v & 0xFFFF);
@@ -671,7 +671,7 @@ void clientWorker::set6022Mode_1(bool v)
 
 }
 
-void clientWorker::set_MV(double value) // °²³]¶Ç¤Jªº¬O 16bit ¼Æ­È
+void clientWorker::set_MV(double value) // ï¿½ï¿½ï¿½]ï¿½Ç¤Jï¿½ï¿½ï¿½O 16bit ï¿½Æ­ï¿½
 {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
         qDebug() << "Modbus is not connected";
@@ -681,9 +681,9 @@ void clientWorker::set_MV(double value) // °²³]¶Ç¤Jªº¬O 16bit ¼Æ­È
 
 
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 11, 1);
-    writeUnit.setValue(0, value); // ª½±µ³]©w 16-bit ¼Æ­È
+    writeUnit.setValue(0, value); // ï¿½ï¿½ï¿½ï¿½ï¿½]ï¿½w 16-bit ï¿½Æ­ï¿½
 
-    // µo°e½Ð¨D (Server ID ¹w³]¬° 1)
+    // ï¿½oï¿½eï¿½Ð¨D (Server ID ï¿½wï¿½]ï¿½ï¿½ 1)
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
 
     if (!reply) {
@@ -691,7 +691,7 @@ void clientWorker::set_MV(double value) // °²³]¶Ç¤Jªº¬O 16bit ¼Æ­È
         return;
     }
 
-    // ¨Ï¥Î EventLoop µ¥«Ý«D¦P¨Bµ²ªG (¦P¨B¤Æ³B²z)
+    // ï¿½Ï¥ï¿½ EventLoop ï¿½ï¿½ï¿½Ý«Dï¿½Pï¿½Bï¿½ï¿½ï¿½G (ï¿½Pï¿½Bï¿½Æ³Bï¿½z)
     QEventLoop loop;
     QObject::connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -713,7 +713,7 @@ void clientWorker::set6022Mode_2(bool v)
         return;
     }
 
-    // 1. ®Ú¾Ú ADAM-6022 ¤â¥U­pºâ¼Æ­È
+    // 1. ï¿½Ú¾ï¿½ ADAM-6022 ï¿½ï¿½Uï¿½pï¿½ï¿½Æ­ï¿½
 
     uint16_t highWord = static_cast<uint16_t>((v >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(v & 0xFFFF);
@@ -752,9 +752,9 @@ void clientWorker::writeSV1(float targetSV) {
         return;
     }
 
-    // 1. ®Ú¾Ú ADAM-6022 ¤â¥U­pºâ¼Æ­È
-    // SV ¦a§} 41020 -> Offset 1019
-    // °²³]¤p¼Æ¦ì¼Æ¬° 3¡A»Ý­¼¥H 1000
+    // 1. ï¿½Ú¾ï¿½ ADAM-6022 ï¿½ï¿½Uï¿½pï¿½ï¿½Æ­ï¿½
+    // SV ï¿½aï¿½} 41020 -> Offset 1019
+    // ï¿½ï¿½ï¿½]ï¿½pï¿½Æ¦ï¿½Æ¬ï¿½ 3ï¿½Aï¿½Ý­ï¿½ï¿½H 1000
     int32_t rawValue = static_cast<int32_t>(targetSV );
     uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
@@ -793,9 +793,9 @@ void clientWorker::writeSV2(float targetSV) {
         return;
     }
 
-    // 1. ®Ú¾Ú ADAM-6022 ¤â¥U­pºâ¼Æ­È
-    // SV ¦a§} 41020 -> Offset 1019
-    // °²³]¤p¼Æ¦ì¼Æ¬° 3¡A»Ý­¼¥H 1000
+    // 1. ï¿½Ú¾ï¿½ ADAM-6022 ï¿½ï¿½Uï¿½pï¿½ï¿½Æ­ï¿½
+    // SV ï¿½aï¿½} 41020 -> Offset 1019
+    // ï¿½ï¿½ï¿½]ï¿½pï¿½Æ¦ï¿½Æ¬ï¿½ 3ï¿½Aï¿½Ý­ï¿½ï¿½H 1000
     int32_t rawValue = static_cast<int32_t>(targetSV );
     uint16_t highWord = static_cast<uint16_t>((rawValue >> 16) & 0xFFFF);
     uint16_t lowWord = static_cast<uint16_t>(rawValue & 0xFFFF);
@@ -854,7 +854,7 @@ void clientWorker::writePID1(double p, double i, double d) {
     writeUnit.setValue(4, highWord_D);
     writeUnit.setValue(5, lowWord_D);
 
-    // 2. µo°e¼g¤J½Ð¨D
+    // 2. ï¿½oï¿½eï¿½gï¿½Jï¿½Ð¨D
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
         qDebug() << "set PID-0 failed :" << m_6022->errorString();
@@ -903,7 +903,7 @@ void clientWorker::writePID2(double p, double i, double d) {
     writeUnit.setValue(4, highWord_D);
     writeUnit.setValue(5, lowWord_D);
 
-    // 2. µo°e¼g¤J½Ð¨D
+    // 2. ï¿½oï¿½eï¿½gï¿½Jï¿½Ð¨D
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
         qDebug() << "set PID-1 failed :" << m_6022->errorString();
@@ -955,11 +955,11 @@ void clientWorker::set_5000HoldingRegister(bool t, int addr, double v)
     req.target = t;
     req.address = addr;
     req.value =v; 
-    if (!m_isSTO || m_isFanSTO) //¦pªG¦bSTO±¡ªp¤U ¼g¤Jªº¼Æ­È¤£¶i¤Jqueue (¤£¼g¤J)
+    if (!m_isSTO || m_isFanSTO) //ï¿½pï¿½Gï¿½bSTOï¿½ï¿½ï¿½pï¿½U ï¿½gï¿½Jï¿½ï¿½ï¿½Æ­È¤ï¿½ï¿½iï¿½Jqueue (ï¿½ï¿½ï¿½gï¿½J)
     {
         m_writeQueue.enqueue(req);
-    } // ¥[¤J¦î¦C
-    // ¤£»Ý­n¦A³]©w f_write5000¡A«á­±ª½±µÀË¬d Queue ¬O§_¬°ªÅ
+    } // ï¿½[ï¿½Jï¿½ï¿½C
+    // ï¿½ï¿½ï¿½Ý­nï¿½Aï¿½]ï¿½w f_write5000ï¿½Aï¿½á­±ï¿½ï¿½ï¿½ï¿½ï¿½Ë¬d Queue ï¿½Oï¿½_ï¿½ï¿½ï¿½ï¿½
 }
 void clientWorker::set_STO(bool v)
 {
@@ -1071,14 +1071,14 @@ void clientWorker::init_flag()
 
 void clientWorker::poll()
 {
-    m_pollTimer->stop(); // ¼È°±­p®É¾¹¡AÁ×§K­«¤J
+    m_pollTimer->stop(); // ï¿½È°ï¿½ï¿½pï¿½É¾ï¿½ï¿½Aï¿½×§Kï¿½ï¿½ï¿½J
     bool is5000Connected = (m_5000 && m_5000->state() == QModbusDevice::ConnectedState);
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
 
     if (!is5000Connected || !is6022Connected) {
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
         reconnectDevices();
-        // Â_½u®É¡A¥[ªø¤U¦¸ poll ªº¶¡¹j¡]¨Ò¦p 2¬í¡^¡AÁ×§K¹L«×ÀWÁc­«¸Õ
+        // ï¿½_ï¿½uï¿½É¡Aï¿½[ï¿½ï¿½ï¿½Uï¿½ï¿½ poll ï¿½ï¿½ï¿½ï¿½ï¿½jï¿½]ï¿½Ò¦p 2ï¿½ï¿½ï¿½^ï¿½Aï¿½×§Kï¿½Lï¿½ï¿½ï¿½Wï¿½cï¿½ï¿½ï¿½ï¿½
         m_pollTimer->start(1000);
         return;
     }
@@ -1242,8 +1242,8 @@ void clientWorker::poll()
     {
         HoldingRegisterRequest req = m_writeQueue.dequeue();
 
-        // ÄÀ©ñÂê©w¦A°õ¦æ Modbus ³q°T (Á×§K Block ¨ä¥¦°õ¦æºü¤Ó¤[)
-        // ¦]¬° WriteSingleHoldingRegisters ¸Ì­±¦³ QEventLoop¡A·|¼È°±¦b³o¸Ìª½¨ì³q°T§¹¦¨
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½Aï¿½ï¿½ï¿½ï¿½ Modbus ï¿½qï¿½T (ï¿½×§K Block ï¿½ä¥¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¤[)
+        // ï¿½]ï¿½ï¿½ WriteSingleHoldingRegisters ï¿½Ì­ï¿½ï¿½ï¿½ QEventLoopï¿½Aï¿½|ï¿½È°ï¿½ï¿½bï¿½oï¿½Ìªï¿½ï¿½ï¿½qï¿½Tï¿½ï¿½ï¿½ï¿½
 
         
         WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
@@ -1284,6 +1284,6 @@ void clientWorker::poll()
     ReadPID2();
     ReadPID1();
     //init_flag();
-    m_pollTimer->start(); // ¥þ³¡Åª¼g§¹«á¡A¤~¶}±Ò¤U¤@¦¸­p®É
+    m_pollTimer->start(); // ï¿½ï¿½ï¿½ï¿½Åªï¿½gï¿½ï¿½ï¿½ï¿½Aï¿½~ï¿½}ï¿½Ò¤Uï¿½@ï¿½ï¿½ï¿½pï¿½ï¿½
 }
 
