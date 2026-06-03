@@ -134,7 +134,11 @@ void Core::init()
         }
     );
 
-    QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, m_manager, &Manager::set_AO1);
+    QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, this, [this](double v)
+        {
+            double value = OutSV_minValue + (v / 100.0) * (OutSV_maxValue - OutSV_minValue);
+            m_manager->set_AO1(value);
+        });
 
     
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
@@ -167,8 +171,11 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::fan7TargetRpmChanged, m_manager, &Manager::fan7TargetRpm);
     QObject::connect(m_proxy, &TdProxy::fan8TargetRpmChanged, m_manager, &Manager::fan8TargetRpm);
     QObject::connect(m_proxy, &TdProxy::fan9TargetRpmChanged, m_manager, &Manager::fan9TargetRpm);
-    QObject::connect(m_proxy, &TdProxy::returnValveOpeningChanged, m_manager, &Manager::returnValveOpening);
-
+    QObject::connect(m_proxy, &TdProxy::returnValveOpeningChanged, this, [this](double v)
+        {
+            double value = MixSV_minValue + (v / 100.0) * (MixSV_maxValue - MixSV_minValue);
+            m_manager->returnValveOpening(value);
+        });
     QObject::connect(m_proxy, &TdProxy::fan1SwitchOnChanged, m_manager, &Manager::set_Fan1Open);
     QObject::connect(m_proxy, &TdProxy::fan2SwitchOnChanged, m_manager, &Manager::set_Fan2Open);
     QObject::connect(m_proxy, &TdProxy::fan3SwitchOnChanged, m_manager, &Manager::set_Fan3Open);
@@ -333,8 +340,6 @@ void Core::updateSenserData(readInput_Data data, QVector <quint16> result)
             }
         }
         //以上為202
-        const double minValue = 65535.0 * 0.20; // 13107
-        const double maxValue = 65535.0 * 0.95; // 62258
         for (int i = 0; i < data.AI_203.size(); ++i)
         {
             int targetIndex = i + 8;
@@ -346,21 +351,39 @@ void Core::updateSenserData(readInput_Data data, QVector <quint16> result)
             else if (i == 4) {
                 senserData[targetIndex] = qRound((data.AI_203[i] / 655.35 * 8) * 100.0) / 100.0;
             }
-            else if (i == 5 || i == 6)
+            else if (i == 5 )
             {
-                if (data.AI_203[i] <= minValue)
+                if (data.AI_203[i] <= Mix_minValue)
                 {
                     senserData[targetIndex] = 0.0;
                 }
-                else if (data.AI_203[i] >= maxValue)
+                else if (data.AI_203[i] >= Mix_maxValue)
                 {
                     senserData[targetIndex] = 100.0;
                 }
                 else
                 {
                     senserData[targetIndex] =
-                        qRound(((data.AI_203[i] - minValue) /
-                            (maxValue - minValue)) * 10000.0) / 100.0;
+                        qRound(((data.AI_203[i] - Mix_minValue) /
+                            (Mix_maxValue - Mix_minValue)) * 10000.0) / 100.0;
+                }
+
+            }
+            else if (i == 6)
+            {
+                if (data.AI_203[i] <= Out_minValue)
+                {
+                    senserData[targetIndex] = 0.0;
+                }
+                else if (data.AI_203[i] >= Out_maxValue)
+                {
+                    senserData[targetIndex] = 100.0;
+                }
+                else
+                {
+                    senserData[targetIndex] =
+                        qRound(((data.AI_203[i] - Out_minValue) /
+                            (Out_maxValue - Out_minValue)) * 10000.0) / 100.0;
                 }
 
             }
@@ -846,8 +869,7 @@ void Core::updateProxyProperty(int index, quint16 value)
 
 void Core::updateProxyProperty2(int index, quint16 value)
 {
-    const double minValue = 4095 * 0.20; // 
-    const double maxValue = 4095 * 0.95; //
+
     switch (index)
     {
     case 1:
@@ -945,36 +967,36 @@ void Core::updateProxyProperty2(int index, quint16 value)
         m_proxy->setFan9TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 11:
 
-        if (value <= minValue)
+        if (value <= MixSV_minValue)
         {
             value = 0.0;
         }
-        else if (value >= maxValue)
+        else if (value >= MixSV_maxValue)
         {
             value = 100.0;
         }
         else
         {
             value =
-                ((value - minValue) /
-                    (maxValue - minValue)) * 100.0;
+                ((value - MixSV_minValue) /
+                    (MixSV_maxValue - MixSV_minValue)) * 100.0;
         }
         m_proxy->setReturnValveOpening(qRound(value * 10.0) / 10.0); break;
     case 12:
 
-        if (value <= minValue)
+        if (value <= OutSV_minValue)
         {
             value = 0.0;
         }
-        else if (value >= maxValue)
+        else if (value >= OutSV_maxValue)
         {
             value = 100.0;
         }
         else
         {
             value =
-                ((value - minValue) /
-                    (maxValue - minValue)) * 100.0;
+                ((value - OutSV_minValue) /
+                    (OutSV_maxValue - OutSV_minValue)) * 100.0;
         }
         m_proxy->setOutValveOpening(qRound(value * 10.0) / 10.0); break;
     case 15: 
@@ -1008,7 +1030,14 @@ void Core::saveProductionSettings()
     settings.setValue("Production/D1", m_proxy->m_fanPidD);
     settings.setValue("Production/P2", m_proxy->m_outValveP);
     settings.setValue("Production/I2", m_proxy->m_outValveI);
-    settings.setValue("Production/D2", m_proxy->m_outValveD);
+    settings.setValue("Production/Mix_min", Mix_minValue);
+    settings.setValue("Production/Mix_max", Mix_maxValue);
+    settings.setValue("Production/MixSV_min", MixSV_minValue);
+    settings.setValue("Production/MixSV_max", MixSV_maxValue);
+    settings.setValue("Production/Out_min", Out_minValue);
+    settings.setValue("Production/Out_max", Out_maxValue);
+    settings.setValue("Production/OutSV_min", OutSV_minValue);
+    settings.setValue("Production/OutSV_max", OutSV_maxValue);
     //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -1043,4 +1072,13 @@ void Core::loadProductionSettings()
     m_proxy->setOutValveD(settings.value("Production/D2", 0).toDouble());
     m_proxy->setFanEmergencySwitchOn(settings.value("Production/ESTOP", true).toBool());
     m_proxy->setMotorFrequencySwitchOn(settings.value("Production/motorpower", true).toBool());
+    Mix_minValue =settings.value("Production/Mix_min", 0).toDouble();
+    Mix_maxValue = settings.value("Production/Mix_max", 65535).toDouble();
+    MixSV_minValue = settings.value("Production/MixSV_min", 0).toDouble();
+    MixSV_maxValue = settings.value("Production/MixSV_max", 65535).toDouble();
+    Out_minValue = settings.value("Production/Out_min", 0).toDouble();
+    Out_maxValue = settings.value("Production/Out_max", 4095).toDouble();
+    OutSV_minValue = settings.value("Production/OutSV_min", 0).toDouble();
+    OutSV_maxValue = settings.value("Production/OutSV_max", 4095).toDouble();
+
 }

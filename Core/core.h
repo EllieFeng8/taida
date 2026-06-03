@@ -117,5 +117,13 @@ private:
     SqlManager* m_sqlManager;
     RESTManager* m_restManager;
     Manager* m_manager = nullptr;
-    
+    double Mix_minValue = 65535.0 * 0.20; 
+    double Mix_maxValue = 65535.0 * 0.95; 
+    double Out_minValue = 4095 * 0.20; 
+    double Out_maxValue = 4095 * 0.95; 
+    double MixSV_minValue = 65535 * 0.20; 
+    double MixSV_maxValue = 65535 * 0.95; 
+    double OutSV_minValue = 4095 * 0.20; 
+    double OutSV_maxValue = 4095 * 0.95; 
+
 };
