@@ -63,67 +63,67 @@ void Manager::init()
 
 			switch (address) {
 			case 31: //
-				this->WriteHoldingRegister(true, 24,value); // 同步回 Client 寫入實體設備
+				this->WriteHoldingRegister_204(0, value); // 同步回 Client 寫入實體設備
 				break;
-			case 32:  
-				this->WriteHoldingRegister(true, 25, value);
+			case 32:
+				this->WriteHoldingRegister_204(1, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false); 
 				//	}, Qt::QueuedConnection);
 				break;
-			case 33:  
-				this->WriteHoldingRegister(true, 26, value);
+			case 33:
+				this->WriteHoldingRegister_204(2, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 34:  
-				this->WriteHoldingRegister(true, 27, value);
+			case 34:
+				this->WriteHoldingRegister_204(3, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 39:  
-				this->WriteHoldingRegister(true, 32, value);
+			case 39:
+				this->WriteHoldingRegister_205(0, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 40:  
-				this->WriteHoldingRegister(true, 33, value);
+			case 40:
+				this->WriteHoldingRegister_205(1, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 41:  
-				this->WriteHoldingRegister(true, 34, value);
+			case 41:
+				this->WriteHoldingRegister_205(2, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 42:  
-				this->WriteHoldingRegister(true, 35, value);
+			case 42:
+				this->WriteHoldingRegister_205(3, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 47:  
-				this->WriteHoldingRegister(true, 40, value);
+			case 47:
+				this->WriteHoldingRegister_206(0, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
-			case 48: 
-				this->WriteHoldingRegister(true, 41, value);
+			case 48:
+				this->WriteHoldingRegister_206(1, value);
 				//QMetaObject::invokeMethod(m_clientWorker, [this]() {
 				//	m_clientWorker->set_Mode1(false);
 				//	}, Qt::QueuedConnection);
 				break;
 			case 49:
-				this->WriteHoldingRegister(true, 42, value);
+				this->WriteHoldingRegister_206(2, value);
 				break;
 			case 50:
-				this->WriteHoldingRegister(false, 11, value);// 6022 的AO1 (出水閥開度)
+				this->WriteHoldingRegister_6022(11, value);// 6022 的AO1 (出水閥開度)
 				break;
 			case 51:
 				qDebug() << value;
@@ -157,7 +157,7 @@ void Manager::init()
 				//this->set_sv(value/4.096);//壓差 >> 風扇 (第一組PID的SV)
 				break;
 			case 63:
-				if(value==0)
+				if (value == 0)
 				{
 					emit update_switch(1, false);
 					this->set_mode1(false);
@@ -171,7 +171,7 @@ void Manager::init()
 			case 64:
 				if (value == 0)
 				{
-					emit update_switch(2,false);
+					emit update_switch(2, false);
 					this->set_mode2(false);
 				}
 				else if (value == 1)
@@ -185,24 +185,24 @@ void Manager::init()
 				if (value == 0)
 				{
 					emit update_switch(3, false);
-					this->set_FanPower(false);
+					this->set_FanEstop(false);
 				}
 				else if (value == 1)
 				{
 					emit update_switch(3, true);
-					this->set_FanPower(true);
+					this->set_FanEstop(true);
 				}
 				break;
 			case 72:
 				if (value == 0)
 				{
 					emit update_switch(4, false);
-					this->set_Estop(false);
+					this->set_motorEstop(false);
 				}
 				else if (value == 1)
 				{
 					emit update_switch(4, true);
-					this->set_Estop(true);
+					this->set_motorEstop(true);
 				}
 				break;
 
@@ -227,7 +227,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 31, &_value))
 					{
 						emit updateToUi(1, _value);
-						this->WriteHoldingRegister(true, 24, _value);
+						this->WriteHoldingRegister_204(0, _value);
 					}
 					m_serverWorker->updateCoils(1, false);
 					break;
@@ -235,7 +235,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 32, &_value))
 					{
 						emit updateToUi(2, _value);
-						this->WriteHoldingRegister(true, 25, _value );
+						this->WriteHoldingRegister_204(1, _value);
 					}
 					m_serverWorker->updateCoils(2, false);
 
@@ -245,7 +245,7 @@ void Manager::init()
 					{
 						emit updateToUi(3, _value);
 
-						this->WriteHoldingRegister(true, 26, _value);
+						this->WriteHoldingRegister_204(2, _value);
 					}
 					m_serverWorker->updateCoils(3, false);
 
@@ -254,7 +254,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 34, &_value))
 					{
 						emit updateToUi(4, _value);
-						this->WriteHoldingRegister(true, 27, _value );
+						this->WriteHoldingRegister_204(3, _value);
 					}
 					m_serverWorker->updateCoils(4, false);
 					break;
@@ -262,7 +262,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 39, &_value))
 					{
 						emit updateToUi(5, _value);
-						this->WriteHoldingRegister(true, 32, _value);
+						this->WriteHoldingRegister_205(0, _value);
 					}
 					m_serverWorker->updateCoils(5, false);
 
@@ -271,7 +271,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 40, &_value))
 					{
 						emit updateToUi(6, _value);
-						this->WriteHoldingRegister(true, 33, _value );
+						this->WriteHoldingRegister_205(1, _value);
 					}
 					m_serverWorker->updateCoils(6, false);
 
@@ -280,7 +280,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 41, &_value))
 					{
 						emit updateToUi(7, _value);
-						this->WriteHoldingRegister(true, 34, _value );
+						this->WriteHoldingRegister_205(2, _value);
 					}
 					m_serverWorker->updateCoils(7, false);
 
@@ -289,7 +289,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 42, &_value))
 					{
 						emit updateToUi(8, _value);
-						this->WriteHoldingRegister(true, 35, _value );
+						this->WriteHoldingRegister_205(3, _value);
 					}
 					m_serverWorker->updateCoils(8, false);
 
@@ -298,7 +298,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 47, &_value))
 					{
 						emit updateToUi(9, _value);
-						this->WriteHoldingRegister(true, 40, _value );
+						this->WriteHoldingRegister_206(0, _value);
 					}
 					m_serverWorker->updateCoils(9, false);
 					break;
@@ -306,7 +306,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 48, &_value))
 					{
 						emit updateToUi(10, _value);
-						this->WriteHoldingRegister(true, 41, _value );
+						this->WriteHoldingRegister_206(1, _value);
 					}
 					m_serverWorker->updateCoils(10, false);
 					break;
@@ -314,7 +314,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 49, &_value))
 					{
 						emit updateToUi(11, _value);
-						this->WriteHoldingRegister(true, 42, _value );
+						this->WriteHoldingRegister_206(2, _value);
 					}
 					m_serverWorker->updateCoils(11, false);
 					break;
@@ -322,7 +322,7 @@ void Manager::init()
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 50, &_value))
 					{
 						emit updateToUi(12, _value);
-						this->WriteHoldingRegister(false, 11, _value );
+						this->WriteHoldingRegister_6022(11, _value);
 
 					}
 					m_serverWorker->updateCoils(12, false);
@@ -333,7 +333,7 @@ void Manager::init()
 					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 52, &i1);
 					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 53, &d1);
 					this->set_PID(p1, i1, d1);
-					emit update_PID(1, p1*1.0/1000, i1 * 1.0 /1000, d1 * 1.0 /1000);
+					emit update_PID(1, p1 * 1.0 / 1000, i1 * 1.0 / 1000, d1 * 1.0 / 1000);
 					m_serverWorker->updateCoils(13, false);
 					break;
 				case 14:
@@ -341,7 +341,7 @@ void Manager::init()
 					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 54, &p2);
 					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 55, &i2);
 					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 56, &d2);
-					emit update_PID(2, p2 * 1.0 /1000, i2 * 1.0 /1000, d2 * 1.0 /1000);
+					emit update_PID(2, p2 * 1.0 / 1000, i2 * 1.0 / 1000, d2 * 1.0 / 1000);
 					this->set_PID2(p2, i2, d2);
 
 					m_serverWorker->updateCoils(14, false);
@@ -349,7 +349,7 @@ void Manager::init()
 				case 15:
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 58, &_value))
 					{
-						emit updateToUi(15, _value/100);
+						emit updateToUi(15, _value / 100);
 						this->set_sv2(_value);
 					}
 					m_serverWorker->updateCoils(15, false);
@@ -357,7 +357,7 @@ void Manager::init()
 				case 16:
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 60, &_value))
 					{
-						emit updateToUi(16, _value/10);
+						emit updateToUi(16, _value / 10);
 						this->set_sv(_value);
 					}
 					m_serverWorker->updateCoils(16, false);
@@ -370,55 +370,61 @@ void Manager::init()
 		});
 	// 將 Client 讀到的資料「接」給 Server 
 	// 當 Client 讀到資料發出 m_5000data 訊號時，自動呼叫 Server 的更新函數
-		connect(m_clientWorker, &clientWorker::connected, this, [this]() { normal = true; });
-		connect(m_clientWorker, &clientWorker::pidcontrolFan, this, [this](double MV1) {emit pidcontrolFan(MV1); });
-		connect(m_clientWorker, &clientWorker::pidcontroloutvalue, this, [this](double MV2) {emit pidcontroloutvalue(MV2); });
+	connect(m_clientWorker, &clientWorker::connected, this, [this]() { normal = true; emit client_on(); });
+	connect(m_serverWorker, &ServerWorker::server_stat, this, [=](bool v) {server_OK = v; emit server_on(); });
+	connect(m_clientWorker, &clientWorker::pidcontrolFan, this, [this](double MV1) {emit pidcontrolFan(MV1); });
+	connect(m_clientWorker, &clientWorker::pidcontroloutvalue, this, [this](double MV2) {emit pidcontroloutvalue(MV2); });
 
-		connect(m_clientWorker, &clientWorker::m_5000Coil, this, [this](const QVector<quint16>& data,const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
-		emit Coil(data);//傳送給Core 
-		
-		if(data[0]==1&& normal)
-		{
-			QMetaObject::invokeMethod(
-				m_clientWorker, [this] { m_clientWorker->set_FanPower(false); },
-				Qt::QueuedConnection
-			);
-			normal = false;
+	connect(m_clientWorker, &clientWorker::R_PV, this, [this](const QVector<quint16>& data) {
+		if (server_OK) {
+			m_serverWorker->updateInputRegister(27, data[3]  );
+			m_serverWorker->updateInputRegister(28, data[0] );
 		}
-		else if(data[0]==0 && !normal)
+		emit R_PV(data); });
+	// TODO :
+// 以下connect要替換成adam6000版本 讀取DI後 將讀值寫入對應server的正確位置 
+
+	connect(m_clientWorker, &clientWorker::input_DATA, this, [this](readInput_Data data)
 		{
-			QMetaObject::invokeMethod(
-				m_clientWorker, [this] { m_clientWorker->set_FanPower(true); },
-				Qt::QueuedConnection
-			);
-			normal = true;
-		}
-		
-		});
-		connect(m_clientWorker, &clientWorker::R_PV, this, [this](const QVector<quint16>& data) {
-			if (server_OK) {
-				m_serverWorker->updateInputRegister(27, data[3]  );
-				m_serverWorker->updateInputRegister(28, data[0] );
+			if(data.AI_202.isEmpty())
+			if (data.DI_201[0] = 0 && normal)//判斷欠逆相檢出 
+			{
+				QMetaObject::invokeMethod(
+					m_clientWorker, [this] { m_clientWorker->set_FanPower(false); m_clientWorker->set_MotorRun(false); }, //關閉風扇及馬達電源
+					Qt::QueuedConnection
+				);
+				normal = false;
 			}
-			emit R_PV(data); });
+			else if (data.DI_201[0] = 1 && !normal)
+			{
+				QMetaObject::invokeMethod(
+					m_clientWorker, [this] { m_clientWorker->set_FanPower(true); m_clientWorker->set_MotorRun(true); }, //開啟風扇及馬達電源
+					Qt::QueuedConnection
+				);
+				normal = true;
+			}	
+			
+			//將讀取到的數值更新到server
+			if (server_OK) {
+				m_serverWorker->updateHoldingRegisters(1,data.AO_204);
+				m_serverWorker->updateHoldingRegisters(9, data.AO_205);
+				m_serverWorker->updateHoldingRegisters(17, data.AO_206);
+				m_serverWorker->updateInputRegister(0, data.DI_201[0]);//相位檢出
+				m_serverWorker->updateInputRegister(1, data.DI_201[1]);//風扇1異常
+				m_serverWorker->updateInputRegister(2, data.DI_201[2]);//風扇2異常
+				m_serverWorker->updateInputRegister(3, data.DI_201[3]);//風扇3異常
+				m_serverWorker->updateInputRegister(4, data.DI_201[4]);//風扇4異常
+				m_serverWorker->updateInputRegister(5, data.DI_201[5]);//風扇5異常
+				m_serverWorker->updateInputRegister(6, data.DI_201[6]);//風扇6異常
+				m_serverWorker->updateInputRegister(7, data.DI_201[7]);//風扇7異常
+				m_serverWorker->updateInputRegister(8, data.DI_204[0]);//風扇8異常
+				m_serverWorker->updateInputRegister(9, data.DI_204[1]);//風扇9異常
+				m_serverWorker->updateInputRegister(10, data.DI_204[2]);//水泵異常
+				m_serverWorker->updateInputRegisters(11, data.AI_202);
+				m_serverWorker->updateInputRegisters(19, data.AI_203);
+				emit senserData(data, m_serverWorker->SaveData);
+			}
 
-		connect(m_serverWorker, &ServerWorker::server_stat, this, [=](bool v) {server_OK = v; emit server_on(); });
-	connect(m_clientWorker, &clientWorker::m_5000Coil, m_serverWorker, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
-		if (server_OK) {
-			m_serverWorker->updateInputRegisters(0, datainput); //將input的部分 傳入InputRegisters (從0開始)
-			//m_serverWorker->updateHoldingRegisters(71, dataoutput);//將output的部分 傳入HoldingRegisters (從71開始)
-		}});
-	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, this, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
-		emit HodingRegister(data); //傳送給Core
-		});
-	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, m_serverWorker, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
-		if (server_OK) {
-
-			emit update_input(datainput);
-			emit update_savedata(m_serverWorker->SaveData);
-			m_serverWorker->updateInputRegisters(11, datainput); //將input的部分 傳入InputRegisters (從11開始)
-			m_serverWorker->updateHoldingRegisters(1, dataoutput);//將output的部分 傳入HoldingRegisters (從1開始)
-		}
 		});
 
 	connect(m_clientWorker, &clientWorker::m_6022PID1, m_serverWorker, [this](const QVector<quint16>& data) {
@@ -552,51 +558,39 @@ void Manager::set_AO1(double v)
 }
 void Manager::motorFrequency(double v)
 {
-	double value = v * 40.96/0.6;
+	double value = v * 40.95/0.6;
 
-	/*QVector<quint16> data;
-	data.resize(1);
-	data[0] = v;*/
-	if(_STO)
+	if(_motor_STO)
 	{
 		m_serverWorker->updateHoldingRegister(31, 0);
 		qDebug() << "set motorFrequency =" << value<< " BUT! STO ON set 0" ;
 	}
 	m_serverWorker->updateHoldingRegister(31,value);
-	//m_serverWorker->updateCoils(1, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, v] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 24, v); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan1TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if(_E_STOP)
+	if(_FAN_STOP)
 	{
 		qDebug() << "set fan1 but E_STOP ON";
 		m_serverWorker->updateHoldingRegisters(32, { 0 });
 	}
 	else {
 		m_serverWorker->updateHoldingRegisters(32, data);
-	}//m_serverWorker->updateCoils(2, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 25, value); },
-	//	Qt::QueuedConnection
-	//);
+	}
 }
 void Manager::fan2TargetRpm(double v)
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	qDebug() << v;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(33, { 0 });
 		qDebug() << "set fan2 but E_STOP ON";
@@ -605,19 +599,14 @@ void Manager::fan2TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(33, data);
 	}
-	//m_serverWorker->updateCoils(3, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 26, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan3TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(34 ,{ 0 });
 		qDebug() << "set fan3 but E_STOP ON";
@@ -625,20 +614,15 @@ void Manager::fan3TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(34, data);
 	}
-	//m_serverWorker->updateCoils(4, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 27, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan4TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(39, { 0 });
 		qDebug() << "set fan4 but E_STOP ON";
@@ -646,19 +630,14 @@ void Manager::fan4TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(39, data);
 	}
-	//m_serverWorker->updateCoils(5, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 32, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan5TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(40, { 0 });
 		qDebug() << "set fan5 but E_STOP ON";
@@ -667,19 +646,14 @@ void Manager::fan5TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(40, data);
 	}
-	//m_serverWorker->updateCoils(6, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 33, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan6TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(41, { 0 });
 		qDebug() << "set fan6 but E_STOP ON";
@@ -688,19 +662,14 @@ void Manager::fan6TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(41, data);
 	}
-	//m_serverWorker->updateCoils(7, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 34, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan7TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (!_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(42, { 0 });
 		qDebug() << "set fan7 but E_STOP ON";
@@ -709,20 +678,15 @@ void Manager::fan7TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(42, data);
 	}
-	//m_serverWorker->updateCoils(8, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 35, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan8TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (!_E_STOP){
+	if (_FAN_STOP){
 		m_serverWorker->updateHoldingRegisters(47 ,{ 0 });
 		qDebug() << "set fan8 but E_STOP ON";
 
@@ -730,19 +694,14 @@ void Manager::fan8TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(47, data);
 	}
-	//m_serverWorker->updateCoils(9, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 40, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::fan9TargetRpm(double v) 
 {
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
-	if (!_E_STOP)
+	if (_FAN_STOP)
 	{
 		m_serverWorker->updateHoldingRegisters(48, { 0 });
 		qDebug() << "set fan9 but E_STOP ON";
@@ -751,11 +710,6 @@ void Manager::fan9TargetRpm(double v)
 	else {
 		m_serverWorker->updateHoldingRegisters(48, data);
 	}
-	//m_serverWorker->updateCoils(10, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 41, value); },
-	//	Qt::QueuedConnection
-	//);
 }
 void Manager::returnValveOpening(double v) 
 {
@@ -767,22 +721,39 @@ void Manager::returnValveOpening(double v)
 	quint16 modbusValue =
 		minValue + (percent / 100.0) * (maxValue - minValue);
 
-	double value = v * 40.96;
+	double value = v * 40.95;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = modbusValue;
 	m_serverWorker->updateHoldingRegisters(49, data);
-	//m_serverWorker->updateCoils(11, true);
-	//QMetaObject::invokeMethod(
-	//	m_clientWorker, [this, value] { m_clientWorker->WriteSingleHoldingRegisters(true, 1, 42, value); },
-	//	Qt::QueuedConnection
-	//);
+
 }
 
-void Manager::WriteHoldingRegister(bool t,int addr, double value)
+void Manager::WriteHoldingRegister_204(int addr, double value)
 {
 	QMetaObject::invokeMethod(
-		m_clientWorker, [this,t,addr,value] { m_clientWorker->set_5000HoldingRegister(t ,addr, value); },
+		m_clientWorker, [this, addr, value] { m_clientWorker->set_204HoldingRegister(addr, value); },
+		Qt::QueuedConnection
+	);
+}
+void Manager::WriteHoldingRegister_205(int addr, double value)
+{
+	QMetaObject::invokeMethod(
+		m_clientWorker, [this, addr, value] { m_clientWorker->set_205HoldingRegister(addr, value); },
+		Qt::QueuedConnection
+	);
+}
+void Manager::WriteHoldingRegister_206(int addr, double value)
+{
+	QMetaObject::invokeMethod(
+		m_clientWorker, [this, addr, value] { m_clientWorker->set_206HoldingRegister(addr, value); },
+		Qt::QueuedConnection
+	);
+}
+void Manager::WriteHoldingRegister_6022(int addr, double value)
+{
+	QMetaObject::invokeMethod(
+		m_clientWorker, [this, addr, value] { m_clientWorker->set_6022HoldingRegister(addr, value); },
 		Qt::QueuedConnection
 	);
 }
@@ -858,12 +829,21 @@ void Manager::set_Fan9Open(bool v)
 		Qt::QueuedConnection
 	);
 }
-void Manager::set_Estop(bool v)
+void Manager::set_motorEstop(bool v)
 {
-	_STO = v;
-	qDebug() << "set E-stop: " << v;
+	_motor_STO = v;
+	qDebug() << "set motor E-stop: " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_STO(v); },
+		Qt::QueuedConnection
+	);
+}
+void Manager::set_FanEstop(bool v)
+{
+	_FAN_STOP = v;
+	qDebug() << "set FAN E-stop: " << v;
+	QMetaObject::invokeMethod(
+		m_clientWorker, [this, v] { m_clientWorker->set_STO2(v); },
 		Qt::QueuedConnection
 	);
 }
@@ -886,49 +866,21 @@ void Manager::set_allFan(double v)
 
 void Manager::set_server(int value)
 {
-	//if (value == 0) {
-	//	QMetaObject::invokeMethod(
-	//		m_serverWorker, [this]
-	//		{
-	//			m_serverWorker->init(502,ip); },
-	//			Qt::QueuedConnection
-	//			);
-	//}
-	//else if (value == 1)
-	//	QMetaObject::invokeMethod(
-	//		m_serverWorker, [this]
-	//		{
-	//			m_serverWorker->init(502,"127.0.0.1"); },
-	//			Qt::QueuedConnection
-	//			);
 }
 void Manager::set_motor(bool v)
 {//水泵STO
-	_STO = v;
+	_motor_STO = v;
 	quint16 value = v ? 1 : 0;
 	m_serverWorker->updateHoldingRegister(72, value);
 	qDebug() << "set motor ";
-	QMetaObject::invokeMethod(
-		m_clientWorker, [this, v] 
-		{
-
-			m_clientWorker->set_STO(v);
-		
-		},
-		Qt::QueuedConnection
-	);
 }
 void Manager::set_FanPower(bool v)
 {
-	_E_STOP = v;
-	if (_E_STOP) {
+	_FAN_STOP = v;
+	if (_FAN_STOP) {
 		set_allFan(0);
 	}
-	quint16 value = v ? 0 : 1;	//緊急停止開啟 = 馬達電源關閉
-	m_serverWorker->updateHoldingRegister(73, value);
-	qDebug() << "set fan E_STOP " <<_E_STOP;
-	QMetaObject::invokeMethod(
-		m_clientWorker, [this, value] { m_clientWorker->set_FanPower(value); },
-		Qt::QueuedConnection
-	);
+	quint16 value = v ? 1 : 0;	//緊急停止開啟 = 馬達電源關閉
+	m_serverWorker->updateHoldingRegister(71, value);
+	qDebug() << "set fan E_STOP " <<_FAN_STOP;
 }

@@ -1,22 +1,22 @@
-#include "core.h"
+ï»¿#include "core.h"
 #include <QNetworkInterface>
 
 Core& Core::instance()
 {
-    static Core inst; // «Ø¥ß°ß¤@ªºÀRºA¹ê¨Ò
-    return inst;      // ¦^¶Ç¸Ó¹ê¨Òªº¤Ş¥Î
+    static Core inst; // å»ºç«‹å”¯ä¸€çš„éœæ…‹å¯¦ä¾‹
+    return inst;      // å›å‚³è©²å¯¦ä¾‹çš„å¼•ç”¨
 }
 Core::~Core()
 {
     saveProductionSettings();
 
-    // ÄÀ©ñ Manager ª«¥ó (³o·|¶i¤@¨BÄ²µo Manager ªº¸Ñºc¦¡°±¤î°õ¦æºü)
+    // é‡‹æ”¾ Manager ç‰©ä»¶ (é€™æœƒé€²ä¸€æ­¥è§¸ç™¼ Manager çš„è§£æ§‹å¼åœæ­¢åŸ·è¡Œç·’)
     if (m_manager) {
         delete m_manager;
         m_manager = nullptr;
     }
 
-    // ÄÀ©ñ TdProxy ª«¥ó
+    // é‡‹æ”¾ TdProxy ç‰©ä»¶
     if (m_proxy) {
         delete m_proxy;
         m_proxy = nullptr;
@@ -43,81 +43,30 @@ void Core::init()
     senserData.fill(0);
     senserData2.resize(40);
     senserData2.fill(0);
-    QObject::connect(m_manager, &Manager::Coil, this, &Core::Coil_Data);
-    QObject::connect(m_manager, &Manager::HodingRegister, this, &Core::HodingRegister_Data);
+
+    QObject::connect(m_manager, &Manager::senserData, this, &Core::onSenserData);
     QObject::connect(m_manager, &Manager::update_savedata, this, [=](QVector<quint16> result)
         {
             
 
-            // §PÂ_®É¶¡®t¬O§_¤j©óµ¥©ó³]©wªº n ¬í
+            // åˆ¤æ–·æ™‚é–“å·®æ˜¯å¦å¤§æ–¼ç­‰æ–¼è¨­å®šçš„ n ç§’
             if (QDateTime::currentDateTime().currentMSecsSinceEpoch() - m_lastSaveTime >= m_sqlManager->readFrequency())
             {
                
                 QDateTime now = QDateTime::currentDateTime();
                 m_lastSaveTime = now.currentMSecsSinceEpoch();
-                // --- ÃöÁä¡G¨Ï¥Î QtConcurrent Á×§K¥d¦í UI ---
-                // ª`·N¡G½T«O saveSensorData ¤º³¡ªº¸ê®Æ®w³s±µ¬O¸Ó½uµ{¨p¦³ªº
+                // --- é—œéµï¼šä½¿ç”¨ QtConcurrent é¿å…å¡ä½ UI ---
+                // æ³¨æ„ï¼šç¢ºä¿ saveSensorData å…§éƒ¨çš„è³‡æ–™åº«é€£æ¥æ˜¯è©²ç·šç¨‹ç§æœ‰çš„
                 m_sqlManager->saveSensorData(now, senserData2, result);
                 saveProductionSettings();
-                //qDebug() << "¡G" << now.toString("hh:mm:ss");
+                //qDebug() << "ï¼š" << now.toString("hh:mm:ss");
             }
             else
             {
-                // ®É¶¡ÁÙ¨S¨ì¡A¥i¥H¿ï¾Ü¸õ¹L¡A©Î¶È§ó·s UI Åã¥Ü
+                // æ™‚é–“é‚„æ²’åˆ°ï¼Œå¯ä»¥é¸æ“‡è·³éï¼Œæˆ–åƒ…æ›´æ–° UI é¡¯ç¤º
             }
         });
-    QObject::connect(m_manager, &Manager::update_input, this, [=](QVector<quint16> result) 
-        {
-            for (int i = 0; i < result.size(); ++i)
-            {
-                if (i == 0 || i == 2 || i == 4 || i == 6 || i==7 || i == 8 || i == 9 || i == 10 || i == 11 || i==13 || i == 14 || i == 15)
-                {
-                    senserData[i] = qRound(result[i] / 655.35 * 100.0) / 100.0;
-                }
-                else if (i == 12) {
-                    senserData[i] = qRound((result[i] / 655.35 * 8) * 100.0) / 100.0;
-                }
-                else 
-                {
-                    senserData[i] = qRound(result[i] / 65.535 * 100.0) / 100.0;
-                }
-            }
-           
-            
-          // (§N±Æ¥­§¡·Å«× - ¥X­··Å«×) * ¬y¶q * 4186 / 60000 * 998   
-           double rawHeat = (((senserData[6] - senserData[7] + senserData[8] - senserData[9]) / 2) * senserData[12] * 4186) / 60000 * 998.5/1000;
-           senserData[18] = qRound(rawHeat * 100.0) / 100.0;
-           m_proxy->setHeatExchange(senserData[18]);
-            //QDateTime now = QDateTime::currentDateTime();
-            //m_sqlManager->saveSensorData(now,senserData );
-           senserData2[0] = senserData[0];//¤J¤ô·Å
-           senserData2[1] = senserData[1];//¤J¤ôÀ£
-           senserData2[2] = senserData[4];//¥X¤ô·Å
-           senserData2[3] = senserData[5];//¥X¤ôÀ£
-           senserData2[4] = senserData[2];//¦^¤ô·Å
-           senserData2[5] = senserData[3];//¦^¤ôÀ£
-           senserData2[6] = senserData[6];//½LºŞ¥ª¤J·Å
-           senserData2[7] = senserData[7];//½LºŞ¥ª¥X·Å
-           senserData2[8] = senserData[8];//½LºŞ¥k¤J·Å
-           senserData2[9] = senserData[9];//½LºŞ¥k¥X·Å
-           senserData2[10] = senserData[10];//¤J­··Å
-           senserData2[11] = senserData[11];//¤J­·Àã
-           senserData2[12] = senserData[12];//¬y¶q­p
-           senserData2[13] = m_proxy->getOutValveOpening();//¥X¤ô»ÖSV 
-           senserData2[14] = senserData[13];//¥X¤ô»ÖPV
-           senserData2[15] = m_proxy->getReturnValveOpening();//²V¤ô»ÖSV
-           senserData2[16] = senserData[14];//²V¤ô»ÖPV
-           senserData2[17] = mv1;//­·®°SV
-           senserData2[18] = senserData[15];//­·®°PV
-           senserData2[19] = senserData[16];//¥X­··Å
-           senserData2[20] = m_proxy->getTargetPressureDiff();//À£®tSV
-           senserData2[21] = senserData[17];//À£®tPV
-           senserData2[22] = senserData[18];//¼ö¥æ´«
-           //senserData2[23] = senserData[0];//¦Û°Ê­·®°
-           //senserData2[24] = senserData[0];//¦Û°Ê·Å«×
-           senserData2[25] = m_proxy->getMotorFrequency();//¬¦®úSV 
-           senserData2[26] = m_proxy->getMotorFrequencyP();//¬¦®úPV 
-        });
+
     QObject::connect(m_manager, &Manager::pidcontrolFan, this, [this](double v) {
         m_proxy->setFan1TargetRpm(v); 
         m_proxy->setFan2TargetRpm(v); 
@@ -168,15 +117,13 @@ void Core::init()
         });
 
     QObject::connect(m_manager, &Manager::R_PV, this, &Core::onPVdata);
-    QObject::connect(m_manager, &Manager::server_on, this, [this]() { this->loadProductionSettings(); });
+    QObject::connect(m_manager, &Manager::client_on, this, [this]() { this->loadProductionSettings(); });
 
     QObject::connect(m_manager, &Manager::_PV1, this, &Core::pidPV1);
     QObject::connect(m_manager, &Manager::_PV2, this, &Core::pidPV2);
     QObject::connect(m_manager, &Manager::_PID1, this, &Core::PID1);
     QObject::connect(m_manager, &Manager::_PID2, this, &Core::PID2);
-    //QObject::connect(m_manager, &Manager::_MV, this, [=](QVector<quint16> v) {
-        //m_proxy->setOutValveOpeningP(v[1]);
-        //});
+
 
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, this, [this](bool v)
@@ -191,12 +138,21 @@ void Core::init()
 
     
     QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, m_manager, &Manager::set_mode2);
+    QObject::connect(m_proxy, &TdProxy::outValvePidOnChanged, this, [this](bool v) {
+        mode2 = v ? 1 : 0;
+
+        });
+
     QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, m_manager, &Manager::set_mode1);
+    QObject::connect(m_proxy, &TdProxy::fanPidMonitorOnChanged, this, [this](bool v) {
+        mode2 = v ? 1 : 0;
+
+        });
+
 
     QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv(v*10); });
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
-    //QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
 
     
@@ -255,13 +211,13 @@ void Core::init()
 
     for (const QHostAddress& addr : all)
     {
-        // 1. °ò¥»¹LÂo¡G±Æ°£¦^Àô¦ì§} (127.0.0.1) ¥B¥u§ì IPv4
+        // 1. åŸºæœ¬éæ¿¾ï¼šæ’é™¤å›ç’°ä½å€ (127.0.0.1) ä¸”åªæŠ“ IPv4
         if (addr.isLoopback() || addr.protocol() != QAbstractSocket::IPv4Protocol)
             continue;
 
         QString ipStr = addr.toString();
 
-        // 2. ®Ö¤ßÅŞ¿è¡G¿z¿ï¥H "192." ¶}ÀYªº¦ì§}
+        // 2. æ ¸å¿ƒé‚è¼¯ï¼šç¯©é¸ä»¥ "192." é–‹é ­çš„ä½å€
         if (ipStr.startsWith("192."))
         {
             ips << ipStr;
@@ -273,11 +229,11 @@ void Core::init()
 
     if (ips.isEmpty())
     {
-        //qInfo() << "§ä¤£¨ì 192 ¶}ÀYªº IPv4 ¦ì§}";
+        //qInfo() << "æ‰¾ä¸åˆ° 192 é–‹é ­çš„ IPv4 ä½å€";
     }
     else
     {
-        qInfo() << "²Å¦X±ø¥óªº IP ¦ì§}:" << ips;
+        qInfo() << "ç¬¦åˆæ¢ä»¶çš„ IP ä½å€:" << ips;
     }
     int freq = m_sqlManager->readFrequency();
     m_proxy->setCaptureFreq(freq);
@@ -286,41 +242,22 @@ void Core::init()
 
 void Core::Coil_Data(QVector <quint16> result)
 {
-    for (int i = 0; i < result.size(); ++i)
-    {
-        //qDebug() << "value" << i << " = " << result[i];
-        //updateProxyProperty(i, result[i]);
-
-    }
 }
 
 void Core::HodingRegister_Data(QVector <quint16> result)
 {
-
     for (int i = 0; i < result.size(); ++i)
     {
-        //qDebug() << "value" << i << " = " << result[i];
         updateProxyProperty(i, result[i]);
-        //senserData[i] = result[i];
     }
-    
 }
 
 void Core::pidPV1(QVector <quint16> result)
 {
-   // double sv = result[0];
-   // m_proxy->setTargetPressureDiff(qRound(sv / 10));
-    //double v = result[0];
-    //m_proxy->setPressureDiff(qRound(v * 100.0) / 100.0);
-    //senserData[17] = v*40.96;
 }
 void Core::pidPV2(QVector <quint16> result)
 {
-    //double pv = result[0];  
     double sv = result[0];
-    //m_proxy->setOutletAirTemp(qRound(pv * 100.0) / 100.0);
-    //senserData[16] = pv*40.96;
-
     m_proxy->setOutWaterTargetTempP(qRound(sv/100));
 }
 void Core::PID1(QVector <quint16> result)
@@ -364,91 +301,500 @@ void Core::set_PID2(double v)
     double piD = m_proxy->m_outValveD;
     m_manager->set_PID2(Pid*1000, pId * 1000, piD * 1000);
 }
+
+void Core::onSenserData(readInput_Data data, QVector <quint16> result)
+{
+    on202data(data.AI_202);
+    on203data(data.AI_203);
+    on204data(data.AO_204);
+    on205data(data.AO_205);
+    on206data(data.AO_206);
+
+    updateSenserData(data, result);
+}
+
+void Core::updateSenserData(readInput_Data data, QVector <quint16> result)
+{
+    // åˆ¤æ–·æ™‚é–“å·®æ˜¯å¦å¤§æ–¼ç­‰æ–¼è¨­å®šçš„ n ç§’
+    if (QDateTime::currentDateTime().currentMSecsSinceEpoch() - m_lastSaveTime >= m_sqlManager->readFrequency())
+    {
+
+        QDateTime now = QDateTime::currentDateTime();
+        m_lastSaveTime = now.currentMSecsSinceEpoch();
+        for (int i = 0; i < data.AI_202.size(); ++i)
+        {
+            if (i == 0 || i == 2 || i == 4 || i == 6 || i == 7)
+            {
+                senserData[i] = qRound(data.AI_202[i] / 655.35 * 100.0) / 100.0;
+            }
+            else
+            {
+                senserData[i] = qRound(data.AI_202[i] / 65.535 * 100.0) / 100.0;
+            }
+        }
+        //ä»¥ä¸Šç‚º202
+        const double minValue = 65535.0 * 0.20; // 13107
+        const double maxValue = 65535.0 * 0.95; // 62258
+        for (int i = 0; i < data.AI_203.size(); ++i)
+        {
+            int targetIndex = i + 8;
+
+            if (i == 0 || i == 1 || i == 2 || i == 3 || i == 7)
+            {
+                senserData[targetIndex] = qRound(data.AI_203[i] / 655.35 * 100.0) / 100.0;
+            }
+            else if (i == 4) {
+                senserData[targetIndex] = qRound((data.AI_203[i] / 655.35 * 8) * 100.0) / 100.0;
+            }
+            else if (i == 5 || i == 6)
+            {
+                if (data.AI_203[i] <= minValue)
+                {
+                    senserData[targetIndex] = 0.0;
+                }
+                else if (data.AI_203[i] >= maxValue)
+                {
+                    senserData[targetIndex] = 100.0;
+                }
+                else
+                {
+                    senserData[targetIndex] =
+                        qRound(((data.AI_203[i] - minValue) /
+                            (maxValue - minValue)) * 10000.0) / 100.0;
+                }
+
+            }
+        }
+        //ä»¥ä¸Šç‚º203
+                  // (å†·æ’å¹³å‡æº«åº¦ - å‡ºé¢¨æº«åº¦) * æµé‡ * 4186 / 60000 * 998   
+        double rawHeat = (((senserData[6] - senserData[7] + senserData[8] - senserData[9]) / 2) * senserData[12] * 4186) / 60000 * 998.5 / 1000;
+        senserData[18] = qRound(rawHeat * 100.0) / 100.0;
+        m_proxy->setHeatExchange(senserData[18]);
+        //QDateTime now = QDateTime::currentDateTime();
+        //m_sqlManager->saveSensorData(now,senserData );
+        senserData2[0] = senserData[0];//è¨­å‚™å…¥æ°´æº«
+        senserData2[1] = senserData[1];//è¨­å‚™å…¥æ°´å£“
+        senserData2[2] = senserData[4];//è¨­å‚™å‡ºæ°´æº«
+        senserData2[3] = senserData[5];//è¨­å‚™å‡ºæ°´å£“
+        senserData2[4] = senserData[2];//æ³µæ™®å…¥æ°´æº«
+        senserData2[5] = senserData[3];//æ³µæ™®å…¥æ°´å£“
+        senserData2[6] = senserData[6];//ç›¤ç®¡å·¦å…¥æº«
+        senserData2[7] = senserData[7];//ç›¤ç®¡å·¦å‡ºæº«
+        senserData2[8] = senserData[9];//ç›¤ç®¡å³å…¥æº«
+        senserData2[9] = senserData[8];//ç›¤ç®¡å³å‡ºæº«
+        senserData2[10] = senserData[10];//å…¥é¢¨æº«
+        senserData2[11] = senserData[11];//å…¥é¢¨æ¿•
+        senserData2[12] = senserData[12];//æµé‡è¨ˆ
+        senserData2[13] = m_proxy->getOutValveOpening();//å‡ºæ°´é–¥SV 
+        senserData2[14] = senserData[13];//å‡ºæ°´é–¥PV
+        senserData2[15] = m_proxy->getReturnValveOpening();//æ··æ°´é–¥SV
+        senserData2[16] = senserData[14];//æ··æ°´é–¥PV
+        senserData2[17] = m_proxy->getFan1TargetRpm();//é¢¨æ‰‡SV
+        senserData2[18] = m_proxy->getFan1TargetRpmPercent();//é¢¨æ‰‡PV
+        senserData2[19] = senserData[16];//å‡ºé¢¨æº«
+        senserData2[20] = m_proxy->getTargetPressureDiff();//å£“å·®SV
+        senserData2[21] = senserData[17];//å£“å·®PV
+        senserData2[22] = senserData[18];//ç†±äº¤æ›
+        senserData2[23] = mode1;//é¢¨æ‰‡è‡ªå‹•
+        senserData2[24] = mode2;//æº«åº¦è‡ªå‹•
+        senserData2[25] = m_proxy->getMotorFrequency();//æ³µæµ¦SV 
+        senserData2[26] = m_proxy->getMotorFrequencyP();//æ³µæµ¦PV 
+         
+         
+        
+        // æ³¨æ„ï¼šç¢ºä¿ saveSensorData å…§éƒ¨çš„è³‡æ–™åº«é€£æ¥æ˜¯è©²ç·šç¨‹ç§æœ‰çš„
+        m_sqlManager->saveSensorData(now, senserData2, result);
+        saveProductionSettings();
+        //qDebug() << "ï¼š" << now.toString("hh:mm:ss");
+    }
+    else
+    {
+        // æ™‚é–“é‚„æ²’åˆ°ï¼Œå¯ä»¥é¸æ“‡è·³éï¼Œæˆ–åƒ…æ›´æ–° UI é¡¯ç¤º
+    }
+
+}
+
+void Core::on202data(QVector<quint16> value)
+{
+    for (int i = 0; i < value.size(); ++i)
+    {
+        update202Proxy(i, value[i]);
+    }
+}
+void Core::on203data(QVector<quint16> value)
+{
+    for (int i = 0; i < value.size(); ++i)
+    {
+        update203Proxy(i, value[i]);
+    }
+}
+void Core::on204data(QVector<quint16> value)
+{
+    for (int i = 0; i < value.size(); ++i)
+    {
+        update204Proxy(i, value[i]);
+    }
+}
+void Core::on205data(QVector<quint16> value)
+{
+    for (int i = 0; i <  value.size(); ++i)
+    {
+        update205Proxy(i, value[i]);
+    }
+}
+void Core::on206data(QVector<quint16> value)
+{
+    for (int i = 0; i < value.size(); ++i)
+    {
+        update206Proxy(i, value[i]);
+    }
+}
+void Core::update202Proxy(int index, quint16 value)
+{
+    if (!m_proxy) return;
+
+    switch (index) {
+
+    case 0:
+        if (value == v_0) { return; }
+        if (value == 0 && c_0 < 3) { c_0++; return; }
+        if (value == 100 && c_0 < 3) { c_0++; return; }
+
+        m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥æ°´æº«åº¦
+        c_0 = 0;
+    case 1:
+        if (value == v_1) { return; }
+        if (value == 0 && c_1 < 3) { c_1++; return; }
+        if (value == 100 && c_1 < 3) { c_1++; return; }
+        c_1 = 0;
+
+        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å…¥æ°´å£“åŠ›
+    case 2:
+        if (value == v_2) { return; }
+        if (value == 0 && c_2 < 3) { c_2++; return; }
+        if (value == 100 && c_2 < 3) { c_2++; return; }
+        c_2 = 0;
+
+        v_2 = value;        
+        m_proxy->setOutWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å‡ºæ°´å£æº«åº¦
+    case 3:
+        if (value == v_3) { return; }
+        if (value == 0 && c_3 < 3) { c_3++; return; }
+        if (value == 100 && c_3 < 3) { c_3++; return; }
+        c_3 = 0;
+
+        v_3 = value;
+        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å‡ºæ°´å£å£“åŠ›
+
+    case 4:
+        if (value == v_4) { return; }
+        if (value == 0 && c_4 < 3) { c_4++; return; }
+        if (value == 100 && c_4 < 3) { c_4++; return; }
+        c_4 = 0;
+
+        v_4 = value;
+        m_proxy->setReturnWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break;//å›æ°´å£æº«åº¦
+
+    case 5:
+        if (value == v_5) { return; }
+        if (value == 0 && c_5 < 3) { c_5++; return; }
+        if (value == 100 && c_5 < 3) { c_5++; return; }
+        c_5 = 0;
+        v_5 = value;
+        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å›æ°´å£å£“åŠ›
+
+    case 6:
+        if (value == v_6) { return; }
+        if (value == 0 && c_6 < 3) { c_6++; return; }
+        if (value == 100 && c_6 < 3) { c_6++; return; }
+        c_6 = 0;
+
+        v_6 = value;
+        m_proxy->setCondenserLeft1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-1
+    case 7:
+        if (value == v_7) { return; }
+        if (value == 0 && c_7 < 3) { c_7++; return; }
+        if (value == 100 && c_7 < 3) { c_7++; return; }
+        c_7 = 0;
+        v_7 = value;
+        m_proxy->setCondenserLeft2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-2
+    }
+}
+void Core::update203Proxy(int index, quint16 value)
+{
+    if (!m_proxy) return;
+    double value0506 = 0.0;
+    if (index == 5 || index == 6)
+    {
+        const double minValue = 65535.0 * 0.20; // 13107
+        const double maxValue = 65535.0 * 0.95; // 62258
+
+        if (value <= minValue)
+        {
+            value0506 = 0.0;
+        }
+        else if (value >= maxValue)
+        {
+            value0506 = 100.0;
+        }
+        else
+        {
+            value0506 =
+                qRound(((value - minValue) /
+                    (maxValue - minValue)) * 10000.0) / 100.0;
+        }
+    }
+    switch (index) {
+    case 0:
+        if (value == v_8) { return; }
+        if (value == 0 && c_8 < 3) { c_8++; return; }
+        if (value == 100 && c_8 < 3) { c_8++; return; }
+
+        c_8 = 0;
+
+        v_8 = value;
+        m_proxy->setCondenserRight2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-3
+    case 1:
+        if (value == v_9) { return; }
+        if (value == 0 && c_9 < 3) { c_9++; return; }
+        if (value == 100 && c_9 < 3) { c_9++; return; }
+        c_9 = 0;
+
+        v_9 = value;
+        m_proxy->setCondenserRight1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-4
+    case 2:
+        if (value == v_10) { return; }
+        if (value == 0 && c_10 < 3) { c_10++; return; }
+        if (value == 100 && c_10 < 3) { c_10++; return; }
+        c_10 = 0;
+
+        v_10 = value;
+        m_proxy->setInletAirTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥é¢¨å£æº«åº¦
+    case 3:
+        if (value == v_11) { return; }
+        if (value == 0 && c_11 < 3) { c_11++; return; }
+        if (value == 100 && c_11 < 3) { c_11++; return; }
+        c_11 = 0;
+
+        v_11 = value;
+        m_proxy->setInletAirHumidity(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥é¢¨å£æ¿•åº¦
+    case 4:
+        if (value == v_12) { return; }
+        if (value == 0 && c_12 < 3) { c_12++; return; }
+        if (value == 100 && c_12 < 3) { c_12++; return; }
+        c_12 = 0;
+
+        v_12 = value;
+        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// æµé‡è¨ˆ 0~800
+    case 5:
+        if (value == v_13) { return; }
+        if (value == 0 && c_13 < 3) { c_13++; return; }
+        if (value == 100 && c_13 < 3) { c_13++; return; }
+        c_13 = 0;
+        v_13 = value;
+        m_proxy->setOutValveOpeningP(value0506); break; //å‡ºæ°´é›»å‹•é–¥ä½ç½®å›æˆ
+    case 6:
+        if (value == v_14) { return; }
+        if (value == 0 && c_14 < 3) { c_14++; return; }
+        if (value == 100 && c_14 < 3) { c_14++; return; }
+        c_14 = 0;
+        v_14 = value;
+        m_proxy->setReturnValveOpeningP(value0506); break; //å›æ°´é›»å‹•é–¥ä½ç½®å›æˆ
+    case 7: break; //é¢¨æ‰‡è‡ªå‹•é€Ÿç‡
+    }
+}
+
+void Core::update204Proxy(int index, quint16 value)
+{
+    if (!m_proxy) return;
+
+    switch (index) {
+    case 0:
+        if (value == v_16) { return; }
+        c_16 = 0;
+        v_16 = value;
+        m_proxy->setMotorFrequencyP(qRound((value / 40.95 * 0.6) * 10.0) / 10.0); break; //å¾ªç’°æ°´æ³µé€Ÿç‡è¼¸å‡º
+    case 1:
+        if (value == v_17) { return; }
+        v_17 = value;
+        m_proxy->setFan1TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan1TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡1
+    case 2:
+        if (value == v_18) { return; }
+        v_18 = value;
+        m_proxy->setFan2TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan2TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡2
+    case 3:
+        if (value == v_19) { return; }
+        v_19 = value;
+        m_proxy->setFan3TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan3TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡3
+    }
+}
+void Core::update205Proxy(int index, quint16 value)
+{
+    if (!m_proxy) return;
+
+    switch (index) {
+    case 0:
+        if (value == v_24) { return; }
+        v_24 = value;
+        m_proxy->setFan4TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan4TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡4
+
+    case 1:
+        if (value == v_25) { return; }
+        v_25 = value;
+        m_proxy->setFan5TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan5TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡5
+    case 2:
+        if (value == v_26) { return; }
+        v_26 = value;
+        m_proxy->setFan6TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan6TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡6
+    case 3:
+        if (value == v_27) { return; }
+        v_27 = value;
+        m_proxy->setFan7TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan7TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡7
+    }
+}
+void Core::update206Proxy(int index, quint16 value)
+{
+    if (!m_proxy) return;
+
+    switch (index) {
+    case 0:
+        if (value == v_32) { return; }
+        v_32 = value;
+        m_proxy->setFan8TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan8TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡8
+    case 1:
+        if (value == v_33) { return; }
+        v_33 = value;
+        m_proxy->setFan9TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
+        m_proxy->setFan9TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡9
+    case 2:
+        if (value == v_34) { return; }
+        v_34 = value;
+        //m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //å›æ°´é–¥é–‹åº¦
+    case 3: break; //Null
+    }
+}
+
+
+
+
+
+
+
 void Core::updateProxyProperty(int index, quint16 value)
 {
     if (!m_proxy) return;
+
+    double value1314 = 0.0;
+    if (index == 13 || index == 14)
+    {
+        const double minValue = 65535.0 * 0.20; // 13107
+        const double maxValue = 65535.0 * 0.95; // 62258
+
+        if (value <= minValue)
+        {
+            value1314 = 0.0;
+        }
+        else if (value >= maxValue)
+        {
+            value1314 = 100.0;
+        }
+        else
+        {
+            value1314 =
+                qRound(((value - minValue) /
+                    (maxValue - minValue)) * 10000.0) / 100.0;
+        }
+    }
     switch (index) {
 
     case 0:
         if (value == v_0) { return; }
         v_0 = value;
-        m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //¤J¤ô·Å«×
+        m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥æ°´æº«åº¦
     case 1: 
         if (value == v_1) { return; }
-        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //¤J¤ôÀ£¤O
+        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å…¥æ°´å£“åŠ›
     case 2:
         if (value == v_2) { return; }
         v_2 = value; 
-        m_proxy->setReturnWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break;//¦^¤ô¤f·Å«×
+        m_proxy->setReturnWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break;//å›æ°´å£æº«åº¦
     case 3:
         if (value == v_3) { return; }
         v_3 = value; 
-        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //¦^¤ô¤fÀ£¤O
+        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å›æ°´å£å£“åŠ›
     case 4:
         if (value == v_4) { return; }
         v_4 = value; 
-        m_proxy->setOutWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //¥X¤ô¤f·Å«×
+        m_proxy->setOutWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å‡ºæ°´å£æº«åº¦
     case 5:
         if (value == v_5) { return; }
         v_5 = value; 
-        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //¥X¤ô¤fÀ£¤O
+        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //å‡ºæ°´å£å£“åŠ›
     case 6: 
         if (value == v_6) { return; }
         v_6 = value; 
-        m_proxy->setCondenserLeft1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //§N±Æ·Ã«×­p-1
+        m_proxy->setCondenserLeft1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-1
     case 7:
         if (value == v_7) { return; }
         v_7 = value; 
-        m_proxy->setCondenserLeft2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //§N±Æ·Ã«×­p-2
+        m_proxy->setCondenserLeft2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-2
     case 8:
         if (value == v_8) { return; }
         v_8 = value; 
-        m_proxy->setCondenserRight1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //§N±Æ·Ã«×­p-3
+        m_proxy->setCondenserRight1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-3
     case 9: 
         if (value == v_9) { return; }
         v_9 = value; 
-        m_proxy->setCondenserRight2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //§N±Æ·Ã«×­p-4
+        m_proxy->setCondenserRight2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //å†·æ’æº¼åº¦è¨ˆ-4
     case 10:
         if (value == v_10) { return; }
         v_10 = value; 
-        m_proxy->setInletAirTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //¤J­·¤f·Å«×
+        m_proxy->setInletAirTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥é¢¨å£æº«åº¦
     case 11:
         if (value == v_11) { return; }
         v_11 = value; 
-        m_proxy->setInletAirHumidity(qRound((value / 655.35) * 10.0) / 10.0); break; //¤J­·¤fÀã«×
+        m_proxy->setInletAirHumidity(qRound((value / 655.35) * 10.0) / 10.0); break; //å…¥é¢¨å£æ¿•åº¦
     case 12:
         if (value == v_12) { return; }
         v_12 = value; 
-        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// ¬y¶q­p 0~800
+        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// æµé‡è¨ˆ 0~800
     case 13:
         if (value == v_13) { return; }
         v_13 = value; 
-        m_proxy->setOutValveOpeningP(qRound(value  * 10.0) / 10.0); break; //¥X¤ô¹q°Ê»Ö¦ì¸m¦^±Â
+        m_proxy->setOutValveOpeningP(value1314); break; //å‡ºæ°´é›»å‹•é–¥ä½ç½®å›æˆ
     case 14:
         if (value == v_14) { return; }
         v_14 = value;
-        m_proxy->setReturnValveOpeningP(qRound((value * 10.0) / 10.0)); break; //¦^¤ô¹q°Ê»Ö¦ì¸m¦^±Â
-    case 15: break; //­·®°¦Û°Ê³t²v
+        m_proxy->setReturnValveOpeningP(value1314); break; //å›æ°´é›»å‹•é–¥ä½ç½®å›æˆ
+    case 15: break; //é¢¨æ‰‡è‡ªå‹•é€Ÿç‡
     case 16: 
         if (value == v_16) { return; }
         v_16 = value; 
-        m_proxy->setMotorFrequencyP(qRound((value / 40.95*0.6) * 10.0) / 10.0); break; //´`Àô¤ô¬¦³t²v¿é¥X
+        m_proxy->setMotorFrequencyP(qRound((value / 40.95*0.6) * 10.0) / 10.0); break; //å¾ªç’°æ°´æ³µé€Ÿç‡è¼¸å‡º
     case 17: 
         if (value == v_17) { return; }
         v_17 = value; 
         m_proxy->setFan1TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan1TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°1
+        m_proxy->setFan1TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡1
 
     case 18: 
         if (value == v_18) { return; }
         v_18 = value;
         m_proxy->setFan2TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan2TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°2
+        m_proxy->setFan2TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡2
     case 19: 
         if (value == v_19) { return; }
         v_19 = value; 
         m_proxy->setFan3TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan3TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°3
+        m_proxy->setFan3TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡3
     case 20: break; //
     case 21: break; //
     case 22: break; //
@@ -457,23 +803,23 @@ void Core::updateProxyProperty(int index, quint16 value)
         if (value == v_24) { return; }
         v_24 = value; 
         m_proxy->setFan4TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan4TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°4
+        m_proxy->setFan4TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡4
         
     case 25:
         if (value == v_25) { return; }
         v_25 = value;
         m_proxy->setFan5TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan5TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°5
+        m_proxy->setFan5TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡5
     case 26: 
         if (value == v_26) { return; }
         v_26 = value; 
         m_proxy->setFan6TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan6TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°6
+        m_proxy->setFan6TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡6
     case 27:
         if (value == v_27) { return; }
         v_27 = value; 
         m_proxy->setFan7TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan7TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°7
+        m_proxy->setFan7TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡7
     case 28: break; //
     case 29: break; //
     case 30: break; //
@@ -482,16 +828,16 @@ void Core::updateProxyProperty(int index, quint16 value)
         if (value == v_32) { return; }
         v_32 = value; 
         m_proxy->setFan8TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan8TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°8
+        m_proxy->setFan8TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡8
     case 33:
         if (value == v_33) { return; }
         v_33 = value; 
         m_proxy->setFan9TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
-        m_proxy->setFan9TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //­·®°9
+        m_proxy->setFan9TargetRpmPercent(qRound((value / 40.95) * 10.0) / 10.0); break; //é¢¨æ‰‡9
     case 34:
         if (value == v_34) { return; }
         v_34 = value; 
-        //m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //¦^¤ô»Ö¶}«×
+        //m_proxy->setReturnValveOpeningP(qRound((value / 40.95) * 10.0) / 10.0); break; //å›æ°´é–¥é–‹åº¦
     case 35: break; //Null
 
     default: break;
@@ -500,6 +846,8 @@ void Core::updateProxyProperty(int index, quint16 value)
 
 void Core::updateProxyProperty2(int index, quint16 value)
 {
+    const double minValue = 4095 * 0.20; // 
+    const double maxValue = 4095 * 0.95; //
     switch (index)
     {
     case 1:
@@ -596,9 +944,39 @@ void Core::updateProxyProperty2(int index, quint16 value)
         }
         m_proxy->setFan9TargetRpm(qRound((value / 40.95) * 10.0) / 10.0); break;
     case 11:
-        m_proxy->setReturnValveOpening(qRound((value / 40.95) * 10.0) / 10.0); break;
+
+        if (value <= minValue)
+        {
+            value = 0.0;
+        }
+        else if (value >= maxValue)
+        {
+            value = 100.0;
+        }
+        else
+        {
+            value =
+                ((value - minValue) /
+                    (maxValue - minValue)) * 100.0;
+        }
+        m_proxy->setReturnValveOpening(qRound(value * 10.0) / 10.0); break;
     case 12:
-        m_proxy->setOutValveOpening(qRound((value / 40.95) * 10.0) / 10.0); break;
+
+        if (value <= minValue)
+        {
+            value = 0.0;
+        }
+        else if (value >= maxValue)
+        {
+            value = 100.0;
+        }
+        else
+        {
+            value =
+                ((value - minValue) /
+                    (maxValue - minValue)) * 100.0;
+        }
+        m_proxy->setOutValveOpening(qRound(value * 10.0) / 10.0); break;
     case 15: 
         m_proxy->setOutWaterTargetTemp(qRound((value) * 10.0) / 10.0); break;
     case 16:
@@ -642,7 +1020,7 @@ void Core::loadProductionSettings()
 {
     QSettings settings("production.ini", QSettings::IniFormat);
 
-    // Åª¨ú¼Æ­È¡A­YÀÉ®×¤£¦s¦b«h¨Ï¥Î¹w³]­È 0.0
+    // è®€å–æ•¸å€¼ï¼Œè‹¥æª”æ¡ˆä¸å­˜åœ¨å‰‡ä½¿ç”¨é è¨­å€¼ 0.0
     m_proxy->setMotorFrequency(settings.value("Production/Hz", 0).toDouble());
     m_proxy->setFan1TargetRpm(settings.value("Production/fan1", 0).toDouble());
     m_proxy->setFan2TargetRpm(settings.value("Production/fan2", 0).toDouble());

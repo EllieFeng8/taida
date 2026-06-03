@@ -1,5 +1,6 @@
 
 #include "clientWorker.h"
+#include <qstring.h>
 #include <QEventLoop>
 
 clientWorker::clientWorker(QObject* parent)
@@ -22,10 +23,35 @@ clientWorker::~clientWorker()
     }
 
     // 中斷 Modbus 連線並釋放物件
-    if (m_5000) {
-        m_5000->disconnectDevice();
-        delete m_5000;
-        m_5000 = nullptr;
+    if (m_201) {
+        m_201->disconnectDevice();
+        delete m_201;
+        m_201 = nullptr;
+    }
+    if (m_202) {
+        m_202->disconnectDevice();
+        delete m_202;
+        m_202 = nullptr;
+    }
+    if (m_203) {
+        m_203->disconnectDevice();
+        delete m_203;
+        m_203 = nullptr;
+    }
+    if (m_204) {
+        m_204->disconnectDevice();
+        delete m_204;
+        m_204 = nullptr;
+    }
+    if (m_205) {
+        m_205->disconnectDevice();
+        delete m_205;
+        m_205 = nullptr;
+    }
+    if (m_206) {
+        m_206->disconnectDevice();
+        delete m_206;
+        m_206 = nullptr;
     }
     if (m_6022) {
         m_6022->disconnectDevice();
@@ -47,29 +73,94 @@ void clientWorker::init()
 
     if (!m_reconnectTimer) {
         m_reconnectTimer = new QTimer(this);
-        m_reconnectTimer->setInterval(2000);
+        m_reconnectTimer->setInterval(1000);
         m_reconnectTimer->setSingleShot(true);
         connect(m_reconnectTimer, &QTimer::timeout, this, &clientWorker::init, Qt::QueuedConnection);
     }
-    if (!m_5000) {
-        m_5000 = new QModbusTcpClient(this);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port);
-        m_5000->setTimeout(500);
-        //m_5000->setNumberOfRetries(2);
-        connect(m_5000, &QModbusTcpClient::stateChanged,
-            this, &clientWorker::onStateChanged);
-        connect(m_5000, &QModbusTcpClient::errorOccurred,
+
+    if (!m_201) {
+        m_201 = new QModbusTcpClient(this);
+        m_201->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.201");
+        m_201->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_201->setObjectName("201");
+        m_201->setTimeout(500);
+        connect(m_201, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged_201);
+        connect(m_201, &QModbusTcpClient::errorOccurred,
             this, &clientWorker::onErrorOccurred);
-        m_5000->connectDevice();
+        m_201->connectDevice();
     }
 
+    if (!m_202) {
+        m_202 = new QModbusTcpClient(this);
+        m_202->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.202");
+        m_202->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_202->setObjectName("202");
+        m_202->setTimeout(500);
+        connect(m_202, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_202, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_202->connectDevice();
+    }
+
+    if (!m_203) {
+        m_203 = new QModbusTcpClient(this);
+        m_203->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.203");
+        m_203->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_203->setObjectName("203");
+        m_203->setTimeout(500);
+        connect(m_203, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_203, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_203->connectDevice();
+    }
+
+    if (!m_204) {
+        m_204 = new QModbusTcpClient(this);
+        m_204->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.204");
+        m_204->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_204->setObjectName("204");
+        m_204->setTimeout(500);
+        connect(m_204, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_204, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_204->connectDevice();
+    }
+
+    if (!m_205) {
+        m_205 = new QModbusTcpClient(this);
+        m_205->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.205");
+        m_205->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_205->setObjectName("205");
+        m_205->setTimeout(500);
+        connect(m_205, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_205, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_205->connectDevice();
+    }
+
+    if (!m_206) {
+        m_206 = new QModbusTcpClient(this);
+        m_206->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.206");
+        m_206->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_206->setObjectName("206");
+        m_206->setTimeout(500);
+        connect(m_206, &QModbusTcpClient::stateChanged,
+            this, &clientWorker::onStateChanged);
+        connect(m_206, &QModbusTcpClient::errorOccurred,
+            this, &clientWorker::onErrorOccurred);
+        m_206->connectDevice();
+    }
     if (!m_6022) {
         m_6022 = new QModbusTcpClient(this);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip2);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, m_port2);
+        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.207");
+        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_6022->setObjectName("6022");
         m_6022->setTimeout(500);
-      /*  m_6022->setNumberOfRetries(2);*/
         connect(m_6022, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_6022, &QModbusTcpClient::errorOccurred,
@@ -81,28 +172,36 @@ void clientWorker::onStateChanged(QModbusDevice::State state)
 {
     if (state == QModbusDevice::ConnectedState) {
         qDebug() << "clientWorker" << "connected.";
-        writeSingleCoil(12, false);
-        writeSingleCoil(14, true);
+    }
+    else if (state == QModbusDevice::UnconnectedState) {
+        qDebug() << "clientWorker" << "disconnected.";
+    }
+}
+void clientWorker::onStateChanged_201(QModbusDevice::State state)
+{
+    if (state == QModbusDevice::ConnectedState) {
+        qDebug() << "client 201" << "connected.";
+        //writeSingleCoil(12, false);
+        writeSingleCoil(m_201,19, true);//STO 點位  on=解除STO
+        Fan_PowerControl(true);
+    //    //TODO 確認馬達及STO點位 連線時啟動STO
         QTimer::singleShot(1000, this,
             [=]()
             {
- 
-                Fan_PowerControl(true);
 
-                writeSingleCoil(12, true);
-            });   
+                //Fan_PowerControl(true);//控制風扇
+                //連線時預設風扇停止
+                // 
+                writeSingleCoil(m_201,17, true);//控制馬達
+            });
 
 
         emit connected();
     }
     else if (state == QModbusDevice::UnconnectedState) {
         qDebug() << "clientWorker" << "disconnected.";
-
-
-
     }
 }
-
 void clientWorker::onErrorOccurred(QModbusDevice::Error error)
 {
     qDebug() << error;
@@ -111,26 +210,40 @@ void clientWorker::onErrorOccurred(QModbusDevice::Error error)
 void clientWorker::reconnectDevices()
 {
     // 如果不是正在連線或已連線，就發起連線請求
-    if (m_5000 && m_5000->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-5000 is offline, attempting to reconnect...";
-        m_5000->connectDevice();
+    if (m_201 && m_201->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6250 is offline, attempting to reconnect...";
+        m_201->connectDevice();
     }
-
+    if (m_202 && m_202->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6217-1 is offline, attempting to reconnect...";
+        m_202->connectDevice();
+    }
+    if (m_203 && m_203->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6217-2 is offline, attempting to reconnect...";
+        m_203->connectDevice();
+    }
+    if (m_204 && m_204->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6224-1 is offline, attempting to reconnect...";
+        m_204->connectDevice();
+    }
+    if (m_205 && m_205->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6224-2 is offline, attempting to reconnect...";
+        m_205->connectDevice();
+    }
+    if (m_206 && m_206->state() == QModbusDevice::UnconnectedState) {
+        qDebug() << "ADAM-6224-3 is offline, attempting to reconnect...";
+        m_206->connectDevice();
+    }
     if (m_6022 && m_6022->state() == QModbusDevice::UnconnectedState) {
         qDebug() << "ADAM-6022 is offline, attempting to reconnect...";
         m_6022->connectDevice();
     }
 }
 
-void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int address, int value)
+void clientWorker::WriteSingleHoldingRegisters(QModbusTcpClient* client, int slave, int address, int value)
 {
-    // 如果target = true 代表Adam5000
-    // 如果target = false 代表Adam6022
-    // slave = 站號
-    // address = modbus寫入位置
-    // value = 寫入的值
     qDebug() << "write HoldingRegister : " << address << " = " << value;
-    QModbusTcpClient* client = target ? m_5000 : m_6022;
+
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
     // 4. 準備 Modbus 寫入單元 (必須寫入 2 個暫存器)
@@ -149,7 +262,7 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
 
         if (timeoutTimer.isActive()) {
             if (reply->error() == QModbusDevice::NoError) {
-                qDebug() << "success " << (target ? "5000" : "6022") << "write :" << address << "value:" << value;
+                qDebug() << "success " << client->objectName() << "write :" << address << "value:" << value;
             }
             else {
                 qDebug() << "failed:" << reply->errorString();
@@ -165,50 +278,47 @@ void clientWorker::WriteSingleHoldingRegisters(bool target, int slave, int addre
 
 void clientWorker::MotorControl(bool v)
 {
-    // slave = 站號
-    // address = modbus寫入位置
-    // value = 寫入的值
-    QModbusTcpClient* client =  m_5000 ;
-    if (!client || client->state() != QModbusDevice::ConnectedState) return;
+    //TODO 確認並寫入馬達開關的coil位置
+    //QModbusTcpClient* client =  m_5000 ;
+    //if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
-    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 12, 1);
-    writeUnit.setValue(0, v);
+    //QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 12, 1);
+    //writeUnit.setValue(0, v);
 
-    QEventLoop loop;
-    QTimer timeoutTimer;
-    timeoutTimer.setSingleShot(true);
+    //QEventLoop loop;
+    //QTimer timeoutTimer;
+    //timeoutTimer.setSingleShot(true);
 
-    if (auto reply = client->sendWriteRequest(writeUnit, 1)) {
-        connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
-        connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    //if (auto reply = client->sendWriteRequest(writeUnit, 1)) {
+    //    connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+    //    connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
 
-        timeoutTimer.start(1000); // 1秒寫入逾時
-        loop.exec();
+    //    timeoutTimer.start(1000); // 1秒寫入逾時
+    //    loop.exec();
 
-        if (timeoutTimer.isActive()) {
-            if (reply->error() == QModbusDevice::NoError) {
-                qDebug() << "success ";
-            }
-            else {
-                qDebug() << "failed:" << reply->errorString();
-            }
-        }
-        else {
-            qDebug() << "timeout";
-            reply->deleteLater();
-        }
-        reply->deleteLater();
-    }
+    //    if (timeoutTimer.isActive()) {
+    //        if (reply->error() == QModbusDevice::NoError) {
+    //            qDebug() << "success ";
+    //        }
+    //        else {
+    //            qDebug() << "failed:" << reply->errorString();
+    //        }
+    //    }
+    //    else {
+    //        qDebug() << "timeout";
+    //        reply->deleteLater();
+    //    }
+    //    reply->deleteLater();
+    //}
 }
 void clientWorker::Fan_PowerControl(bool v)
 {
-    // slave = 站號
-    // address = modbus寫入位置
-    // value = 寫入的值
-    QModbusTcpClient* client = m_5000;
+    QModbusTcpClient* client = m_201;
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
-
-    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 11, 1);
+    
+      //TODO 確認並寫入風扇開關的正確位置
+ 
+    QModbusDataUnit writeUnit(QModbusDataUnit::Coils, 16, 1);
     writeUnit.setValue(0, v);
 
     QEventLoop loop;
@@ -235,71 +345,6 @@ void clientWorker::Fan_PowerControl(bool v)
             reply->deleteLater();
         }
         reply->deleteLater();
-    }
-}
-void clientWorker::Read5000HoldingRegisters(int slave, int startAddress, int number)
-{
-    
-    // slave = 站號
-    // startAddress = modbus 起始位置
-    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
-    if (!m_5000) return;
-    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, startAddress, number);
-    QEventLoop loop;
-    QVector <quint16> result;
-    QVector <quint16> result_in;
-    QVector <quint16> result_out;
-    if (auto reply = m_5000->sendReadRequest(readUnit, slave)) {
-        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
-            if (reply->error() == QModbusDevice::NoError) {
-                for (int i = 0; i < reply->result().valueCount(); i++)
-                {
-                    double value = reply->result().value(i);
-
-                    // 13、14 做百分比換算
-                    if (i == 13 || i == 14)
-                    {
-                        const double minValue = 65535.0 * 0.20; // 13107
-                        const double maxValue = 65535.0 * 0.95; // 62258
-
-                        if (value <= minValue)
-                        {
-                            value = 0.0;
-                        }
-                        else if (value >= maxValue)
-                        {
-                            value = 100.0;
-                        }
-                        else
-                        {
-                            value =
-                                ((value - minValue) /
-                                    (maxValue - minValue)) * 100.0;
-                        }
-                    }
-
-                    // 存入換算後的值
-                    result.append(value);
-
-                    if (i < 16)
-                    {
-                        result_in.append(value);
-                    }
-                    else
-                    {
-                        result_out.append(value);
-                    }
-                }
-                MV1 = result[15]/16;
-                emit m_5000HodingRegister(result, result_in, result_out);
-            }
-            else {
-                qDebug() << "Modbus adam-5000 read error:" << reply->errorString();
-            }
-            reply->deleteLater();
-            loop.quit();
-            });
-        loop.exec();
     }
 }
 void clientWorker::ReadPID1()
@@ -514,54 +559,157 @@ void clientWorker::Read6022MV()
     }
 }
 
-void clientWorker::ReadCoils( int slave, int startAddress, int number)
+QVector <quint16> clientWorker::readAdam6250DI()
 {
-    // slave = 站號
-    // startAddress = modbus 起始位置
-    // number = 讀取數量 例如 nimber = 10 , 代表讀取10筆
-        if (!m_5000) return;
-        QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 11);
-        QEventLoop loop;
-        QVector <quint16> result;
-        QVector <quint16> result_in;
-        QVector <quint16> result_out;
-
-        if (auto reply = m_5000->sendReadRequest(readUnit, slave)) {
-            QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
-                if (reply->error() == QModbusDevice::NoError) {
-                    for (int i = 0; i < reply->result().valueCount(); i++)
-                    { 
-                        result.append(reply->result().value(i));
-
-                        if (i < 11)
-                        {
-                            result_in.append(reply->result().value(i));
-                        }
-                        else 
-                        {
-                            result_out.append(reply->result().value(i));
-
-                        }
-
-                    }
-                    emit m_5000Coil(result,result_in,result_out);
+    //DI 0 = 電源相位檢出
+    //DI 4 = 水泵異常
+    QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 8);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (!m_201) return result;
+    if (m_201->state() != QModbusDevice::ConnectedState) {
+        qDebug() << m_201 << "not connected";
+        return result;
+    }
+    if (auto reply = m_201->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
                 }
-                else {
-                    qDebug() << "Modbus read error:" << reply->errorString();
-                }
-                reply->deleteLater();
-                loop.quit();
-                });
-            loop.exec();
-        }
-        return;    
+            }
+            else {
+                qDebug() << "201 read DI error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+    return result;
 }
+QVector <quint16> clientWorker::readAdam6250DO()
+{
+    
+    QModbusDataUnit readUnit(QModbusDataUnit::Coils, 16, 7);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (!m_201) return result;
+    if (m_201->state() != QModbusDevice::ConnectedState) {
+        qDebug() << m_201 << "not connected";
+        return result;
+    }
+    if (auto reply = m_201->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
+                }
+            }
+            else {
+                qDebug() << "201 read DO error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+    return result;
+}
+QVector <quint16> clientWorker::readAdam6217AI(QModbusTcpClient* client)
+{
+    QVector <quint16> result;
+    if (!client) return result;
+    if (client->state() != QModbusDevice::ConnectedState) {
+        qDebug() << client->objectName() << "not connected";
+        return result;
+    }
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0, 8);
+    QEventLoop loop;
 
-void clientWorker::writeSingleCoil(int address, bool value)
+
+    if (auto reply = client->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
+                }
+            }
+            else {
+                qDebug() << client->objectName() << "read AI error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+    return result;
+}
+QVector <quint16> clientWorker::readAdam6224AO(QModbusTcpClient* client)
+{
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0, 4);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (!client) return result;
+    if (client->state() != QModbusDevice::ConnectedState) {
+        qDebug() << client->objectName() << "not connected";
+        return result;
+    }
+
+    if (auto reply = client->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
+                }
+            }
+            else {
+                qDebug() << client->objectName() << "read AO error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+    return result;
+}
+QVector <quint16> clientWorker::readAdam6224DI(QModbusTcpClient* client)
+{
+    QModbusDataUnit readUnit(QModbusDataUnit::Coils, 0, 4);
+    QEventLoop loop;
+    QVector <quint16> result;
+    if (!client) return result;
+    if (client->state() != QModbusDevice::ConnectedState) {
+        qDebug() << client->objectName() << "not connected";
+        return result;
+    }
+    if (auto reply = client->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError) {
+                for (int i = 0; i < reply->result().valueCount(); i++)
+                {
+                    result.append(reply->result().value(i));
+                }
+            }
+            else {
+                qDebug() << client->objectName() <<" read DI error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+            });
+        loop.exec();
+    }
+    return result;
+}
+void clientWorker::writeSingleCoil(QModbusTcpClient* client ,int address, bool value)
 {
     qDebug() << "Write single coil addr:" << address << " = " << value;
 
-    if ( m_5000->state() != QModbusDevice::ConnectedState)
+    if (client->state() != QModbusDevice::ConnectedState)
     {
         return;
     }
@@ -571,7 +719,7 @@ void clientWorker::writeSingleCoil(int address, bool value)
     unit.setValue(0, value ? 1 : 0); // 設定第一個(也是唯一一個)數值
 
     // 發送請求
-    QModbusReply* reply = m_5000->sendWriteRequest(unit, 1); // 1 為 Server ID
+    QModbusReply* reply = client->sendWriteRequest(unit, 1); // 1 為 Server ID
     if (!reply)
     {
         return;
@@ -592,11 +740,11 @@ void clientWorker::writeSingleCoil(int address, bool value)
     }
     reply->deleteLater();
 }
-void clientWorker::writeHoldingRegisters(int address, double value, int number)
+void clientWorker::writeHoldingRegisters(QModbusTcpClient* client,int address, double value, int number)
 {
     //qDebug() << "Write single coil addr:" << address << " = " << value;
 
-    if (m_5000->state() != QModbusDevice::ConnectedState)
+    if (client->state() != QModbusDevice::ConnectedState)
     {
         return;
     }
@@ -606,7 +754,7 @@ void clientWorker::writeHoldingRegisters(int address, double value, int number)
         writeUnit.setValue(i, value);
     }
     // 發送請求
-    QModbusReply* reply = m_5000->sendWriteRequest(writeUnit, 1); // 1 為 Server ID
+    QModbusReply* reply = client->sendWriteRequest(writeUnit, 1); // 1 為 Server ID
     if (!reply)
     {
         return;
@@ -948,18 +1096,54 @@ void clientWorker::set_Mode2(bool v)
     m_mode2 = v;
     f_setMode2 = true;
 }
-void clientWorker::set_5000HoldingRegister(bool t, int addr, double v)
+void clientWorker::set_204HoldingRegister(int addr, double v)
 {
 
     HoldingRegisterRequest req;
-    req.target = t;
+    req.client = m_204;
     req.address = addr;
     req.value =v; 
-    if (!m_isSTO || m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
+    if (!m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
     {
         m_writeQueue.enqueue(req);
     } // 加入佇列
     // 不需要再設定 f_write5000，後面直接檢查 Queue 是否為空
+}
+void clientWorker::set_205HoldingRegister(int addr, double v)
+{
+
+    HoldingRegisterRequest req;
+    req.client = m_205;
+    req.address = addr;
+    req.value =v; 
+    if (!m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
+    {
+        m_writeQueue.enqueue(req);
+    } 
+}
+void clientWorker::set_206HoldingRegister(int addr, double v)
+{
+
+    HoldingRegisterRequest req;
+    req.client = m_206;
+    req.address = addr;
+    req.value = v;
+    if (!m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
+    {
+        m_writeQueue.enqueue(req);
+    }
+}
+void clientWorker::set_6022HoldingRegister(int addr, double v)
+{
+
+    HoldingRegisterRequest req;
+    req.client = m_6022;
+    req.address = addr;
+    req.value = v;
+    if (!m_isSTO || m_isFanSTO) //如果在STO情況下 寫入的數值不進入queue (不寫入)
+    {
+        m_writeQueue.enqueue(req);
+    }
 }
 void clientWorker::set_STO(bool v)
 {
@@ -973,6 +1157,22 @@ void clientWorker::set_STO(bool v)
     {
         m_STO = true;
     }
+    qDebug() << "set motor power = " << m_STO;
+
+}
+void clientWorker::set_STO2(bool v)
+{
+    m_isSTO2 = v;
+    f_STO2 = true;
+    if (v)
+    {
+        m_STO2 = false;
+    }
+    else if (!v)
+    {
+        m_STO2 = true;
+    }
+    qDebug() << "set fan power = "<<m_STO2;
 }
 void clientWorker::set_Reset()
 {
@@ -1072,48 +1272,79 @@ void clientWorker::init_flag()
 void clientWorker::poll()
 {
     m_pollTimer->stop(); // 暫停計時器，避免重入
-    bool is5000Connected = (m_5000 && m_5000->state() == QModbusDevice::ConnectedState);
+    bool is201Connected = (m_201 && m_201->state() == QModbusDevice::ConnectedState);
+    bool is202Connected = (m_202 && m_202->state() == QModbusDevice::ConnectedState);
+    bool is203Connected = (m_203 && m_203->state() == QModbusDevice::ConnectedState);
+    bool is204Connected = (m_204 && m_204->state() == QModbusDevice::ConnectedState);
+    bool is205Connected = (m_205 && m_205->state() == QModbusDevice::ConnectedState);
+    bool is206Connected = (m_206 && m_206->state() == QModbusDevice::ConnectedState);
+
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
 
-    if (!is5000Connected || !is6022Connected) {
+    if (!is201Connected || !is6022Connected|| !is202Connected || !is203Connected || !is204Connected || !is205Connected || !is206Connected  ) {
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
         reconnectDevices();
         // 斷線時，加長下次 poll 的間隔（例如 2秒），避免過度頻繁重試
         m_pollTimer->start(1000);
         return;
     }
-    ReadCoils(1, 0, 15);
-    Read5000HoldingRegisters(1, 8, 35);
+    auto _201DI = readAdam6250DI();
+    auto _201DO = readAdam6250DO();
+    auto _202AI = readAdam6217AI(m_202);
+    auto _203AI = readAdam6217AI(m_203);
+    auto _204DI = readAdam6224DI(m_204);
+    auto _204AO = readAdam6224AO(m_204);
+    auto _205AO = readAdam6224AO(m_205);
+    auto _206AO = readAdam6224AO(m_206);
+    readInput_Data data;
+    data.DI_201 = _201DI;
+    data.DO_201 = _201DO;
+    data.AI_202 = _202AI;
+    data.AI_203 = _203AI;
+    data.DI_204 = _204DI;
+    data.AO_204 = _204AO;
+    data.AO_205 = _205AO;
+    data.AO_206 = _206AO;
+    if (!data.AI_202.isEmpty() && !data.AI_203.isEmpty() && !data.AO_204.isEmpty() && !data.AO_205.isEmpty() && !data.AO_206.isEmpty())
+    {
+        emit input_DATA(data);
+    }
     read_test();
     if (f_STO)
     {
         if (m_STO)
         {
-            writeSingleCoil(14, m_STO);
+            writeSingleCoil(m_201,19, m_STO);
             QTimer::singleShot(1000, this,
                 [=]()
                 {
-                    writeSingleCoil(12, true);
+                    writeSingleCoil(m_201,17, true);
                 });
         }
         else
         {
-            writeSingleCoil(14, m_STO);
+            writeSingleCoil(m_201,19, m_STO);
             QTimer::singleShot(1000, this,
                 [=]()
                 {
-                    writeSingleCoil(12, false);
+                    writeSingleCoil(m_201,17, false);
                 });
         }
         f_STO = false;
     }
+    if (f_STO2)
+    {
+        writeSingleCoil(m_201, 16, m_STO2);
+
+        f_STO2 = false;
+    }
     if (f_Reset)
     {
-        writeSingleCoil(13, true);
+        //writeSingleCoil(13, true);
         QTimer::singleShot(1000, this,
             [=]()
             {
-                writeSingleCoil(13, false);
+                //writeSingleCoil(13, false);
             });
         f_Reset = false;
 
@@ -1126,14 +1357,18 @@ void clientWorker::poll()
     if (f_FanCtrl)
     {
         Fan_PowerControl(power);
-        writeHoldingRegisters(25, 0, 17);
+        writeHoldingRegisters(m_204,1, 0, 3);
+        writeHoldingRegisters(m_205, 0, 0, 4);
+        writeHoldingRegisters(m_206, 0, 0, 2);
+
         f_FanCtrl = false;
     }
     if (m_Open1)
     {
         if (!fan1_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 25, 0);
+            WriteSingleHoldingRegisters(m_204, 1, 1, 0);
+            //將第一台風扇的AO位置寫入0
         }
         m_Open1 = false;
 
@@ -1142,7 +1377,10 @@ void clientWorker::poll()
     {
         if (!fan2_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 26, 0);
+            WriteSingleHoldingRegisters(m_204, 1, 2, 0);
+
+            //將第二台風扇的AO位置寫入0
+
         }
         m_Open2 = false;
 
@@ -1151,7 +1389,10 @@ void clientWorker::poll()
     {
         if (!fan3_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 27, 0);
+            WriteSingleHoldingRegisters(m_204, 1, 3, 0);
+
+            //將第三台風扇的AO位置寫入0
+
         }
         m_Open3 = false;
 
@@ -1160,7 +1401,10 @@ void clientWorker::poll()
     {
         if (!fan4_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 32, 0);
+            WriteSingleHoldingRegisters(m_205, 1, 0, 0);
+
+            //將第四台風扇的AO位置寫入0
+
         }
         m_Open4 = false;
 
@@ -1169,7 +1413,10 @@ void clientWorker::poll()
     {
         if (!fan5_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 33, 0);
+            WriteSingleHoldingRegisters(m_205, 1, 1, 0);
+
+            //將第五台風扇的AO位置寫入0
+
         }
         m_Open5 = false;
 
@@ -1178,7 +1425,10 @@ void clientWorker::poll()
     {
         if (!fan6_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 34, 0);
+            WriteSingleHoldingRegisters(m_205, 1, 2, 0);
+
+            //將第六台風扇的AO位置寫入0
+
         }
         m_Open6 = false;
 
@@ -1187,7 +1437,10 @@ void clientWorker::poll()
     {
         if (!fan7_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 35, 0);
+            WriteSingleHoldingRegisters(m_205, 1, 3, 0);
+
+            //將第七台風扇的AO位置寫入0
+
         }
         m_Open7 = false;
 
@@ -1196,7 +1449,10 @@ void clientWorker::poll()
     {
         if (!fan8_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 40, 0);
+            WriteSingleHoldingRegisters(m_206, 1, 0, 0);
+
+            //將第八台風扇的AO位置寫入0
+
         }
         m_Open8 = false;
 
@@ -1205,7 +1461,10 @@ void clientWorker::poll()
     {
         if (!fan9_open)
         {
-            WriteSingleHoldingRegisters(true, 1, 41, 0);
+            WriteSingleHoldingRegisters(m_206, 1, 1, 0);
+
+            //將第九台風扇的AO位置寫入0
+
         }
         m_Open9 = false;
     }
@@ -1222,18 +1481,22 @@ void clientWorker::poll()
     }
     if (m_mode1)
     {
-        writeHoldingRegisters(25, MV1, 17);
-        emit pidcontrolFan(MV1/40.96);
+        writeHoldingRegisters(m_204, 1, MV1, 3);
+        writeHoldingRegisters(m_205, 0, MV1, 4);
+        writeHoldingRegisters(m_204, 0, MV1, 2);
+        emit pidcontrolFan(MV1/40.95);
     }
     if (m_mode2)
     {
-        //writeHoldingRegisters(42, MV2, 1);
-        emit pidcontroloutvalue(MV2/40.96);
+        emit pidcontroloutvalue(MV2/40.95);
     }
     if (f_setFAN)
     {
         if (power) {
-            writeHoldingRegisters(25, m_setALL, 17);
+            writeHoldingRegisters(m_204, 1, m_setALL, 3);
+            writeHoldingRegisters(m_205, 0, m_setALL, 4);
+            writeHoldingRegisters(m_204, 0, m_setALL, 2);
+
             f_setFAN = false;
         }
     }
@@ -1246,7 +1509,7 @@ void clientWorker::poll()
         // 因為 WriteSingleHoldingRegisters 裡面有 QEventLoop，會暫停在這裡直到通訊完成
 
         
-        WriteSingleHoldingRegisters(req.target, 1, req.address, req.value);
+        WriteSingleHoldingRegisters(req.client, 1, req.address, req.value);
 
     }
 

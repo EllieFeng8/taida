@@ -10,9 +10,19 @@
 #include <QQueue>
 
 struct HoldingRegisterRequest {
-    bool target;
+    QModbusTcpClient* client;
     int address;
     double value; // 原本傳 double，但底層 WriteSingleHoldingRegisters 用 int，建議統一
+};
+struct readInput_Data {
+    QVector <quint16> DI_201;
+    QVector <quint16> DO_201;
+    QVector <quint16> AI_202;
+    QVector <quint16> AI_203;
+    QVector <quint16> DI_204;
+    QVector <quint16> AO_204;
+    QVector <quint16> AO_205;
+    QVector <quint16> AO_206;
 };
 
 class clientWorker : public QObject
@@ -27,7 +37,7 @@ public:
     void init_flag();
     void poll();
     void reconnectDevices();
-    void writeSingleCoil(int address, bool value);
+    void writeSingleCoil(QModbusTcpClient* client,int address, bool value);
 
     //寫入
     void set_MV(double v);
@@ -47,6 +57,8 @@ public:
     void set_Mode1(bool v);
     void set_Mode2(bool v);
     void set_STO(bool v);
+    void set_STO2(bool v);
+
     void set_Reset();
     void set_SV1(double v);
     void set_SV2(double v);
@@ -54,8 +66,13 @@ public:
     void set_PID2(double p, double i, double d);
     void set_AO1(double v);
     void set_Fan(double v);
-    void set_5000HoldingRegister(bool t,int addr, double v);
-    
+    //void set_202HoldingRegister(int addr, double v);
+    //void set_203HoldingRegister(int addr, double v);
+    void set_204HoldingRegister(int addr, double v);
+    void set_205HoldingRegister(int addr, double v);
+    void set_206HoldingRegister(int addr, double v);
+    void set_6022HoldingRegister(int addr, double v);
+
     void set6022Mode_1(bool v);
     void set6022Mode_2(bool v);
 
@@ -63,8 +80,8 @@ public:
     void writeSV2(float targetSV);
     void writePID1( double p, double i, double d);
     void writePID2( double p, double i, double d);
-    void writeHoldingRegisters(int address, double value, int number);
-    void WriteSingleHoldingRegisters(bool target ,int slave, int address, int value);
+    void writeHoldingRegisters(QModbusTcpClient* client,int address, double value, int number);
+    void WriteSingleHoldingRegisters(QModbusTcpClient* client,int slave, int address, int value);
     void MotorControl(bool v);
     void Fan_PowerControl(bool v);
 
@@ -78,9 +95,14 @@ public:
     //void readtest();
     void ReadPID1(); //第一組PID
     void ReadPID2(); //第二組PID 
-    void ReadCoils( int slave, int startAddress, int number); 
-
+    QVector <quint16> readAdam6250DI();
+    QVector <quint16> readAdam6250DO();
+    QVector <quint16> readAdam6217AI(QModbusTcpClient* client);
+    QVector <quint16> readAdam6224AO(QModbusTcpClient* client);
+    QVector <quint16> readAdam6224DI(QModbusTcpClient* client);
     void onStateChanged(QModbusDevice::State state);
+    void onStateChanged_201(QModbusDevice::State state);
+
     void onErrorOccurred(QModbusDevice::Error error);
     bool m_mode1 = false;
     bool m_mode2 = false;
@@ -99,12 +121,18 @@ signals:
     void m_6022MV(QVector <quint16> result);
     void m_6022PID1(QVector <quint16> result);
     void m_6022PID2(QVector <quint16> result);
-
+    void input_DATA(readInput_Data data);
 private:
     QQueue<HoldingRegisterRequest> m_writeQueue; // 新增佇列
     QMutex m_lock;
-    QModbusTcpClient* m_5000 = nullptr;
+    QModbusTcpClient* m_201 = nullptr;
+    QModbusTcpClient* m_202 = nullptr;
+    QModbusTcpClient* m_203 = nullptr;
+    QModbusTcpClient* m_204 = nullptr;
+    QModbusTcpClient* m_205 = nullptr;
+    QModbusTcpClient* m_206 = nullptr;
     QModbusTcpClient* m_6022 = nullptr;
+
     QTimer* m_pollTimer = nullptr;
     QTimer* m_reconnectTimer = nullptr;
     QString m_ip = "192.168.1.201";
@@ -135,6 +163,8 @@ private:
     bool fan9_open = false;
 
     bool m_STO = false;
+    bool m_STO2 = false;
+
     double AO1 = 0.0;
     double MV1 = 0.0;
     double MV2 = 0.0;
@@ -152,6 +182,8 @@ private:
     bool f_setMode1 = false;
     bool f_setMode2 = false;
     bool f_STO = false;
+    bool f_STO2 = false;
+
     bool f_Reset = false;
     bool f_setSV1 = false;
     bool f_setSV2 = false;
@@ -163,5 +195,7 @@ private:
     bool f_MotorCtrl = false; //
     bool f_setAO1 = false; //出水閥開度
     bool m_isSTO = false;
+    bool m_isSTO2= false;
+
     bool m_isFanSTO = false;
 };

@@ -25,7 +25,12 @@ public:
     void set_PID(double p, double i, double d);
     void set_PID2(double p, double i, double d);
 
-    void WriteHoldingRegister(bool t, int add, double value);
+    void WriteHoldingRegister_202(int add, double value);
+    void WriteHoldingRegister_203(int add, double value);
+    void WriteHoldingRegister_204(int add, double value);
+    void WriteHoldingRegister_205(int add, double value);
+    void WriteHoldingRegister_206(int add, double value);
+    void WriteHoldingRegister_6022(int add, double value);
 
     void motorFrequency(double v);
     void fan1TargetRpm(double v);
@@ -51,10 +56,13 @@ public:
     void set_Fan9Open(bool v);
     void set_allFan(double v);
     void set_AO1(double v);
-    void set_Estop(bool v);
+    void set_motorEstop(bool v);
+    void set_FanEstop(bool v);
+
     void set_Reset(bool v);
 signals:
     void server_on();
+    void client_on();
     void Coil(QVector <quint16> result);
     void HodingRegister(QVector <quint16> result);
     void Adam6022Data(QVector <quint16> result);
@@ -73,10 +81,10 @@ signals:
     void E_STOPset0();
     void pidcontrolFan(double v);
     void pidcontroloutvalue(double v);
-
+    void senserData(readInput_Data data, QVector <quint16> result);
 private:
-    bool _E_STOP = false;
-    bool _STO = false;
+    bool _FAN_STOP = false;
+    bool _motor_STO = false;
     bool server_OK = false;
     bool normal = true;
     bool m_PID1 = false;
@@ -97,9 +105,9 @@ private:
 
     MS300* m_ms300 = nullptr;
     QThread* m_ms300Thread = nullptr;
-    quint16 version_num1 = 0;
-    quint16 version_num2 = 14;
-    quint16 version_num3 = 15;
+    quint16 version_num1 = 1;
+    quint16 version_num2 = 1;
+    quint16 version_num3 = 2;
     quint16 version_year = 2026;
-    quint16 version_date = 423;
+    quint16 version_date = 602;
 };

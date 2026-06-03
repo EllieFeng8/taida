@@ -35,6 +35,14 @@ public slots:
     }
     void Coil_Data(QVector <quint16> result);
     void HodingRegister_Data(QVector <quint16> result);
+    void onSenserData(readInput_Data data,QVector <quint16> result);
+    //void on201data(QVector <quint16>);
+    void on202data(QVector <quint16>);
+    void on203data(QVector <quint16>);
+    void on204data(QVector <quint16>);
+    void on205data(QVector <quint16>);
+    void on206data(QVector <quint16>);
+
     void pidPV1(QVector <quint16> result);
     void pidPV2(QVector <quint16> result);
     void PID1(QVector <quint16> result);
@@ -46,6 +54,12 @@ private:
     explicit Core(QObject* parent = nullptr){}
     ~Core();
     void updateProxyProperty(int index, quint16 value);
+    void update202Proxy(int index, quint16 value);
+    void update203Proxy(int index, quint16 value);
+    void update204Proxy(int index, quint16 value);
+    void update205Proxy(int index, quint16 value);
+    void update206Proxy(int index, quint16 value);
+    void updateSenserData(readInput_Data data, QVector<quint16> result);
     void updateProxyProperty2(int index, quint16 value);
 
     void saveProductionSettings();
@@ -77,10 +91,29 @@ private:
     quint16 v_32;
     quint16 v_33;
     quint16 v_34;
+    int c_0;
+    int c_1;
+    int c_2;
+    int c_3;
+    int c_4;
+    int c_5;
+    int c_6;
+    int c_7;
+    int c_8;
+    int c_9;
+    int c_10;
+    int c_11;
+    int c_12;
+    int c_13;
+    int c_14;
+    int c_15;
+    int c_16;
     qint64 m_lastSaveTime = 0;
     QVector <double> senserData;
     QVector <double> senserData2;
     double mv1=0.0;
+    int mode1 = 0;
+    int mode2 = 0;
     SqlManager* m_sqlManager;
     RESTManager* m_restManager;
     Manager* m_manager = nullptr;

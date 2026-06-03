@@ -61,7 +61,7 @@ QVector<quint16>  ServerWorker::getSavedata()
 
 void ServerWorker::updateCoils(int startAddr, const bool data)
 {
-    //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+    if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
     // 將 ClientWorker 讀到的資料同步到 Server 
 
@@ -72,7 +72,7 @@ void ServerWorker::updateCoils(int startAddr, const bool data)
 void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& data)
 {
     {
-        //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+        if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
         // 將 ClientWorker 讀到的資料同步到 Server 
         for (int i = 0; i < data.size(); ++i) {
@@ -84,7 +84,7 @@ void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& d
 void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>& data)
 {
     {
-        //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+        if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
         QMutexLocker m_lock(&lock);
         // 將 ClientWorker 讀到的資料同步到 Server 
         for (int i = 0; i < data.size(); ++i) {
@@ -96,7 +96,7 @@ void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>&
 }
 void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
 {
-        //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+        if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
         // 將 ClientWorker 讀到的資料同步到 Server 
     QMutexLocker m_lock(&lock);
@@ -108,7 +108,7 @@ void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
 }
 void ServerWorker::updateInputRegister(int startAddr, const quint16 data)
 {
-    //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
+    if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
     // 將 ClientWorker 讀到的資料同步到 Server 
 
