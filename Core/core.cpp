@@ -608,7 +608,14 @@ void Core::update203Proxy(int index, quint16 value)
         c_12 = 0;
 
         v_12 = value;
-        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+        if (value < 0.2) 
+        {
+            m_proxy->setCurrentWaterFlow(qRound((0 / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+        }
+        else
+        {
+            m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+        }
     case 5:
         if (value == v_13) { return; }
         if (value == 0 && c_13 < 3) { c_13++; return; }
