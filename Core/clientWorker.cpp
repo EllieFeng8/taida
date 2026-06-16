@@ -1218,12 +1218,12 @@ void clientWorker::poll()
     if (m_mode1)
     {
         writeHoldingRegisters(25, MV1, 17);
-        emit pidcontrolFan(MV1/40.96);
+        emit pidcontrolFan(MV1/40.95);
     }
     if (m_mode2)
     {
         //writeHoldingRegisters(42, MV2, 1);
-        emit pidcontroloutvalue(MV2/40.96);
+        emit pidcontroloutvalue(MV2/40.95);
     }
     if (f_setFAN)
     {

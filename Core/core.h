@@ -25,7 +25,7 @@ public slots:
     //manager
     void onPVdata(QVector <quint16> result)
     {
-        double pv0 = result[0]/65.535;
+        double pv0 = result[0]/65.535*2.5-1250;
         double pv3 = result[3] /655.35;
 
         m_proxy->setPressureDiff(qRound(pv0 * 100.0) / 100.0);

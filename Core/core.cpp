@@ -141,11 +141,7 @@ void Core::init()
            senserData2[24] = mode2;//溫度自動
            senserData2[25] = m_proxy->getMotorFrequency();//泵浦SV 
            senserData2[26] = m_proxy->getMotorFrequencyP();//泵浦PV 
-           qDebug() << "sql 23 :" << senserData2[22];
-           qDebug() << "sql 24 :" << senserData2[23];
-           qDebug() << "sql 25 :" << senserData2[24];
-           qDebug() << "sql 26 :" << senserData2[25];
-           qDebug() << "sql 27 :" << senserData2[26];
+
 
         });
     QObject::connect(m_manager, &Manager::pidcontrolFan, this, [this](double v) {
@@ -243,7 +239,9 @@ void Core::init()
         }
     );
 
-    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv(v*10); });
+    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv((v * 10 / 1.25) / 2 + 5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
+        });
+
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
     //QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
