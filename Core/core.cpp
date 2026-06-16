@@ -608,9 +608,9 @@ void Core::update203Proxy(int index, quint16 value)
         c_12 = 0;
 
         v_12 = value;
-        if (value < 0.2) 
+        if (value < 655) 
         {
-            m_proxy->setCurrentWaterFlow(qRound((0 / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+            m_proxy->setCurrentWaterFlow(0); break;// 流量計 0~800
         }
         else
         {
@@ -795,7 +795,15 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 12:
         if (value == v_12) { return; }
         v_12 = value; 
-        m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+        if (value < 1000)
+        {
+            m_proxy->setCurrentWaterFlow(qRound((0 / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+            //qDebug() << "CurrentWaterFlow " << value;
+        }
+        else 
+        {
+            m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
+        }
     case 13:
         if (value == v_13) { return; }
         v_13 = value; 
