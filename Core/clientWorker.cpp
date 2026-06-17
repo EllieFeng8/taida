@@ -1095,10 +1095,20 @@ void clientWorker::poll()
         if (m_STO2)
         {
             writeSingleCoil(14, m_STO2);
+            QTimer::singleShot(1000, this,
+                [=]()
+                {
+                    writeSingleCoil(12, false);
+                });
         }
         else
         {
             writeSingleCoil(14, m_STO2);
+            QTimer::singleShot(1000, this,
+                [=]()
+                {
+                    writeSingleCoil(12, false);
+                });
         }
         f_STO2 = false;
     }
