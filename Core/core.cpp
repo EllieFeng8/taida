@@ -156,7 +156,7 @@ void Core::init()
 
     QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {
         
-        m_manager->set_sv((v*10/1.25)/2+5000);//v*10 是換算成 0~10000 對應 0~100(%)
+        m_manager->set_sv((v*10/1.25)/2+5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
         });
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);

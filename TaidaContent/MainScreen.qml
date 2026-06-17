@@ -364,7 +364,7 @@ MainScreenUI {
     }
 
     targetPressBtnMouseArea.onClicked: {
-        if(targetPressTxtInput.text>0) {
+        if(targetPressTxtInput.text>=-1250&&targetPressTxtInput.text<=1250) {
             Td.targetPressureDiff = targetPressTxtInput.text
             console.log("11 Td.targetPressureDiff changed~~~",
                 Td.targetPressureDiff,

@@ -106,8 +106,8 @@ private:
     MS300* m_ms300 = nullptr;
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
-    quint16 version_num2 = 1;
-    quint16 version_num3 = 6;
+    quint16 version_num2 = 2; // 1=更換壓差計前 2=更換壓差計後
+    quint16 version_num3 = 10;
     quint16 version_year = 2026;
-    quint16 version_date = 616;
+    quint16 version_date = 617;
 };

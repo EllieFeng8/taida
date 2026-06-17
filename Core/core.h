@@ -25,7 +25,7 @@ public slots:
     //manager
     void onPVdata(QVector <quint16> result)
     {
-        double pv0 = result[0]/65.535*2500-1250;
+        double pv0 = result[0]/65.535*2.5-1250;
         double pv3 = result[3] /655.35;
 
         m_proxy->setPressureDiff(qRound(pv0 * 100.0) / 100.0);
@@ -119,10 +119,10 @@ private:
     Manager* m_manager = nullptr;
     double Mix_minValue = 65535.0 * 0.20; 
     double Mix_maxValue = 65535.0 * 0.95; 
-    double Out_minValue = 4095 * 0.20; 
-    double Out_maxValue = 4095 * 0.95; 
-    double MixSV_minValue = 65535 * 0.20; 
-    double MixSV_maxValue = 65535 * 0.95; 
+    double Out_minValue = 65535 * 0.20;
+    double Out_maxValue = 65535 * 0.95;
+    double MixSV_minValue = 4095 * 0.20;
+    double MixSV_maxValue = 4095 * 0.95;
     double OutSV_minValue = 4095 * 0.20; 
     double OutSV_maxValue = 4095 * 0.95; 
 

@@ -1180,6 +1180,7 @@ void clientWorker::set_Reset()
 }
 void clientWorker::set_SV1(double v)
 {
+    qDebug() << v;
     SV1 = v;
     f_setSV1 = true;
 }
