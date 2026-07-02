@@ -53,8 +53,8 @@ void clientWorker::init()
     }
     if (!m_5000) {
         m_5000 = new QModbusTcpClient(this);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
-        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 1502);
+        m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
+        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_5000->setTimeout(500);
         //m_5000->setNumberOfRetries(2);
         connect(m_5000, &QModbusTcpClient::stateChanged,
@@ -66,8 +66,8 @@ void clientWorker::init()
 
     if (!m_6022) {
         m_6022 = new QModbusTcpClient(this);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
-        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 2502);
+        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip2);
+        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_6022->setTimeout(500);
       /*  m_6022->setNumberOfRetries(2);*/
         connect(m_6022, &QModbusTcpClient::stateChanged,
