@@ -109,11 +109,11 @@ private:
     QModbusTcpClient* m_6022 = nullptr;
     QTimer* m_pollTimer = nullptr;
     QTimer* m_reconnectTimer = nullptr;
-    // QString m_ip = "127.0.0.1";
+     //QString m_ip = "127.0.0.1";
     QString m_ip = "192.168.1.201";
     // int m_port = 1502;
     int m_port = 502;
-    // QString m_ip2 = "127.0.0.1";
+     //QString m_ip2 = "127.0.0.1";
     QString m_ip2 = "192.168.1.202";
     // int m_port2 = 2502;
     int m_port2 = 502;

@@ -16,7 +16,11 @@ public:
     static Core& instance();
     TdProxy* m_proxy = nullptr; 
     void init();
-
+    void set_DifferentialPressure(bool v)
+    {
+        new_PD = v;
+        m_manager->new_PD = v;
+    }
 public slots:
     //proxy
     void set_PID_click();
@@ -25,7 +29,13 @@ public slots:
     //manager
     void onPVdata(QVector <quint16> result)
     {
-        double pv0 = result[0]/65.535*2.5-1250;
+        double pv0;
+        if (!new_PD) {
+            pv0 = result[0] / 65.535;
+        }
+        else {
+            pv0 = result[0] / 65.535 * 2.5 - 1250;
+        }
         double pv3 = result[3] /655.35;
 
         m_proxy->setPressureDiff(qRound(pv0 * 100.0) / 100.0);
@@ -113,5 +123,5 @@ private:
     SqlManager* m_sqlManager;
     RESTManager* m_restManager;
     Manager* m_manager = nullptr;
-    
+    bool new_PD = false;
 };

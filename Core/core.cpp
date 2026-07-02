@@ -239,7 +239,13 @@ void Core::init()
         }
     );
 
-    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {m_manager->set_sv((v * 10 / 1.25) / 2 + 5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
+    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) 
+        {
+            if(!new_PD){
+                m_manager->set_sv(v * 10); }//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%)
+            else {
+                m_manager->set_sv((v * 10 / 1.25) / 2 + 5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
+            }
         });
 
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
@@ -443,68 +449,68 @@ void Core::updateProxyProperty(int index, quint16 value)
 
     case 0:
         if (value == v_0) { return;}
-            if (value==0&&c_0<3) {c_0++; return;}
-            if (value==100&&c_0<3) {c_0++; return;}
+            if (value==0&&c_0<5) {c_0++; return;}
+            if (value==100&&c_0<5) {c_0++; return;}
 
             m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //入水溫度
             c_0=0;
     case 1: 
         if (value == v_1) { return; }
-            if (value==0&&c_1<3) {c_1++; return;}
-            if (value==100&&c_1<3) {c_1++; return;}
+            if (value==0&&c_1<5) {c_1++; return;}
+            if (value==100&&c_1<5) {c_1++; return;}
             c_1=0;
 
         v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //入水壓力
     case 2:
         if (value == v_2) { return; }
-            if (value==0&&c_2<3) {c_2++; return;}
-            if (value==100&&c_2<3) {c_2++; return;}
+            if (value==0&&c_2<5) {c_2++; return;}
+            if (value==1000&&c_2<5) {c_2++; return;}
             c_2=0;
 
         v_2 = value; 
         m_proxy->setReturnWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break;//回水口溫度
     case 3:
         if (value == v_3) { return; }
-            if (value==0&&c_3<3) {c_3++; return;}
-            if (value==100&&c_3<3) {c_3++; return;}
+            if (value==0&&c_3<5) {c_3++; return;}
+            if (value==100&&c_3<5) {c_3++; return;}
             c_3=0;
 
         v_3 = value; 
         m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //回水口壓力
     case 4:
         if (value == v_4) { return; }
-            if (value==0&&c_4<3) {c_4++; return;}
-            if (value==100&&c_4<3) {c_4++; return;}
+            if (value==0&&c_4<5) {c_4++; return;}
+            if (value==1000&&c_4<5) {c_4++; return;}
             c_4=0;
 
         v_4 = value; 
         m_proxy->setOutWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //出水口溫度
     case 5:
         if (value == v_5) { return; }
-            if (value==0&&c_5<3) {c_5++; return;}
-            if (value==100&&c_5<3) {c_5++; return;}
+            if (value==0&&c_5<5) {c_5++; return;}
+            if (value==100&&c_5<5) {c_5++; return;}
             c_5=0;
         v_5 = value; 
         m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //出水口壓力
     case 6: 
         if (value == v_6) { return; }
-            if (value==0&&c_6<3) {c_6++; return;}
-            if (value==100&&c_6<3) {c_6++; return;}
+            if (value==0&&c_6<5) {c_6++; return;}
+            if (value==1000&&c_6<5) {c_6++; return;}
             c_6=0;
 
         v_6 = value; 
         m_proxy->setCondenserLeft1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-1
     case 7:
         if (value == v_7) { return; }
-            if (value==0&&c_7<3) {c_7++; return;}
-            if (value==100&&c_7<3) {c_7++; return;}
+            if (value==0&&c_7<5) {c_7++; return;}
+            if (value==100&&c_7<5) {c_7++; return;}
             c_7=0;
         v_7 = value; 
         m_proxy->setCondenserLeft2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-2
     case 8:
         if (value == v_8) { return; }
-            if (value==0&&c_8<3) {c_8++; return;}
-            if (value==100&&c_8<3) {c_8++; return;}
+            if (value==0&&c_8<5) {c_8++; return;}
+            if (value==100&&c_8<5) {c_8++; return;}
 
             c_8=0;
 
@@ -512,62 +518,62 @@ void Core::updateProxyProperty(int index, quint16 value)
         m_proxy->setCondenserRight2Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-3
     case 9: 
         if (value == v_9) { return; }
-            if (value==0&&c_9<3) {c_9++; return;}
-            if (value==100&&c_9<3) {c_9++; return;}
+            if (value==0&&c_9<5) {c_9++; return;}
+            if (value==100&&c_9<5) {c_9++; return;}
             c_9=0;
 
         v_9 = value; 
         m_proxy->setCondenserRight1Temp(qRound((value / 655.35) * 10.0) / 10.0); break; //冷排溼度計-4
     case 10:
         if (value == v_10) { return; }
-            if (value==0&&c_10<3) {c_10++; return;}
-            if (value==100&&c_10<3) {c_10++; return;}
+            if (value==0&&c_10<5) {c_10++; return;}
+            if (value==100&&c_10<5) {c_10++; return;}
             c_10=0;
 
         v_10 = value; 
         m_proxy->setInletAirTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //入風口溫度
     case 11:
         if (value == v_11) { return; }
-            if (value==0&&c_11<3) {c_11++; return;}
-            if (value==100&&c_11<3) {c_11++; return;}
+            if (value==0&&c_11<5) {c_11++; return;}
+            if (value==100&&c_11<5) {c_11++; return;}
             c_11=0;
 
         v_11 = value; 
         m_proxy->setInletAirHumidity(qRound((value / 655.35) * 10.0) / 10.0); break; //入風口濕度
     case 12:
         if (value == v_12) { return; }
-            if (value==0&&c_12<3) {c_12++; return;}
-            if (value==100&&c_12<3) {c_12++; return;}
+            if (value==0&&c_12<5) {c_12++; return;}
+            if (value==100&&c_12<5) {c_12++; return;}
             c_12=0;
 
         v_12 = value; 
         m_proxy->setCurrentWaterFlow(qRound((value / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
     case 13:
         if (value == v_13) { return; }
-            if (value==0&&c_13<3) {c_13++; return;}
-            if (value==100&&c_13<3) {c_13++; return;}
+            if (value==0&&c_13<5) {c_13++; return;}
+            if (value==100&&c_13<5) {c_13++; return;}
             c_13=0;
         v_13 = value;
         m_proxy->setOutValveOpeningP(value1314); break; //出水電動閥位置回授
     case 14:
         if (value == v_14) { return; }
-            if (value==0&&c_14<3) {c_14++; return;}
-            if (value==100&&c_14<3) {c_14++; return;}
+            if (value==0&&c_14<5) {c_14++; return;}
+            if (value==100&&c_14<5) {c_14++; return;}
             c_14=0;
         v_14 = value;
         m_proxy->setReturnValveOpeningP(value1314); break; //回水電動閥位置回授
     case 15: break; //風扇自動速率
     case 16: 
         if (value == v_16) { return; }
-            if (value==0&&c_16<3) {c_16++; return;}
-            if (value==100&&c_16<3) {c_16++; return;}
+            if (value==0&&c_16<5) {c_16++; return;}
+            if (value==100&&c_16<5) {c_16++; return;}
             c_16=0;
         v_16 = value;
         m_proxy->setMotorFrequencyP(qRound((value / 40.95*0.6) * 10.0) / 10.0); break; //循環水泵速率輸出
     case 17: 
         if (value == v_17) { return; }
-            //if (value==0&&c_17<3) {c_17++; return;}
-            //if (value==100&&c_17<3) {c_17++; return;}
+            //if (value==0&&c_17<5) {c_17++; return;}
+            //if (value==100&&c_17<5) {c_17++; return;}
             //c_17=0;
         v_17 = value;
         m_proxy->setFan1TargetRpmP(qRound(((value / 40.95) * 10.0) / 10.0) * 37.50);
@@ -798,7 +804,7 @@ void Core::saveProductionSettings()
     settings.setValue("Production/P2", m_proxy->m_outValveP);
     settings.setValue("Production/I2", m_proxy->m_outValveI);
     settings.setValue("Production/D2", m_proxy->m_outValveD);
-    //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
+    //settings.setValue("Production/New_DP",new_PD );
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
 
@@ -832,4 +838,5 @@ void Core::loadProductionSettings()
     m_proxy->setOutValveD(settings.value("Production/D2", 0).toDouble());
     m_proxy->setFanEmergencySwitchOn(settings.value("Production/ESTOP", true).toBool());
     m_proxy->setMotorFrequencySwitchOn(settings.value("Production/motorpower", true).toBool());
+    set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
 }

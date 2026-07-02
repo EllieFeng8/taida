@@ -14,6 +14,7 @@ public:
     explicit Manager(QObject* parent = nullptr);
     ~Manager();
 
+    bool new_PD = false;
     QString ip;
     void init();
     void set_mode1(bool v);
@@ -99,7 +100,7 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 0;
     quint16 version_num2 = 14;
-    quint16 version_num3 = 30;
+    quint16 version_num3 = 31;
     quint16 version_year = 2026;
-    quint16 version_date = 617;
+    quint16 version_date = 629;
 };

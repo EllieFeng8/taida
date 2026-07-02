@@ -53,8 +53,8 @@ void clientWorker::init()
     }
     if (!m_5000) {
         m_5000 = new QModbusTcpClient(this);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
-        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
+        m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 1502);
         m_5000->setTimeout(500);
         //m_5000->setNumberOfRetries(2);
         connect(m_5000, &QModbusTcpClient::stateChanged,
@@ -66,8 +66,8 @@ void clientWorker::init()
 
     if (!m_6022) {
         m_6022 = new QModbusTcpClient(this);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip2);
-        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
+        m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "127.0.0.1");
+        m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 2502);
         m_6022->setTimeout(500);
       /*  m_6022->setNumberOfRetries(2);*/
         connect(m_6022, &QModbusTcpClient::stateChanged,
@@ -960,7 +960,7 @@ void clientWorker::set_STO2(bool v)
     f_STO2 = true;
     if (v)
     {
-        m_STO2 = false;
+        m_STO2 = v;
     }
     else if (!v)
     {
@@ -1095,18 +1095,24 @@ void clientWorker::poll()
         if (m_STO2)
         {
             writeSingleCoil(14, m_STO2);
+            qDebug() << "set coil [14]"<< m_STO2;
             QTimer::singleShot(1000, this,
                 [=]()
                 {
-                    writeSingleCoil(12, false);
+                    writeSingleCoil(12, true);
+                    qDebug() << "set coil [12]" << true;
+
                 });
         }
         else
         {
             writeSingleCoil(14, m_STO2);
+            qDebug() << "set coil [14]" << m_STO2;
+
             QTimer::singleShot(1000, this,
                 [=]()
                 {
+                    qDebug() << "set coil [12]" << false;
                     writeSingleCoil(12, false);
                 });
         }
