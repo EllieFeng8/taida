@@ -154,9 +154,13 @@ void Core::init()
         });
 
 
-    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v) {
-        
-        m_manager->set_sv((v*10/1.25)/2+5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
+    QObject::connect(m_proxy, &TdProxy::targetPressureDiffChanged, this, [=](double v)
+        {
+            if (!new_PD) {
+                m_manager->set_sv(v * 10); }
+            else {
+                m_manager->set_sv((v* 10 / 1.25) / 2 + 5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
+            }
         });
     QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
@@ -1056,6 +1060,7 @@ void Core::saveProductionSettings()
     settings.setValue("Production/Out_max", Out_maxValue);
     settings.setValue("Production/OutSV_min", OutSV_minValue);
     settings.setValue("Production/OutSV_max", OutSV_maxValue);
+    settings.setValue("Production/New_DP",new_PD );
     //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -1098,5 +1103,6 @@ void Core::loadProductionSettings()
     Out_maxValue = settings.value("Production/Out_max", 4095).toDouble();
     OutSV_minValue = settings.value("Production/OutSV_min", 0).toDouble();
     OutSV_maxValue = settings.value("Production/OutSV_max", 4095).toDouble();
+    set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
 
 }

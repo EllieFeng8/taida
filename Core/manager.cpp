@@ -357,7 +357,12 @@ void Manager::init()
 				case 16:
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 60, &_value))
 					{
-						emit updateToUi(16, (_value-5000)/4);
+						if (!new_PD) {
+							emit updateToUi(16, _value / 10);
+						}
+						else {
+							emit updateToUi(16, (_value-5000)/4);
+						}	
 						this->set_sv(_value);
 					}
 					m_serverWorker->updateCoils(16, false);
