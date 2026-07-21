@@ -184,7 +184,11 @@ class TdProxy : public QObject
     Q_PROPERTY(int captureFreq READ getCaptureFreq WRITE setCaptureFreq NOTIFY captureFreqChanged)
     //模式選擇: 0-連動 1-單機
     Q_PROPERTY(int modeSelect READ getModeSelect WRITE setModeSelect NOTIFY modeSelectChanged)
-
+    // =========================
+    // 乾燥模式
+    // =========================
+    Q_PROPERTY(bool dryMode READ getDryMode WRITE setDryMode NOTIFY dryModeChanged)
+    Q_PROPERTY(int dryModeCountdown READ getDryModeCountdown WRITE setDryModeCountdown NOTIFY dryModeCountdownChanged)
 
 public:
 
@@ -956,6 +960,21 @@ public:
         qDebug() << "set check";
         emit settingBtnChanged();
     }
+    // =========================
+    // 乾燥模式
+    // =========================
+    Q_INVOKABLE bool getDryMode() const { return m_dryMode; }
+    Q_INVOKABLE void setDryMode(bool value)
+    {
+        m_dryMode = value;
+        emit dryModeChanged(m_dryMode);
+    }
+    Q_INVOKABLE int getDryModeCountdown() const { return m_dryModeCountdown; }
+    Q_INVOKABLE void setDryModeCountdown(int value)
+    {
+        m_dryModeCountdown = value;
+        emit dryModeCountdownChanged(m_dryModeCountdown);
+    }
 
 
     signals:
@@ -1082,6 +1101,10 @@ public:
     void modeSelectChanged(int value);
 
     void settingBtnChanged();
+
+    void dryModeChanged(bool value);
+    void dryModeCountdownChanged(int value);
+
 
 private:
     // =========================
@@ -1212,6 +1235,9 @@ private:
 //擷取頻率
     int m_captureFreq = 0;
     int m_modeSelect = 0;//0-連動 1-單機
+
+    bool m_dryMode = false;
+    int m_dryModeCountdown = 0;
 };
 
 

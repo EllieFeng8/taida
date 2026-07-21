@@ -250,6 +250,91 @@ Rectangle {
                         }
                     }
                 }
+                Rectangle {
+                    id: statusBar
+                    anchors.left:container_3.right
+                    anchors.leftMargin:90
+                    width: 270
+                    height: 50
+                    radius: 21
+                    color: "#ffffff"
+                    border.color: "#e5eaf1"
+
+                    property bool dryMode: false
+                    property int dryRemainSec: 30 * 60   // 30分鐘倒數
+
+                    Timer {
+                        interval: 1000
+                        running: statusBar.dryMode && statusBar.dryRemainSec > 0
+                        repeat: true
+                        onTriggered: statusBar.dryRemainSec--
+                    }
+
+                    function formatRemain(sec) {
+                        let m = Math.floor(sec / 60)
+                        let s = sec % 60
+                        return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
+                    }
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 18
+                        anchors.rightMargin: 14
+                        spacing: 10
+
+                        Text {
+                            text: "乾燥模式"
+                            color: "#0f2744"
+                            font.pixelSize: 20
+                            font.bold: true
+                        }
+                        Rectangle {
+                            width: 1
+                            height: 16
+                            color: "#d8e0ea"
+                        }
+                        Switch {
+                            id: drySwitch
+                            checked: Td.dryMode
+
+
+                            onToggled: {
+                                Td.dryMode = checked
+                                console.log("Td.dryMode",Td.dryMode)
+                            }
+
+                            indicator: Rectangle {
+                                implicitWidth: 38
+                                implicitHeight: 20
+                                radius: 10
+                                y:5
+                                color: drySwitch.checked ? "#2f6df6" : "#cfd8e3"
+
+                                Rectangle {
+                                    width: 16
+                                    height: 16
+                                    radius: 8
+                                    x: drySwitch.checked ? parent.width - width - 2 : 2
+                                    y: 2
+                                    color: "#ffffff"
+
+                                    Behavior on x {
+                                        NumberAnimation { duration: 150 }
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            visible: Td.dryMode
+                            text: Td.dryModeCountdown//statusBar.formatRemain(statusBar.dryRemainSec)
+                            color: "#2f6df6"
+                            font.pixelSize: 18
+                            font.bold: true
+                            font.family: "Consolas"
+                        }
+                    }
+                }
             }
             Item {
                 id: section
