@@ -124,6 +124,12 @@ void Core::init()
     QObject::connect(m_manager, &Manager::_PID1, this, &Core::PID1);
     QObject::connect(m_manager, &Manager::_PID2, this, &Core::PID2);
 
+    QObject::connect(m_manager, &Manager::Elapsed, 
+        this,[this](int v )
+        {
+            m_proxy->setDryModeCountdown(v);
+        });
+
 
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, this, [this](bool v)
@@ -218,6 +224,8 @@ void Core::init()
         {
             m_sqlManager->setReadFrequency(v);
         });
+
+    QObject::connect(m_proxy, &TdProxy::dryModeChanged, m_manager, &Manager::set_dry);
 
 
     QStringList ips;
@@ -1025,6 +1033,8 @@ void Core::updateProxyProperty2(int index, quint16 value)
         m_proxy->setOutWaterTargetTemp(qRound((value) * 10.0) / 10.0); break;
     case 16:
         m_proxy->setTargetPressureDiff(qRound((value) * 10.0) / 10.0); break;
+    case 17:
+        m_proxy->setDryMode(value); break;
     default:
         break;
     }

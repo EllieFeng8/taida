@@ -27,7 +27,7 @@ void ServerWorker::init(int port,QVariant ip,quint16 v1, quint16 v2, quint16 v3,
     reg.insert(QModbusDataUnit::Coils,
         { QModbusDataUnit::Coils, 0, 20 });
     reg.insert(QModbusDataUnit::InputRegisters,
-        { QModbusDataUnit::InputRegisters, 0, 36 });
+        { QModbusDataUnit::InputRegisters, 0, 41 });
     reg.insert(QModbusDataUnit::HoldingRegisters,
         { QModbusDataUnit::HoldingRegisters, 0, 80 });
 
@@ -48,6 +48,11 @@ void ServerWorker::init(int port,QVariant ip,quint16 v1, quint16 v2, quint16 v3,
         emit server_stat(status);
         updateInputRegisters(31, { v1,v2,v3,years,date });
     }
+    updateInputRegister(36, 0);
+    updateInputRegister(37, 0);
+    updateInputRegister(38, 0);
+    updateInputRegister(39, 0);
+
 }
 
 QVector<quint16>  ServerWorker::getSavedata()

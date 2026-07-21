@@ -5,6 +5,7 @@
 #include <qthread>
 #include "clientWorker.h"
 #include "serverWorker.h"
+#include "watchdogheartbeatclient.h"
 #include "ms300.h"
 class Manager : public QObject
 {
@@ -61,6 +62,8 @@ public:
     void set_FanEstop(bool v);
 
     void set_Reset(bool v);
+    void set_dry(bool v);
+
 signals:
     void server_on();
     void client_on();
@@ -83,6 +86,7 @@ signals:
     void pidcontrolFan(double v);
     void pidcontroloutvalue(double v);
     void senserData(readInput_Data data, QVector <quint16> result);
+    void Elapsed(int v);
 private:
     bool _FAN_STOP = false;
     bool _motor_STO = false;
@@ -108,7 +112,12 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 14;
+    quint16 version_num3 = 18;
     quint16 version_year = 2026;
-    quint16 version_date = 629;
+    quint16 version_date = 721;
+    quint16 openValveP1 = 60;
+    quint16 openValveP2 = 60;
+    QElapsedTimer timer;
+    bool dry_Over = false;
+    int dryTime = 1800;
 };

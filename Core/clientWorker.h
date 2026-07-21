@@ -8,7 +8,7 @@
 #include <QModbusTcpClient>
 #include <QModbusReply>
 #include <QQueue>
-
+#include "watchdogheartbeatclient.h"
 struct HoldingRegisterRequest {
     QModbusTcpClient* client;
     int address;

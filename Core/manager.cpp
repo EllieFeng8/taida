@@ -63,7 +63,14 @@ void Manager::init()
 
 			switch (address) {
 			case 31: //
-				this->WriteHoldingRegister_204(0, value); // 同步回 Client 寫入實體設備
+				if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830 + 65535 * 0.2)){
+				this->WriteHoldingRegister_204(0, 0); // 同步回 Client 寫入實體設備
+				}
+				else {
+					qDebug() << "1111111111"<< openValveP1<< openValveP2<< (9830 + 65535 * 0.2);
+					this->WriteHoldingRegister_204(0, value); // 同步回 Client 寫入實體設備
+
+				}
 				break;
 			case 32:
 				this->WriteHoldingRegister_204(1, value);
@@ -221,13 +228,57 @@ void Manager::init()
 		if (table == QModbusDataUnit::Coils)
 		{
 			quint16 _value;
+			if(address==17)
+			{
+				if (value) {
+					qDebug() << "dryyyyyy";
+					set_AO1(0);
+
+					timer.restart();
+					dry_Over = false;
+					qDebug() << "dryyyyyy2";
+					//set_allFan(30);
+					fan1TargetRpm(30);
+					fan2TargetRpm(30);
+					fan3TargetRpm(30);
+					fan4TargetRpm(30);
+					fan5TargetRpm(30);
+					fan6TargetRpm(30);
+					fan7TargetRpm(30);
+					fan8TargetRpm(30);
+					fan9TargetRpm(30);
+					qDebug() << "dryyyyyy3";
+				}
+				else {
+					qDebug() << "close dry mode";
+					set_AO1(0);
+					//set_allFan(0);
+					fan1TargetRpm(0);
+					fan2TargetRpm(0);
+					fan3TargetRpm(0);
+					fan4TargetRpm(0);
+					fan5TargetRpm(0);
+					fan6TargetRpm(0);
+					fan7TargetRpm(0);
+					fan8TargetRpm(0);
+					fan9TargetRpm(0);
+					//timer.restart();
+					dry_Over = true;
+				}
+				emit updateToUi(17, value);
+			}
 			if (value != 0) {
 				switch (address) {
 				case 1:
 					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 31, &_value))
 					{
 						emit updateToUi(1, _value);
-						this->WriteHoldingRegister_204(0, _value);
+						if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830+65535 * 0.2)) {
+							this->WriteHoldingRegister_204(0, 0);
+						}
+						else {
+							this->WriteHoldingRegister_204(0, _value);
+						}
 					}
 					m_serverWorker->updateCoils(1, false);
 					break;
@@ -375,7 +426,11 @@ void Manager::init()
 		});
 	// 將 Client 讀到的資料「接」給 Server 
 	// 當 Client 讀到資料發出 m_5000data 訊號時，自動呼叫 Server 的更新函數
-	connect(m_clientWorker, &clientWorker::connected, this, [this]() { normal = true; emit client_on(); });
+	connect(m_clientWorker, &clientWorker::connected, this, [this]() { 
+			WatchdogHeartbeatClient::instance().pulse("start connect"); 
+			normal = true;
+			emit client_on(); 
+		});
 	connect(m_serverWorker, &ServerWorker::server_stat, this, [=](bool v) {server_OK = v; emit server_on(); });
 	connect(m_clientWorker, &clientWorker::pidcontrolFan, this, [this](double MV1) {emit pidcontrolFan(MV1); });
 	connect(m_clientWorker, &clientWorker::pidcontroloutvalue, this, [this](double MV2) {emit pidcontroloutvalue(MV2); });
@@ -408,7 +463,41 @@ void Manager::init()
 				);
 				normal = true;
 			}	
+			openValveP1 = data.AI_203[5];
+			openValveP2 = data.AI_203[6];
+			if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830 + 65535 * 0.2)) {
+				this->WriteHoldingRegister_204(0, 0); // 同步回 Client 寫入實體設備
+			}
 			
+			auto ElapsedTimer = timer.elapsed() / 1000;
+			qDebug() << "ElapsedTimer"<<ElapsedTimer;
+			auto t_str = dryTime - ElapsedTimer;
+			if (t_str < 0) {
+				t_str = 0;
+			}
+			else if (t_str > dryTime) {
+				t_str = dryTime;
+			}
+			emit Elapsed(t_str);
+			m_serverWorker->updateInputRegister(40, t_str);
+
+			if (ElapsedTimer > dryTime && !dry_Over)
+			{
+				//set_allFan(0);
+				fan1TargetRpm(0);
+				fan2TargetRpm(0);
+				fan3TargetRpm(0);
+				fan4TargetRpm(0);
+				fan5TargetRpm(0);
+				fan6TargetRpm(0);
+				fan7TargetRpm(0);
+				fan8TargetRpm(0);
+				fan9TargetRpm(0);
+				dry_Over = true;
+				qDebug() << "dry_Over";
+				
+
+			}
 			//將讀取到的數值更新到server
 			if (server_OK) {
 				m_serverWorker->updateHoldingRegisters(1,data.AO_204);
@@ -562,7 +651,14 @@ void Manager::motorFrequency(double v)
 		m_serverWorker->updateHoldingRegister(31, 0);
 		qDebug() << "set motorFrequency =" << value<< " BUT! STO ON set 0" ;
 	}
-	m_serverWorker->updateHoldingRegister(31,value);
+	else if(openValveP1<(65535*0.2) && openValveP2<(65535*0.2))
+	{
+		m_serverWorker->updateHoldingRegister(31, 0);
+		qDebug() << "set motorFrequency =" << value << " BUT! openningValve 0"<< openValveP1<< openValveP2;
+	}
+	else {
+		m_serverWorker->updateHoldingRegister(31, value);
+	}
 }
 void Manager::fan1TargetRpm(double v) 
 {
@@ -873,4 +969,15 @@ void Manager::set_FanPower(bool v)
 	quint16 value = v ? 1 : 0;	//緊急停止開啟 = 馬達電源關閉
 	m_serverWorker->updateHoldingRegister(71, value);
 	qDebug() << "set fan E_STOP " <<_FAN_STOP;
+}
+void Manager::set_dry(bool v)
+{
+	if(v)
+	{
+		m_serverWorker->updateCoils(17, v);
+	}
+	else
+	{
+		m_serverWorker->updateCoils(17, v);
+	}
 }

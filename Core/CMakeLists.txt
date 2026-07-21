@@ -17,6 +17,9 @@ qt_add_qml_module(Core STATIC
         RestManager.cpp
         ms300.h
         ms300.cpp
+        heartbeatprotocol.h
+        watchdogheartbeatclient.cpp
+        watchdogheartbeatclient.h
 )
 
 target_include_directories(Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

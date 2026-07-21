@@ -5,7 +5,16 @@
 
 clientWorker::clientWorker(QObject* parent)
 {
+    auto& heartbeat = WatchdogHeartbeatClient::instance();
 
+    WatchdogHeartbeatClient::Settings settings;
+    settings.hostName = "127.0.0.1";
+    settings.port = 45454;
+    settings.sourceName = "CurrentFlow";
+    settings.automaticHeartbeatEnabled = false;
+
+    heartbeat.initialize(settings);
+    heartbeat.start();
 }
 
 clientWorker::~clientWorker()
@@ -67,8 +76,8 @@ void clientWorker::init()
         m_pollTimer = new QTimer(this);
         connect(m_pollTimer, &QTimer::timeout, this, &clientWorker::poll, Qt::DirectConnection);
         // DirectConnection 因為 timer 與 this 在同一 thread (保障)
-        if (!m_pollTimer->isActive())
-            m_pollTimer->start(1000);
+        //if (!m_pollTimer->isActive())
+        m_pollTimer->start(1000);
     }
 
     if (!m_reconnectTimer) {
@@ -1211,6 +1220,7 @@ void clientWorker::set_PID2(double p, double i, double d)
 }
 void clientWorker::set_Fan(double v)
 {
+    qDebug() << "set fan =" << v;
     m_setALL = v * 40.95;
     f_setFAN = true;
 }
@@ -1281,12 +1291,13 @@ void clientWorker::poll()
     bool is206Connected = (m_206 && m_206->state() == QModbusDevice::ConnectedState);
 
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
+    WatchdogHeartbeatClient::instance().pulse("start connect");
 
     if (!is201Connected || !is6022Connected|| !is202Connected || !is203Connected || !is204Connected || !is205Connected || !is206Connected  ) {
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
         reconnectDevices();
         // 斷線時，加長下次 poll 的間隔（例如 2秒），避免過度頻繁重試
-        m_pollTimer->start(1000);
+        m_pollTimer->start(500);
         return;
     }
     auto _201DI = readAdam6250DI();
