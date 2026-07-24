@@ -82,6 +82,55 @@ Rectangle {
     property bool correctionIsOn: Td.outValveCorrectionOn
     property bool correction2IsOn: Td.fanCorrectionSwitchOn
     property bool fansEmergency:false
+    property bool fanControlsDisabled: Td.dryMode || Td.fanEmergencySwitchOn
+
+    states: State {
+        name: "fanControlsDisabled"
+        when: body.fanControlsDisabled
+
+        PropertyChanges { target: correction2SwitchMouseArea; enabled: false }
+        PropertyChanges { target: allFansPIDSwitchMouseArea; enabled: false }
+        PropertyChanges { target: fansPIDSetBtnMouseArea; enabled: false }
+        PropertyChanges { target: targetPressBtnMouseArea; enabled: false }
+        PropertyChanges { target: allFansSwitchMouseArea; enabled: false }
+        PropertyChanges { target: fansallbtnMouseArea; enabled: false }
+
+        PropertyChanges { target: fans1SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans2SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans3SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans4SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans5SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans6SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans7SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans8SwitchMouseArea; enabled: false }
+        PropertyChanges { target: fans9SwitchMouseArea; enabled: false }
+
+        PropertyChanges { target: fans1btnMouseArea; enabled: false }
+        PropertyChanges { target: fans2btnMouseArea; enabled: false }
+        PropertyChanges { target: fans3btnMouseArea; enabled: false }
+        PropertyChanges { target: fans4btnMouseArea; enabled: false }
+        PropertyChanges { target: fans5btnMouseArea; enabled: false }
+        PropertyChanges { target: fans6btnMouseArea; enabled: false }
+        PropertyChanges { target: fans7btnMouseArea; enabled: false }
+        PropertyChanges { target: fans8btnMouseArea; enabled: false }
+        PropertyChanges { target: fans9btnMouseArea; enabled: false }
+
+        PropertyChanges { target: fansPTxtInput; enabled: false }
+        PropertyChanges { target: fansITxtInput; enabled: false }
+        PropertyChanges { target: fansDTxtInput; enabled: false }
+        PropertyChanges { target: targetPressTxtInput; enabled: false }
+        PropertyChanges { target: fansallSetTextInput; enabled: false }
+
+        PropertyChanges { target: fans1SetTextInput; enabled: false }
+        PropertyChanges { target: fans2SetTextInput; enabled: false }
+        PropertyChanges { target: fans3SetTextInput; enabled: false }
+        PropertyChanges { target: fans4SetTextInput; enabled: false }
+        PropertyChanges { target: fans5SetTextInput; enabled: false }
+        PropertyChanges { target: fans6SetTextInput; enabled: false }
+        PropertyChanges { target: fans7SetTextInput; enabled: false }
+        PropertyChanges { target: fans8SetTextInput; enabled: false }
+        PropertyChanges { target: fans9SetTextInput; enabled: false }
+    }
 
     Rectangle {
         id: background
@@ -299,6 +348,12 @@ Rectangle {
 
 
                             onToggled: {
+                                if (checked && Td.fanEmergencySwitchOn) {
+                                    Td.dryMode = false
+                                    console.log("Td.dryMode blocked by fan emergency switch", Td.dryMode)
+                                    return
+                                }
+
                                 Td.dryMode = checked
                                 console.log("Td.dryMode",Td.dryMode)
                             }
@@ -4115,6 +4170,7 @@ Rectangle {
                             onClicked: {
                                 Td.fanEmergencySwitchOn = !Td.fanEmergencySwitchOn
                                 if(Td.fanEmergencySwitchOn === true) {
+                                    Td.dryMode = false
                                     Td.fan1SwitchOn = false
                                     Td.fan2SwitchOn = false
                                     Td.fan3SwitchOn = false
