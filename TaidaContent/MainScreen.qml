@@ -5,11 +5,16 @@ import Core 1.0
 
 MainScreenUI {
     id: root
+
+    function fanControlsLockedByDryMode() {
+        return Td.dryMode || Td.fanEmergencySwitchOn
+    }
+
     returnValveBtnMouseArea.onClicked: {
         Td.returnValveOpening = returnValveTxtInput.text
         returnValveTxtInput.focus = false
-//        Td.returnValveValue = returnValveSetTxtInput.text
-//        returnValveSetTxtInput.focus = false
+        // Td.returnValveValue = returnValveSetTxtInput.text
+        // returnValveSetTxtInput.focus = false
         console.log("回水:",Td.returnValveOpening,Td.returnValveValue)
     }
 
@@ -36,65 +41,95 @@ MainScreenUI {
     }
 
     fansPIDSetBtnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fanPidP = fansPTxtInput.text
         Td.fanPidI = fansITxtInput.text
         Td.fanPidD = fansDTxtInput.text
         fansPTxtInput.focus = false
         fansITxtInput.focus = false
         fansDTxtInput.focus = false
- Td.fanPidSet();
+
     console.log("fans pid:",Td.fanPidP,Td.fanPidI,Td.fanPidD)
     }
 
     fans1SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan1SwitchOn = !Td.fan1SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans2SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan2SwitchOn = !Td.fan2SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans3SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan3SwitchOn = !Td.fan3SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans4SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan4SwitchOn = !Td.fan4SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans5SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan5SwitchOn = !Td.fan5SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans6SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan6SwitchOn = !Td.fan6SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans7SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan7SwitchOn = !Td.fan7SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans8SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan8SwitchOn = !Td.fan8SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
         }
     }
     fans9SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fan9SwitchOn = !Td.fan9SwitchOn
         if(Td.fanAllOn === true){
             Td.fanAllOn = false
@@ -104,11 +139,17 @@ MainScreenUI {
         Td.motorFrequencySwitchOn = !Td.motorFrequencySwitchOn
     }
     allFansPIDSwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fanPidMonitorOn = !Td.fanPidMonitorOn
     console.log("Td.fanPidMonitorOn",Td.fanPidMonitorOn)
     }
 
     allFansSwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fanAllOn = !Td.fanAllOn
     if(Td.fanAllOn === false){
         Td.fan1SwitchOn = false
@@ -135,6 +176,9 @@ MainScreenUI {
     }
     //風扇inputchange
     fans1btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans1SetTextInput.text>100 || fans1SetTextInput.text<0) {
             fans1SetTextInput.color = "red"
         }
@@ -155,6 +199,9 @@ MainScreenUI {
         fans1SetTextInput.focus = false
     }
     fans2btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans2SetTextInput.text>100 || fans2SetTextInput.text<0) {
             fans2SetTextInput.color = "red"
         }
@@ -174,6 +221,9 @@ MainScreenUI {
         fans2SetTextInput.focus = false
     }
     fans3btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans3SetTextInput.text>100 || fans3SetTextInput.text<0) {
             fans3SetTextInput.color = "red"
         }
@@ -193,6 +243,9 @@ MainScreenUI {
         fans3SetTextInput.focus = false
     }
     fans4btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans4SetTextInput.text>100 || fans4SetTextInput.text<0) {
             fans4SetTextInput.color = "red"
         }
@@ -212,6 +265,9 @@ MainScreenUI {
         fans4SetTextInput.focus = false
     }
     fans5btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans5SetTextInput.text>100 || fans5SetTextInput.text<0) {
             fans5SetTextInput.color = "red"
         }
@@ -231,6 +287,9 @@ MainScreenUI {
         fans5SetTextInput.focus = false
     }
     fans6btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans6SetTextInput.text>100 || fans6SetTextInput.text<0) {
             fans6SetTextInput.color = "red"
         }
@@ -250,6 +309,9 @@ MainScreenUI {
         fans6SetTextInput.focus = false
     }
     fans7btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans7SetTextInput.text>100 || fans7SetTextInput.text<0) {
             fans7SetTextInput.color = "red"
         }
@@ -269,6 +331,9 @@ MainScreenUI {
         fans7SetTextInput.focus = false
     }
     fans8btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans8SetTextInput.text>100 || fans8SetTextInput.text<0) {
             fans8SetTextInput.color = "red"
         }
@@ -288,6 +353,9 @@ MainScreenUI {
         fans8SetTextInput.focus = false
     }
     fans9btnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fans9SetTextInput.text>100 || fans9SetTextInput.text<0) {
             fans9SetTextInput.color = "red"
         }
@@ -307,6 +375,9 @@ MainScreenUI {
         fans9SetTextInput.focus = false
     }
     fansallbtnMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         if(fansallSetTextInput.text>100 || fansallSetTextInput.text<0) {
             fansallSetTextInput.color = "red"
         }
@@ -341,6 +412,7 @@ MainScreenUI {
         fansallSetTextInput.focus = false
     }
     setBtnMouseArea.onClicked: {
+        Td.hitSettingBtn();
         connectSet.visible = true
     }
 
@@ -350,6 +422,9 @@ MainScreenUI {
     }
 
     correction2SwitchMouseArea.onClicked: {
+        if (fanControlsLockedByDryMode())
+            return
+
         Td.fanCorrectionSwitchOn = !Td.fanCorrectionSwitchOn
         console.log("Td.fanCorrectionSwitchOn",Td.fanCorrectionSwitchOn)
     }
@@ -364,7 +439,10 @@ MainScreenUI {
     }
 
     targetPressBtnMouseArea.onClicked: {
-        if(targetPressTxtInput.text>=-1250&&targetPressTxtInput.text<=1250) {
+        if (fanControlsLockedByDryMode())
+            return
+
+        if(targetPressTxtInput.text>0) {
             Td.targetPressureDiff = targetPressTxtInput.text
             console.log("11 Td.targetPressureDiff changed~~~",
                 Td.targetPressureDiff,

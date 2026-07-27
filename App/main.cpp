@@ -3,14 +3,93 @@
 
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QFile>
 
 #include <QLocalServer>
 #include <QLocalSocket>
 #include "autogen/environment.h"
 #include "Core/TdProxy.h"
 #include "Core/core.h"
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "Dbghelp.lib")
 
+QFile logFile;
 
+void myMessageHandler(QtMsgType type,
+    const QMessageLogContext& context,
+    const QString& msg)
+{
+    QString level;
+
+    switch (type) {
+    case QtDebugMsg:
+        level = "DEBUG";
+        break;
+    case QtInfoMsg:
+        level = "INFO";
+        break;
+    case QtWarningMsg:
+        level = "WARNING";
+        break;
+    case QtCriticalMsg:
+        level = "CRITICAL";
+        break;
+    case QtFatalMsg:
+        level = "FATAL";
+        break;
+    }
+
+    QString time = QDateTime::currentDateTime()
+        .toString("yyyy-MM-dd hh:mm:ss");
+
+    QString logText = QString("[%1] [%2] %3")
+        .arg(time)
+        .arg(level)
+        .arg(msg);
+
+    // console
+    fprintf(stdout, "%s\n", logText.toLocal8Bit().constData());
+
+    // txt
+    if (logFile.isOpen()) {
+        QTextStream stream(&logFile);
+        stream << logText << Qt::endl;
+        stream.flush();
+    }
+
+    if (type == QtFatalMsg)
+        abort();
+}
+
+LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException)
+{
+    HANDLE hFile = CreateFile(
+        L"crash.dmp",
+        GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        MINIDUMP_EXCEPTION_INFORMATION info;
+        info.ThreadId = GetCurrentThreadId();
+        info.ExceptionPointers = pException;
+        info.ClientPointers = FALSE;
+        MiniDumpWriteDump(
+            GetCurrentProcess(),
+            GetCurrentProcessId(),
+            hFile,
+            MiniDumpNormal,
+            &info,
+            NULL,
+            NULL);
+        CloseHandle(hFile);
+    }
+    return EXCEPTION_EXECUTE_HANDLER;
+}
 
 static QLocalServer* g_singleInstanceServer = nullptr;
 
@@ -37,6 +116,15 @@ static bool isAnotherInstanceRunning(const QString& serverName)
 
 int main(int argc, char *argv[])
 {
+    logFile.setFileName("app_log.txt");
+    logFile.open(QIODevice::Append | QIODevice::Text);
+
+    qInstallMessageHandler(myMessageHandler);
+    SetUnhandledExceptionFilter(CrashHandler);
+    //// 測試 crash
+    //int* p = nullptr;
+    //*p = 1;
+    qDebug() << "程式啟動";
     set_qt_environment();
 
 
