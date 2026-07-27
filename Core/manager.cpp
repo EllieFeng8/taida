@@ -516,7 +516,7 @@ void Manager::init()
 				m_serverWorker->updateInputRegister(10, data.DI_204[2]);//¤ô¬¦²§±`
 				m_serverWorker->updateInputRegisters(11, data.AI_202);
 				m_serverWorker->updateInputRegisters(19, data.AI_203);
-				emit senserData(data, m_serverWorker->SaveData);
+				emit senserData(data, m_serverWorker->getSavedata());
 			}
 
 		});
