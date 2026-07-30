@@ -1291,7 +1291,6 @@ void clientWorker::poll()
     bool is206Connected = (m_206 && m_206->state() == QModbusDevice::ConnectedState);
 
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
-    WatchdogHeartbeatClient::instance().pulse("start connect");
 
     if (!is201Connected || !is6022Connected|| !is202Connected || !is203Connected || !is204Connected || !is205Connected || !is206Connected  ) {
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
@@ -1317,7 +1316,7 @@ void clientWorker::poll()
     data.AO_204 = _204AO;
     data.AO_205 = _205AO;
     data.AO_206 = _206AO;
-    if (!data.AI_202.isEmpty() && !data.AI_203.isEmpty() && !data.AO_204.isEmpty() && !data.AO_205.isEmpty() && !data.AO_206.isEmpty())
+    if (data.DI_201.size() >= 7 && data.DI_204.size() >= 3 && data.AI_202.size() >= 1 && data.AI_203.size() >= 7 && data.AO_204.size() >= 1 && data.AO_205.size() >= 1 && data.AO_206.size() >= 1)
     {
         emit input_DATA(data);
     }

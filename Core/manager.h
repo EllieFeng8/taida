@@ -88,6 +88,13 @@ signals:
     void senserData(readInput_Data data, QVector <quint16> result);
     void Elapsed(int v);
 private:
+    void queueServerHoldingRegisters(int startAddr, const QVector<quint16>& data);
+    void queueServerHoldingRegister(int startAddr, quint16 data);
+    void queueServerInputRegisters(int startAddr, const QVector<quint16>& data);
+    void queueServerInputRegister(int startAddr, quint16 data);
+    void queueServerCoil(int startAddr, bool data);
+    bool readServerHoldingRegister(int address, quint16 *value) const;
+    QVector<quint16> serverSaveData() const;
     bool _FAN_STOP = false;
     bool _motor_STO = false;
     bool server_OK = false;
@@ -112,7 +119,7 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 18;
+    quint16 version_num3 = 22;
     quint16 version_year = 2026;
     quint16 version_date = 721;
     quint16 openValveP1 = 60;

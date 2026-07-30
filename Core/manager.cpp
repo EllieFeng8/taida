@@ -27,6 +27,102 @@ Manager::~Manager()
 	}
 }
 
+void Manager::queueServerHoldingRegisters(int startAddr, const QVector<quint16>& data)
+{
+    if (!m_serverWorker) {
+        return;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    const QVector<quint16> values = data;
+    QMetaObject::invokeMethod(server, [server, startAddr, values] {
+        server->updateHoldingRegisters(startAddr, values);
+    }, Qt::QueuedConnection);
+}
+
+void Manager::queueServerHoldingRegister(int startAddr, quint16 data)
+{
+    if (!m_serverWorker) {
+        return;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    QMetaObject::invokeMethod(server, [server, startAddr, data] {
+        server->updateHoldingRegister(startAddr, data);
+    }, Qt::QueuedConnection);
+}
+
+void Manager::queueServerInputRegisters(int startAddr, const QVector<quint16>& data)
+{
+    if (!m_serverWorker) {
+        return;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    const QVector<quint16> values = data;
+    QMetaObject::invokeMethod(server, [server, startAddr, values] {
+        server->updateInputRegisters(startAddr, values);
+    }, Qt::QueuedConnection);
+}
+
+void Manager::queueServerInputRegister(int startAddr, quint16 data)
+{
+    if (!m_serverWorker) {
+        return;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    QMetaObject::invokeMethod(server, [server, startAddr, data] {
+        server->updateInputRegister(startAddr, data);
+    }, Qt::QueuedConnection);
+}
+
+void Manager::queueServerCoil(int startAddr, bool data)
+{
+    if (!m_serverWorker) {
+        return;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    QMetaObject::invokeMethod(server, [server, startAddr, data] {
+        server->updateCoils(startAddr, data);
+    }, Qt::QueuedConnection);
+}
+
+bool Manager::readServerHoldingRegister(int address, quint16 *value) const
+{
+    if (!m_serverWorker || !value) {
+        return false;
+    }
+
+    ServerWorker *server = m_serverWorker;
+    quint16 serverValue = 0;
+    bool found = false;
+    if (!QMetaObject::invokeMethod(server, [server, address, &serverValue, &found] {
+        found = server->readHoldingRegister(address, &serverValue);
+    }, Qt::BlockingQueuedConnection)) {
+        return false;
+    }
+
+    if (found) {
+        *value = serverValue;
+    }
+    return found;
+}
+
+QVector<quint16> Manager::serverSaveData() const
+{
+    if (!m_serverWorker) {
+        return {};
+    }
+
+    ServerWorker *server = m_serverWorker;
+    QVector<quint16> data;
+    QMetaObject::invokeMethod(server, [server, &data] {
+        data = server->getSavedata();
+    }, Qt::BlockingQueuedConnection);
+    return data;
+}
 void Manager::init()
 {
 	m_ms300Thread = new QThread(this);
@@ -38,7 +134,7 @@ void Manager::init()
 	connect(m_ms300, &MS300::dataUpdated, this, [this](int v) 
 		{
 			if (server_OK) {
-				m_serverWorker->updateInputRegister(29, v);
+				queueServerInputRegister(29, v);
 			}
 		});
 
@@ -270,7 +366,7 @@ void Manager::init()
 			if (value != 0) {
 				switch (address) {
 				case 1:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 31, &_value))
+					if (readServerHoldingRegister(31, &_value))
 					{
 						emit updateToUi(1, _value);
 						if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830+65535 * 0.2)) {
@@ -280,133 +376,133 @@ void Manager::init()
 							this->WriteHoldingRegister_204(0, _value);
 						}
 					}
-					m_serverWorker->updateCoils(1, false);
+					queueServerCoil(1, false);
 					break;
 				case 2:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 32, &_value))
+					if (readServerHoldingRegister(32, &_value))
 					{
 						emit updateToUi(2, _value);
 						this->WriteHoldingRegister_204(1, _value);
 					}
-					m_serverWorker->updateCoils(2, false);
+					queueServerCoil(2, false);
 
 					break;
 				case 3:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 33, &_value))
+					if (readServerHoldingRegister(33, &_value))
 					{
 						emit updateToUi(3, _value);
 
 						this->WriteHoldingRegister_204(2, _value);
 					}
-					m_serverWorker->updateCoils(3, false);
+					queueServerCoil(3, false);
 
 					break;
 				case 4:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 34, &_value))
+					if (readServerHoldingRegister(34, &_value))
 					{
 						emit updateToUi(4, _value);
 						this->WriteHoldingRegister_204(3, _value);
 					}
-					m_serverWorker->updateCoils(4, false);
+					queueServerCoil(4, false);
 					break;
 				case 5:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 39, &_value))
+					if (readServerHoldingRegister(39, &_value))
 					{
 						emit updateToUi(5, _value);
 						this->WriteHoldingRegister_205(0, _value);
 					}
-					m_serverWorker->updateCoils(5, false);
+					queueServerCoil(5, false);
 
 					break;
 				case 6:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 40, &_value))
+					if (readServerHoldingRegister(40, &_value))
 					{
 						emit updateToUi(6, _value);
 						this->WriteHoldingRegister_205(1, _value);
 					}
-					m_serverWorker->updateCoils(6, false);
+					queueServerCoil(6, false);
 
 					break;
 				case 7:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 41, &_value))
+					if (readServerHoldingRegister(41, &_value))
 					{
 						emit updateToUi(7, _value);
 						this->WriteHoldingRegister_205(2, _value);
 					}
-					m_serverWorker->updateCoils(7, false);
+					queueServerCoil(7, false);
 
 					break;
 				case 8:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 42, &_value))
+					if (readServerHoldingRegister(42, &_value))
 					{
 						emit updateToUi(8, _value);
 						this->WriteHoldingRegister_205(3, _value);
 					}
-					m_serverWorker->updateCoils(8, false);
+					queueServerCoil(8, false);
 
 					break;
 				case 9:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 47, &_value))
+					if (readServerHoldingRegister(47, &_value))
 					{
 						emit updateToUi(9, _value);
 						this->WriteHoldingRegister_206(0, _value);
 					}
-					m_serverWorker->updateCoils(9, false);
+					queueServerCoil(9, false);
 					break;
 				case 10:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 48, &_value))
+					if (readServerHoldingRegister(48, &_value))
 					{
 						emit updateToUi(10, _value);
 						this->WriteHoldingRegister_206(1, _value);
 					}
-					m_serverWorker->updateCoils(10, false);
+					queueServerCoil(10, false);
 					break;
 				case 11:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 49, &_value))
+					if (readServerHoldingRegister(49, &_value))
 					{
 						emit updateToUi(11, _value);
 						this->WriteHoldingRegister_206(2, _value);
 					}
-					m_serverWorker->updateCoils(11, false);
+					queueServerCoil(11, false);
 					break;
 				case 12:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 50, &_value))
+					if (readServerHoldingRegister(50, &_value))
 					{
 						emit updateToUi(12, _value);
 						this->WriteHoldingRegister_6022(11, _value);
 
 					}
-					m_serverWorker->updateCoils(12, false);
+					queueServerCoil(12, false);
 					break;
 				case 13:
 
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 51, &p1);
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 52, &i1);
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 53, &d1);
+					readServerHoldingRegister(51, &p1);
+					readServerHoldingRegister(52, &i1);
+					readServerHoldingRegister(53, &d1);
 					this->set_PID(p1, i1, d1);
 					emit update_PID(1, p1 * 1.0 / 1000, i1 * 1.0 / 1000, d1 * 1.0 / 1000);
-					m_serverWorker->updateCoils(13, false);
+					queueServerCoil(13, false);
 					break;
 				case 14:
 
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 54, &p2);
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 55, &i2);
-					m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 56, &d2);
+					readServerHoldingRegister(54, &p2);
+					readServerHoldingRegister(55, &i2);
+					readServerHoldingRegister(56, &d2);
 					emit update_PID(2, p2 * 1.0 / 1000, i2 * 1.0 / 1000, d2 * 1.0 / 1000);
 					this->set_PID2(p2, i2, d2);
 
-					m_serverWorker->updateCoils(14, false);
+					queueServerCoil(14, false);
 					break;
 				case 15:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 58, &_value))
+					if (readServerHoldingRegister(58, &_value))
 					{
 						emit updateToUi(15, _value / 100);
 						this->set_sv2(_value);
 					}
-					m_serverWorker->updateCoils(15, false);
+					queueServerCoil(15, false);
 					break;
 				case 16:
-					if (m_serverWorker->m_server->data(QModbusDataUnit::HoldingRegisters, 60, &_value))
+					if (readServerHoldingRegister(60, &_value))
 					{
 						if (!new_PD) {
 							emit updateToUi(16, _value / 10);
@@ -416,7 +512,7 @@ void Manager::init()
 						}	
 						this->set_sv(_value);
 					}
-					m_serverWorker->updateCoils(16, false);
+					queueServerCoil(16, false);
 					break;
 				default:
 					break;
@@ -436,9 +532,9 @@ void Manager::init()
 	connect(m_clientWorker, &clientWorker::pidcontroloutvalue, this, [this](double MV2) {emit pidcontroloutvalue(MV2); });
 
 	connect(m_clientWorker, &clientWorker::R_PV, this, [this](const QVector<quint16>& data) {
-		if (server_OK) {
-			m_serverWorker->updateInputRegister(27, data[3]  );
-			m_serverWorker->updateInputRegister(28, data[0] );
+		if (server_OK && data.size() >= 4) {
+			queueServerInputRegister(27, data[3]  );
+			queueServerInputRegister(28, data[0] );
 		}
 		emit R_PV(data); });
 	// TODO :
@@ -446,6 +542,7 @@ void Manager::init()
 
 	connect(m_clientWorker, &clientWorker::input_DATA, this, [this](readInput_Data data)
 		{
+			WatchdogHeartbeatClient::instance().pulse("start connect");
 			if(data.AI_202.isEmpty())
 			if (data.DI_201[0] = 0 && normal)//判斷欠逆相檢出 
 			{
@@ -479,7 +576,7 @@ void Manager::init()
 				t_str = dryTime;
 			}
 			emit Elapsed(t_str);
-			m_serverWorker->updateInputRegister(40, t_str);
+			queueServerInputRegister(40, t_str);
 
 			if (ElapsedTimer > dryTime && !dry_Over)
 			{
@@ -500,61 +597,62 @@ void Manager::init()
 			}
 			//將讀取到的數值更新到server
 			if (server_OK) {
-				m_serverWorker->updateHoldingRegisters(1,data.AO_204);
-				m_serverWorker->updateHoldingRegisters(9, data.AO_205);
-				m_serverWorker->updateHoldingRegisters(17, data.AO_206);
-				m_serverWorker->updateInputRegister(0, data.DI_201[0]);//相位檢出
-				m_serverWorker->updateInputRegister(1, data.DI_201[1]);//風扇1異常
-				m_serverWorker->updateInputRegister(2, data.DI_201[2]);//風扇2異常
-				m_serverWorker->updateInputRegister(3, data.DI_201[3]);//風扇3異常
-				m_serverWorker->updateInputRegister(4, data.DI_201[4]);//風扇4異常
-				m_serverWorker->updateInputRegister(5, data.DI_201[5]);//風扇5異常
-				m_serverWorker->updateInputRegister(6, data.DI_201[6]);//風扇6異常
-				m_serverWorker->updateInputRegister(7, data.DI_201[7]);//風扇7異常
-				m_serverWorker->updateInputRegister(8, data.DI_204[0]);//風扇8異常
-				m_serverWorker->updateInputRegister(9, data.DI_204[1]);//風扇9異常
-				m_serverWorker->updateInputRegister(10, data.DI_204[2]);//水泵異常
-				m_serverWorker->updateInputRegisters(11, data.AI_202);
-				m_serverWorker->updateInputRegisters(19, data.AI_203);
-				emit senserData(data, m_serverWorker->getSavedata());
+				queueServerHoldingRegisters(1,data.AO_204);
+				queueServerHoldingRegisters(9, data.AO_205);
+				queueServerHoldingRegisters(17, data.AO_206);
+				queueServerInputRegister(0, data.DI_201[0]);//相位檢出
+				queueServerInputRegister(1, data.DI_201[1]);//風扇1異常
+				queueServerInputRegister(2, data.DI_201[2]);//風扇2異常
+				queueServerInputRegister(3, data.DI_201[3]);//風扇3異常
+				queueServerInputRegister(4, data.DI_201[4]);//風扇4異常
+				queueServerInputRegister(5, data.DI_201[5]);//風扇5異常
+				queueServerInputRegister(6, data.DI_201[6]);//風扇6異常
+				queueServerInputRegister(7, data.DI_201[7]);//風扇7異常
+				queueServerInputRegister(8, data.DI_204[0]);//風扇8異常
+				queueServerInputRegister(9, data.DI_204[1]);//風扇9異常
+				queueServerInputRegister(10, data.DI_204[2]);//水泵異常
+				queueServerInputRegisters(11, data.AI_202);
+				queueServerInputRegisters(19, data.AI_203);
+				emit senserData(data, serverSaveData());
 			}
 
 		});
 
-	connect(m_clientWorker, &clientWorker::m_6022PID1, m_serverWorker, [this](const QVector<quint16>& data) {
+	connect(m_clientWorker, &clientWorker::m_6022PID1, this, [this](const QVector<quint16>& data) {
 		if (server_OK) {
-			m_serverWorker->updateHoldingRegisters(21, data);
+			queueServerHoldingRegisters(21, data);
 		}
 		emit _PID1(data);
 		});
-	connect(m_clientWorker, &clientWorker::m_6022PID2, m_serverWorker, [this](const QVector<quint16>& data) {
+	connect(m_clientWorker, &clientWorker::m_6022PID2, this, [this](const QVector<quint16>& data) {
 		if (server_OK) {
-			m_serverWorker->updateHoldingRegisters(24, data);
+			queueServerHoldingRegisters(24, data);
 		}
 		emit _PID2(data);
 		});
 	//  Adam6022 資料放在 Server 的InputRegister 27,28
-	connect(m_clientWorker, &clientWorker::m_6022PV1, m_serverWorker, [this](const QVector<quint16>& data) {
-		if (server_OK) {
-			//m_serverWorker->updateInputRegister(27, data[0]);
-			m_serverWorker->updateHoldingRegister(59, data[0]);
+	connect(m_clientWorker, &clientWorker::m_6022PV1, this, [this](const QVector<quint16>& data) {
+		if (server_OK && !data.isEmpty()) {
+			//queueServerInputRegister(27, data[0]);
+			queueServerHoldingRegister(59, data[0]);
 		}
 		emit _PV1(data);
 		});
-	connect(m_clientWorker, &clientWorker::m_6022PV2, m_serverWorker, [this](const QVector<quint16>& data) {
-		if (server_OK) {
-			//m_serverWorker->updateInputRegister(28, data[0]);
-			m_serverWorker->updateHoldingRegister(57, data[0]);
+	connect(m_clientWorker, &clientWorker::m_6022PV2, this, [this](const QVector<quint16>& data) {
+		if (server_OK && !data.isEmpty()) {
+			//queueServerInputRegister(28, data[0]);
+			queueServerHoldingRegister(57, data[0]);
 		}
 		emit _PV2(data);
 		});
-	connect(m_clientWorker, &clientWorker::m_6022MV, m_serverWorker, [this](const QVector<quint16>& data) {
+	connect(m_clientWorker, &clientWorker::m_6022MV, this, [this](const QVector<quint16>& data) {
+		if (data.size() < 2) { return; }
 		emit _MV(data);
 		PID_AO1 = data[0];
 		PID_AO2 = data[1];
 		if (server_OK) {
-			m_serverWorker->updateInputRegister(26, PID_AO1);
-			m_serverWorker->updateHoldingRegister(20, PID_AO2);
+			queueServerInputRegister(26, PID_AO1);
+			queueServerHoldingRegister(20, PID_AO2);
 		}
 		});
 
@@ -568,7 +666,7 @@ void Manager::init()
 void Manager::set_mode1(bool v)
 {
 	qDebug() << "set pid-1  mode : " << v;
-	m_serverWorker->updateHoldingRegister(63, v);
+	queueServerHoldingRegister(63, v);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Mode1(v); },
 		Qt::QueuedConnection
@@ -577,7 +675,7 @@ void Manager::set_mode1(bool v)
 void Manager::set_mode2(bool v)
 {
 	qDebug() << "set pid-2  mode : " << v;
-	m_serverWorker->updateHoldingRegister(64, v);
+	queueServerHoldingRegister(64, v);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Mode2(v); },
 		Qt::QueuedConnection
@@ -586,8 +684,8 @@ void Manager::set_mode2(bool v)
 void Manager::set_sv(int v)
 {
 	double value = v;
-	m_serverWorker->updateHoldingRegister(60, value);
-	//m_serverWorker->updateCoils(16,true);
+	queueServerHoldingRegister(60, value);
+	//queueServerCoil(16,true);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_SV1( v*10); },
 		Qt::QueuedConnection
@@ -596,8 +694,8 @@ void Manager::set_sv(int v)
 void Manager::set_sv2(int v)
 {
 
-	m_serverWorker->updateHoldingRegister(58, v);
-	//m_serverWorker->updateCoils(15, true);
+	queueServerHoldingRegister(58, v);
+	//queueServerCoil(15, true);
 
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_SV2(v*10); },
@@ -611,8 +709,8 @@ void Manager::set_PID(double p, double i, double d)
 	data[0] = p;
 	data[1] = i;
 	data[2] = d;
-	m_serverWorker->updateHoldingRegisters(51, data);
-	//m_serverWorker->updateCoils(13, true);
+	queueServerHoldingRegisters(51, data);
+	//queueServerCoil(13, true);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, p,i,d] { m_clientWorker->set_PID1(p,i,d); },
 		Qt::QueuedConnection
@@ -625,8 +723,8 @@ void Manager::set_PID2(double p, double i, double d)
 	data[0] = p;
 	data[1] = i;
 	data[2] = d;
-	m_serverWorker->updateHoldingRegisters(54, data);
-	//m_serverWorker->updateCoils(14, true);
+	queueServerHoldingRegisters(54, data);
+	//queueServerCoil(14, true);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, p, i, d] { m_clientWorker->set_PID2(p, i, d); },
 		Qt::QueuedConnection
@@ -636,7 +734,7 @@ void Manager::set_AO1(double v)
 {
 	quint16 modbusValue = v;
 	qDebug() << "set Out Open SV"<<modbusValue;
-	m_serverWorker->updateHoldingRegister(50, modbusValue);
+	queueServerHoldingRegister(50, modbusValue);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, modbusValue] { m_clientWorker->set_AO1(modbusValue); },
 		Qt::QueuedConnection
@@ -648,16 +746,16 @@ void Manager::motorFrequency(double v)
 
 	if(_motor_STO)
 	{
-		m_serverWorker->updateHoldingRegister(31, 0);
+		queueServerHoldingRegister(31, 0);
 		qDebug() << "set motorFrequency =" << value<< " BUT! STO ON set 0" ;
 	}
 	else if(openValveP1<(65535*0.2) && openValveP2<(65535*0.2))
 	{
-		m_serverWorker->updateHoldingRegister(31, 0);
+		queueServerHoldingRegister(31, 0);
 		qDebug() << "set motorFrequency =" << value << " BUT! openningValve 0"<< openValveP1<< openValveP2;
 	}
 	else {
-		m_serverWorker->updateHoldingRegister(31, value);
+		queueServerHoldingRegister(31, value);
 	}
 }
 void Manager::fan1TargetRpm(double v) 
@@ -670,10 +768,10 @@ void Manager::fan1TargetRpm(double v)
 	if(_FAN_STOP)
 	{
 		qDebug() << "set fan1 but E_STOP ON";
-		m_serverWorker->updateHoldingRegisters(32, { 0 });
+		queueServerHoldingRegisters(32, { 0 });
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(32, data);
+		queueServerHoldingRegisters(32, data);
 	}
 }
 void Manager::fan2TargetRpm(double v)
@@ -685,12 +783,12 @@ void Manager::fan2TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(33, { 0 });
+		queueServerHoldingRegisters(33, { 0 });
 		qDebug() << "set fan2 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(33, data);
+		queueServerHoldingRegisters(33, data);
 	}
 }
 void Manager::fan3TargetRpm(double v) 
@@ -701,11 +799,11 @@ void Manager::fan3TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(34 ,{ 0 });
+		queueServerHoldingRegisters(34 ,{ 0 });
 		qDebug() << "set fan3 but E_STOP ON";
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(34, data);
+		queueServerHoldingRegisters(34, data);
 	}
 }
 void Manager::fan4TargetRpm(double v) 
@@ -717,11 +815,11 @@ void Manager::fan4TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(39, { 0 });
+		queueServerHoldingRegisters(39, { 0 });
 		qDebug() << "set fan4 but E_STOP ON";
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(39, data);
+		queueServerHoldingRegisters(39, data);
 	}
 }
 void Manager::fan5TargetRpm(double v) 
@@ -732,12 +830,12 @@ void Manager::fan5TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(40, { 0 });
+		queueServerHoldingRegisters(40, { 0 });
 		qDebug() << "set fan5 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(40, data);
+		queueServerHoldingRegisters(40, data);
 	}
 }
 void Manager::fan6TargetRpm(double v) 
@@ -748,12 +846,12 @@ void Manager::fan6TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(41, { 0 });
+		queueServerHoldingRegisters(41, { 0 });
 		qDebug() << "set fan6 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(41, data);
+		queueServerHoldingRegisters(41, data);
 	}
 }
 void Manager::fan7TargetRpm(double v) 
@@ -764,12 +862,12 @@ void Manager::fan7TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(42, { 0 });
+		queueServerHoldingRegisters(42, { 0 });
 		qDebug() << "set fan7 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(42, data);
+		queueServerHoldingRegisters(42, data);
 	}
 }
 void Manager::fan8TargetRpm(double v) 
@@ -780,12 +878,12 @@ void Manager::fan8TargetRpm(double v)
 	data.resize(1);
 	data[0] = value;
 	if (_FAN_STOP){
-		m_serverWorker->updateHoldingRegisters(47 ,{ 0 });
+		queueServerHoldingRegisters(47 ,{ 0 });
 		qDebug() << "set fan8 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(47, data);
+		queueServerHoldingRegisters(47, data);
 	}
 }
 void Manager::fan9TargetRpm(double v) 
@@ -796,12 +894,12 @@ void Manager::fan9TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP)
 	{
-		m_serverWorker->updateHoldingRegisters(48, { 0 });
+		queueServerHoldingRegisters(48, { 0 });
 		qDebug() << "set fan9 but E_STOP ON";
 
 	}
 	else {
-		m_serverWorker->updateHoldingRegisters(48, data);
+		queueServerHoldingRegisters(48, data);
 	}
 }
 void Manager::returnValveOpening(double v) 
@@ -812,7 +910,7 @@ void Manager::returnValveOpening(double v)
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = modbusValue;
-	m_serverWorker->updateHoldingRegisters(49, data);
+	queueServerHoldingRegisters(49, data);
 }
 
 void Manager::WriteHoldingRegister_204(int addr, double value)
@@ -957,7 +1055,7 @@ void Manager::set_motor(bool v)
 {//水泵STO
 	_motor_STO = v;
 	quint16 value = v ? 1 : 0;
-	m_serverWorker->updateHoldingRegister(72, value);
+	queueServerHoldingRegister(72, value);
 	qDebug() << "set motor ";
 }
 void Manager::set_FanPower(bool v)
@@ -967,17 +1065,17 @@ void Manager::set_FanPower(bool v)
 		set_allFan(0);
 	}
 	quint16 value = v ? 1 : 0;	//緊急停止開啟 = 馬達電源關閉
-	m_serverWorker->updateHoldingRegister(71, value);
+	queueServerHoldingRegister(71, value);
 	qDebug() << "set fan E_STOP " <<_FAN_STOP;
 }
 void Manager::set_dry(bool v)
 {
 	if(v)
 	{
-		m_serverWorker->updateCoils(17, v);
+		queueServerCoil(17, v);
 	}
 	else
 	{
-		m_serverWorker->updateCoils(17, v);
+		queueServerCoil(17, v);
 	}
 }

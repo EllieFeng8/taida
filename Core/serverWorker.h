@@ -18,6 +18,7 @@ public:
     void init(int port,QVariant ip, quint16 v1, quint16 v2, quint16 v3, quint16 years,quint16 date); // ªì©l¤Æ Server
     //void connectDevice();
     QVector<quint16> getSavedata();
+    bool readHoldingRegister(int address, quint16 *value) const;
 signals:
     void modbusDataChanged(QModbusDataUnit::RegisterType table, int address, quint16 value);
     void server_stat(bool v);

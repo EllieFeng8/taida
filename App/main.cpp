@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     //// 測試 crash
     //int* p = nullptr;
     //*p = 1;
-    qDebug() << "程式啟動";
+    qDebug() << "程式啟動_V1.2.22_260727";
     set_qt_environment();
 
 

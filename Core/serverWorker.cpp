@@ -64,6 +64,13 @@ QVector<quint16>  ServerWorker::getSavedata()
 
 }
 
+
+bool ServerWorker::readHoldingRegister(int address, quint16 *value) const
+{
+    return value && m_server
+        && m_server->state() == QModbusDevice::ConnectedState
+        && m_server->data(QModbusDataUnit::HoldingRegisters, address, value);
+}
 void ServerWorker::updateCoils(int startAddr, const bool data)
 {
     if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
