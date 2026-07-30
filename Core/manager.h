@@ -119,7 +119,7 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 22;
+    quint16 version_num3 = 24;
     quint16 version_year = 2026;
     quint16 version_date = 721;
     quint16 openValveP1 = 60;

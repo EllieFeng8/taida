@@ -136,4 +136,5 @@ private:
     double OutSV_minValue = 4095 * 0.20; 
     double OutSV_maxValue = 4095 * 0.95; 
     bool new_PD = false;
+    bool m_productionSettingsLoaded = false;
 };

@@ -2,8 +2,16 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include <QApplication>
+#include <QDate>
+#include <QDateTime>
+#include <QDir>
 #include <QQmlApplicationEngine>
 #include <QFile>
+#include <QFileInfo>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QRegularExpression>
+#include <QTextStream>
 
 #include <QLocalServer>
 #include <QLocalSocket>
@@ -14,7 +22,57 @@
 #include <dbghelp.h>
 #pragma comment(lib, "Dbghelp.lib")
 
+namespace {
+
 QFile logFile;
+QDate logFileDate;
+QMutex logFileMutex;
+
+constexpr int logRetentionDays = 7;
+const QString logFilePrefix = QStringLiteral("app_log_");
+const QString logFileSuffix = QStringLiteral(".txt");
+
+QString dailyLogFileName(const QDate &date)
+{
+    return logFilePrefix + date.toString(QStringLiteral("yyyy-MM-dd")) + logFileSuffix;
+}
+
+void removeExpiredLogFiles(const QDate &today)
+{
+    const QDate oldestDateToKeep = today.addDays(-(logRetentionDays - 1));
+    const QRegularExpression fileNamePattern(
+        QStringLiteral("^app_log_(\\d{4}-\\d{2}-\\d{2})\\.txt$"));
+    const QDir logDirectory = QDir::current();
+
+    const QFileInfoList logFiles = logDirectory.entryInfoList(
+        {QStringLiteral("app_log_*.txt")}, QDir::Files);
+    for (const QFileInfo &fileInfo : logFiles) {
+        const QRegularExpressionMatch match = fileNamePattern.match(fileInfo.fileName());
+        const QDate fileDate = QDate::fromString(match.captured(1), QStringLiteral("yyyy-MM-dd"));
+        if (!fileDate.isValid() || fileDate < oldestDateToKeep) {
+            QFile::remove(fileInfo.absoluteFilePath());
+        }
+    }
+
+    const QFileInfo legacyLogFile(logDirectory.filePath(QStringLiteral("app_log.txt")));
+    if (legacyLogFile.exists() && legacyLogFile.lastModified().date() < oldestDateToKeep) {
+        QFile::remove(legacyLogFile.absoluteFilePath());
+    }
+}
+
+bool openDailyLogFile(const QDate &date)
+{
+    if (logFile.isOpen()) {
+        logFile.close();
+    }
+
+    removeExpiredLogFiles(date);
+    logFile.setFileName(QDir::current().filePath(dailyLogFileName(date)));
+    logFileDate = date;
+    return logFile.open(QIODevice::Append | QIODevice::Text);
+}
+
+} // namespace
 
 void myMessageHandler(QtMsgType type,
     const QMessageLogContext& context,
@@ -40,8 +98,8 @@ void myMessageHandler(QtMsgType type,
         break;
     }
 
-    QString time = QDateTime::currentDateTime()
-        .toString("yyyy-MM-dd hh:mm:ss");
+    const QDateTime timestamp = QDateTime::currentDateTime();
+    const QString time = timestamp.toString("yyyy-MM-dd hh:mm:ss");
 
     QString logText = QString("[%1] [%2] %3")
         .arg(time)
@@ -51,7 +109,11 @@ void myMessageHandler(QtMsgType type,
     // console
     fprintf(stdout, "%s\n", logText.toLocal8Bit().constData());
 
-    // txt
+    QMutexLocker locker(&logFileMutex);
+    if (logFileDate != timestamp.date()) {
+        openDailyLogFile(timestamp.date());
+    }
+
     if (logFile.isOpen()) {
         QTextStream stream(&logFile);
         stream << logText << Qt::endl;
@@ -116,15 +178,14 @@ static bool isAnotherInstanceRunning(const QString& serverName)
 
 int main(int argc, char *argv[])
 {
-    logFile.setFileName("app_log.txt");
-    logFile.open(QIODevice::Append | QIODevice::Text);
+    openDailyLogFile(QDate::currentDate());
 
     qInstallMessageHandler(myMessageHandler);
     SetUnhandledExceptionFilter(CrashHandler);
     //// 測試 crash
     //int* p = nullptr;
     //*p = 1;
-    qDebug() << "程式啟動_V1.2.22_260727";
+    qDebug() << "程式啟動_V1.2.24_260730";
     set_qt_environment();
 
 

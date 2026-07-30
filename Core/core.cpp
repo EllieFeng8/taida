@@ -117,7 +117,16 @@ void Core::init()
         });
 
     QObject::connect(m_manager, &Manager::R_PV, this, &Core::onPVdata);
-    QObject::connect(m_manager, &Manager::client_on, this, [this]() { this->loadProductionSettings(); });
+    QObject::connect(m_manager, &Manager::client_on, this, [this]() {
+        if (m_productionSettingsLoaded) {
+            return;
+        }
+
+        m_productionSettingsLoaded = true;
+        loadProductionSettings();
+        m_proxy->setOutValveOpening(0);
+        m_proxy->setReturnValveOpening(0);
+    });
 
     QObject::connect(m_manager, &Manager::_PV1, this, &Core::pidPV1);
     QObject::connect(m_manager, &Manager::_PV2, this, &Core::pidPV2);
