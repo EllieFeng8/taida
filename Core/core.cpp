@@ -1080,6 +1080,8 @@ void Core::saveProductionSettings()
     settings.setValue("Production/OutSV_min", OutSV_minValue);
     settings.setValue("Production/OutSV_max", OutSV_maxValue);
     settings.setValue("Production/New_DP",new_PD );
+    settings.setValue("Production/Dry_time", m_manager->dryTime);
+    settings.setValue("Production/Dry_value", m_manager->dryValue);
     //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -1123,5 +1125,6 @@ void Core::loadProductionSettings()
     OutSV_minValue = settings.value("Production/OutSV_min", 0).toDouble();
     OutSV_maxValue = settings.value("Production/OutSV_max", 4095).toDouble();
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
-
+    m_manager->set_dryTime(settings.value("Production/Dry_time", 3600).toInt());
+    m_manager->set_dryValue(settings.value("Production/Dry_value", 40).toInt());
 }

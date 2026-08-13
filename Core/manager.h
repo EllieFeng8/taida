@@ -16,6 +16,8 @@ public:
     ~Manager();
 
     bool new_PD = false;
+    int dryTime = 3600;
+    int dryValue = 40;
     QString ip;
     void init();
     void set_mode1(bool v);
@@ -63,6 +65,8 @@ public:
 
     void set_Reset(bool v);
     void set_dry(bool v);
+    void set_dryTime(int v);
+    void set_dryValue(int v);
 
 signals:
     void server_on();
@@ -95,6 +99,7 @@ private:
     void queueServerCoil(int startAddr, bool data);
     bool readServerHoldingRegister(int address, quint16 *value) const;
     QVector<quint16> serverSaveData() const;
+    bool areAllFanPvsAboveThreshold() const;
     bool _FAN_STOP = false;
     bool _motor_STO = false;
     bool server_OK = false;
@@ -119,12 +124,12 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 24;
+    quint16 version_num3 = 26;
     quint16 version_year = 2026;
-    quint16 version_date = 721;
+    quint16 version_date = 803;
     quint16 openValveP1 = 60;
     quint16 openValveP2 = 60;
     QElapsedTimer timer;
     bool dry_Over = false;
-    int dryTime = 1800;
+
 };

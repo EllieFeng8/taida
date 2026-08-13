@@ -92,7 +92,8 @@ void clientWorker::init()
         m_201->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.201");
         m_201->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_201->setObjectName("201");
-        m_201->setTimeout(500);
+        m_201->setTimeout(1000);
+        m_201->setNumberOfRetries(1);
         connect(m_201, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged_201);
         connect(m_201, &QModbusTcpClient::errorOccurred,
@@ -105,7 +106,8 @@ void clientWorker::init()
         m_202->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.202");
         m_202->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_202->setObjectName("202");
-        m_202->setTimeout(500);
+        m_202->setTimeout(1000);
+        m_202->setNumberOfRetries(1);
         connect(m_202, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_202, &QModbusTcpClient::errorOccurred,
@@ -118,7 +120,8 @@ void clientWorker::init()
         m_203->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.203");
         m_203->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_203->setObjectName("203");
-        m_203->setTimeout(500);
+        m_203->setTimeout(1000);
+        m_203->setNumberOfRetries(1);
         connect(m_203, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_203, &QModbusTcpClient::errorOccurred,
@@ -131,7 +134,8 @@ void clientWorker::init()
         m_204->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.204");
         m_204->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_204->setObjectName("204");
-        m_204->setTimeout(500);
+        m_204->setTimeout(1000);
+        m_204->setNumberOfRetries(1);
         connect(m_204, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_204, &QModbusTcpClient::errorOccurred,
@@ -144,7 +148,8 @@ void clientWorker::init()
         m_205->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.205");
         m_205->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_205->setObjectName("205");
-        m_205->setTimeout(500);
+        m_205->setTimeout(1000);
+        m_205->setNumberOfRetries(1);
         connect(m_205, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_205, &QModbusTcpClient::errorOccurred,
@@ -157,7 +162,8 @@ void clientWorker::init()
         m_206->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.206");
         m_206->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_206->setObjectName("206");
-        m_206->setTimeout(500);
+        m_206->setTimeout(1000);
+        m_206->setNumberOfRetries(1);
         connect(m_206, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_206, &QModbusTcpClient::errorOccurred,
@@ -169,7 +175,8 @@ void clientWorker::init()
         m_6022->setConnectionParameter(QModbusDevice::NetworkAddressParameter, "192.168.1.207");
         m_6022->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_6022->setObjectName("6022");
-        m_6022->setTimeout(500);
+        m_6022->setTimeout(1000);
+        m_6022->setNumberOfRetries(1);
         connect(m_6022, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_6022, &QModbusTcpClient::errorOccurred,

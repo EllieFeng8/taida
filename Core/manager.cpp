@@ -334,15 +334,15 @@ void Manager::init()
 					dry_Over = false;
 					qDebug() << "dryyyyyy2";
 					//set_allFan(30);
-					fan1TargetRpm(30);
-					fan2TargetRpm(30);
-					fan3TargetRpm(30);
-					fan4TargetRpm(30);
-					fan5TargetRpm(30);
-					fan6TargetRpm(30);
-					fan7TargetRpm(30);
-					fan8TargetRpm(30);
-					fan9TargetRpm(30);
+					fan1TargetRpm(dryValue);
+					fan2TargetRpm(dryValue);
+					fan3TargetRpm(dryValue);
+					fan4TargetRpm(dryValue);
+					fan5TargetRpm(dryValue);
+					fan6TargetRpm(dryValue);
+					fan7TargetRpm(dryValue);
+					fan8TargetRpm(dryValue);
+					fan9TargetRpm(dryValue);
 					qDebug() << "dryyyyyy3";
 				}
 				else {
@@ -590,6 +590,8 @@ void Manager::init()
 				fan7TargetRpm(0);
 				fan8TargetRpm(0);
 				fan9TargetRpm(0);
+				queueServerCoil(17, false);
+				emit updateToUi(17, false);
 				dry_Over = true;
 				qDebug() << "dry_Over";
 				
@@ -730,9 +732,28 @@ void Manager::set_PID2(double p, double i, double d)
 		Qt::QueuedConnection
 	);
 }
+bool Manager::areAllFanPvsAboveThreshold() const
+{
+    constexpr quint16 fanPvThreshold = 1433;
+    const int fanPvAddresses[] = {2, 3, 4, 9, 10, 11, 12, 17, 18};
+
+    for (const int address : fanPvAddresses) {
+        quint16 fanPv = 0;
+        if (!readServerHoldingRegister(address, &fanPv) || fanPv <= fanPvThreshold) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void Manager::set_AO1(double v)
 {
 	quint16 modbusValue = v;
+	if (modbusValue > 0 && !areAllFanPvsAboveThreshold()) {
+		qWarning() << "AO1 closed because at least one fan PV is not above 35%.";
+		modbusValue = 0;
+	}
 	qDebug() << "set Out Open SV"<<modbusValue;
 	queueServerHoldingRegister(50, modbusValue);
 	QMetaObject::invokeMethod(
@@ -1078,4 +1099,12 @@ void Manager::set_dry(bool v)
 	{
 		queueServerCoil(17, v);
 	}
+}
+void Manager::set_dryTime(int v)
+{
+	dryTime = v;
+}
+void Manager::set_dryValue(int v)
+{
+	dryValue = v;
 }
