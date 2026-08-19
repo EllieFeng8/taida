@@ -74,6 +74,7 @@ private:
 
     void saveProductionSettings();
     void loadProductionSettings();
+    void applyOutletTemperaturePreset(double targetTemperature);
     quint16 v_0;
     quint16 v_1;
     quint16 v_2;
@@ -137,4 +138,5 @@ private:
     double OutSV_maxValue = 4095 * 0.95; 
     bool new_PD = false;
     bool m_productionSettingsLoaded = false;
+    bool m_loadingProductionSettings = false;
 };

@@ -699,10 +699,10 @@ void Manager::set_sv2(int v)
 	queueServerHoldingRegister(58, v);
 	//queueServerCoil(15, true);
 
-	QMetaObject::invokeMethod(
+/*	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_SV2(v*10); },
 		Qt::QueuedConnection
-	);
+	);*/
 }
 void Manager::set_PID(double p, double i, double d)
 {

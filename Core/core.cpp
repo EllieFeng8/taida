@@ -1,5 +1,6 @@
 ﻿#include "core.h"
 #include <QNetworkInterface>
+#include <array>
 
 Core& Core::instance()
 {
@@ -177,7 +178,12 @@ void Core::init()
                 m_manager->set_sv((v* 10 / 1.25) / 2 + 5000);//v*10/1.125 是將0~1250 換算成 0~10000 , 除以2+5000是再換算5000~10000 對應50~100(%) 
             }
         });
-    QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [=](double v) {m_manager->set_sv2(v*100); });
+    QObject::connect(m_proxy, &TdProxy::outWaterTargetTempChanged, this, [this](double v) {
+        m_manager->set_sv2(qRound(v * 100));
+        if (!m_loadingProductionSettings) {
+            applyOutletTemperaturePreset(v);
+        }
+    });
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
 
@@ -1092,6 +1098,7 @@ void Core::saveProductionSettings()
 void Core::loadProductionSettings()
 {
     QSettings settings("production.ini", QSettings::IniFormat);
+    m_loadingProductionSettings = true;
 
     // 讀取數值，若檔案不存在則使用預設值 0.0
     m_proxy->setMotorFrequency(settings.value("Production/Hz", 0).toDouble());
@@ -1127,4 +1134,63 @@ void Core::loadProductionSettings()
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
     m_manager->set_dryTime(settings.value("Production/Dry_time", 3600).toInt());
     m_manager->set_dryValue(settings.value("Production/Dry_value", 40).toInt());
+    m_loadingProductionSettings = false;
+}
+void Core::applyOutletTemperaturePreset(double targetTemperature)
+{
+    struct OutletTemperaturePreset
+    {
+        double targetTemperature;
+        double outValveOpening;
+        double returnValveOpening;
+        double motorFrequency;
+    };
+
+    static const std::array<OutletTemperaturePreset, 21> presets = {{
+        {10.0, 70.0, 80.0, 40.0}, {11.0, 66.0, 74.0, 38.0},
+        {12.0, 62.0, 68.0, 36.0}, {13.0, 58.0, 62.0, 34.0},
+        {14.0, 54.0, 56.0, 32.0}, {15.0, 50.0, 50.0, 30.0},
+        {16.0, 45.5, 48.0, 29.0}, {17.0, 41.0, 46.0, 28.0},
+        {18.0, 36.5, 44.0, 27.0}, {19.0, 32.0, 42.0, 26.0},
+        {20.0, 27.5, 40.0, 25.0}, {21.0, 25.6, 38.0, 24.0},
+        {22.0, 23.7, 36.0, 23.0}, {23.0, 21.8, 34.0, 22.0},
+        {24.0, 19.9, 32.0, 21.0}, {25.0, 18.0, 30.0, 20.0},
+        {26.0, 16.1, 28.0, 19.0}, {27.0, 14.2, 26.0, 18.0},
+        {28.0, 12.3, 24.0, 17.0}, {29.0, 10.4, 22.0, 16.0},
+        {30.0, 8.5, 20.0, 15.0},
+    }};
+
+    OutletTemperaturePreset preset = presets.front();
+    if (targetTemperature >= presets.back().targetTemperature) {
+        preset = presets.back();
+    } else if (targetTemperature > presets.front().targetTemperature) {
+        for (std::size_t index = 1; index < presets.size(); ++index) {
+            const auto& upper = presets[index];
+            const auto& lower = presets[index - 1];
+            if (targetTemperature > upper.targetTemperature) {
+                continue;
+            }
+
+            const double ratio = (targetTemperature - lower.targetTemperature) /
+                (upper.targetTemperature - lower.targetTemperature);
+            preset = {
+                targetTemperature,
+                lower.outValveOpening + ratio * (upper.outValveOpening - lower.outValveOpening),
+                lower.returnValveOpening + ratio * (upper.returnValveOpening - lower.returnValveOpening),
+                lower.motorFrequency + ratio * (upper.motorFrequency - lower.motorFrequency),
+            };
+            break;
+        }
+    }
+
+    if (targetTemperature < presets.front().targetTemperature ||
+        targetTemperature > presets.back().targetTemperature) {
+        qWarning() << "Outlet temperature target is outside the preset range; using"
+                   << preset.targetTemperature << "C.";
+    }
+
+    m_proxy->setOutValvePidOn(false);
+    m_proxy->setOutValveOpening(preset.outValveOpening);
+    m_proxy->setReturnValveOpening(preset.returnValveOpening);
+    m_proxy->setMotorFrequency(preset.motorFrequency);
 }
