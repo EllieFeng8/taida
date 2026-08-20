@@ -1766,9 +1766,10 @@ Rectangle {
                             font.weight: Font.Bold
                             horizontalAlignment: Text.AlignRight
 
-                            text: Number(Td.outWaterTargetTemp).toFixed(2)
+                            text: Math.round(Number(Td.outWaterTargetTemp)).toString()
                             verticalAlignment: Text.AlignVCenter
-                            validator: DoubleValidator {}
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            validator: IntValidator {}
                         }
                         Text {
 
@@ -1895,6 +1896,7 @@ Rectangle {
                         }
                         Item {
                             id: correction
+                            visible: false
 
                             x: 309.95
                             y: 2
@@ -1974,6 +1976,7 @@ Rectangle {
 
                         Item {
                             id: label
+                            visible: false
 
                             x: 449.95
                             y: 2
@@ -2067,7 +2070,7 @@ Rectangle {
 
                                         // height: 15
                                         Layout.leftMargin: 10
-                                        Layout.preferredWidth: 44
+                                        // Layout.preferredWidth: 10
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
                                     font.family: "Noto Sans TC"
@@ -2090,7 +2093,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "PV"
@@ -2107,7 +2110,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: Td.outValveOpeningP
@@ -2115,6 +2118,7 @@ Rectangle {
                                         // verticalAlignment: Text.AlignVCenter
                                     }
                                     Rectangle {
+                                        visible: false
                                         Layout.preferredWidth: 1
                                         Layout.preferredHeight: 20
                                         color: "#94a3b8"
@@ -2122,6 +2126,7 @@ Rectangle {
                                         Layout.leftMargin: 5
                                     }
                                     Text {
+                                        visible: false
 
                                         // id: element_26
                                         // height: 15
@@ -2132,7 +2137,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "SV"
@@ -2141,6 +2146,7 @@ Rectangle {
                                     }
                                 TextInput {
                                     id: waterValveOpenTxtInput
+                                        visible: false
                                         // x: 92
                                         // y: 0
 
@@ -2205,7 +2211,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "PV"
@@ -2222,7 +2228,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: Td.outValvePP
@@ -2230,6 +2236,7 @@ Rectangle {
                                         // verticalAlignment: Text.AlignVCenter
                                     }
                                     Rectangle {
+                                        visible: false
                                         Layout.preferredWidth: 1
                                         Layout.preferredHeight: 20
                                         color: "#94a3b8"
@@ -2237,6 +2244,7 @@ Rectangle {
                                         Layout.leftMargin: 5
                                     }
                                     Text {
+                                        visible: false
 
                                         // id: element_26
                                         // height: 15
@@ -2247,7 +2255,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "SV"
@@ -2256,6 +2264,7 @@ Rectangle {
                                     }
                                 TextInput {
                                     id: waterPTxtInpt
+                                        visible: false
 
                                         Layout.leftMargin: -200
                                         Layout.preferredWidth: parent.width
@@ -2304,7 +2313,7 @@ Rectangle {
 
                                         // height: 15
                                         Layout.leftMargin: 10
-                                        // Layout.preferredWidth: 44
+                                        Layout.preferredWidth: 44
                                         color: "#94a3b8"
                                         font.capitalization: Font.AllUppercase
                                         font.family: "Noto Sans TC"
@@ -2327,7 +2336,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "PV"
@@ -2344,7 +2353,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: Td.outValveIP
@@ -2352,6 +2361,7 @@ Rectangle {
                                         // verticalAlignment: Text.AlignVCenter
                                     }
                                     Rectangle {
+                                        visible: false
                                         Layout.preferredWidth: 1
                                         Layout.preferredHeight: 20
                                         color: "#94a3b8"
@@ -2359,6 +2369,7 @@ Rectangle {
                                         Layout.leftMargin: 5
                                     }
                                     Text {
+                                        visible: false
 
                                         // id: element_26
                                         // height: 15
@@ -2378,6 +2389,7 @@ Rectangle {
                                     }
                                 TextInput {
                                     id: waterITxtInpt
+                                        visible: false
 
                                         Layout.leftMargin: -200
                                         Layout.preferredWidth: parent.width
@@ -2416,7 +2428,7 @@ Rectangle {
 
                                         // height: 15
                                         Layout.leftMargin: 10
-                                        // Layout.preferredWidth: 44
+                                        Layout.preferredWidth: 44
                                         color: "#94a3b8"
                                         font.capitalization: Font.AllUppercase
                                         font.family: "Noto Sans TC"
@@ -2439,7 +2451,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "PV"
@@ -2456,7 +2468,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: Td.outValveDP
@@ -2464,6 +2476,7 @@ Rectangle {
                                         // verticalAlignment: Text.AlignVCenter
                                     }
                                     Rectangle {
+                                        visible: false
                                         Layout.preferredWidth: 1
                                         Layout.preferredHeight: 20
                                         color: "#94a3b8"
@@ -2471,6 +2484,7 @@ Rectangle {
                                         Layout.leftMargin: 10
                                     }
                                     Text {
+                                        visible: false
 
                                         // id: element_26
                                         // height: 15
@@ -2491,6 +2505,7 @@ Rectangle {
 
                                     TextInput {
                                         id: waterDTxtInpt
+                                        visible: false
                                         Layout.leftMargin: -200
                                         Layout.preferredWidth: parent.width
 
@@ -2510,6 +2525,7 @@ Rectangle {
                     }
                     Rectangle {
                         id: waterValveSet
+                        visible: false
 
                         x: 21
                         y: 203
@@ -2629,7 +2645,7 @@ Rectangle {
 
                                     // height: 15
                                     Layout.leftMargin: 10
-                                    // Layout.preferredWidth: 60
+                                    Layout.preferredWidth: 44
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
                                     font.family: "Noto Sans TC"
@@ -2646,13 +2662,12 @@ Rectangle {
 
                                     // id: element_26
                                     // height: 15
-                                    Layout.leftMargin: 50
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
                                     font.family: "Noto Sans TC"
                                     font.pixelSize: 12
                                     font.weight: Font.Medium
-                                    // horizontalAlignment: Text.AlignLeft
+                                    horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
                                     text: "PV"
@@ -2669,8 +2684,7 @@ Rectangle {
                                     font.family: "Noto Sans TC"
                                     font.pixelSize: 20
                                     font.weight: Font.Medium
-                                    Layout.leftMargin: 20
-                                    // horizontalAlignment: Text.AlignLeft
+                                    horizontalAlignment: Text.AlignLeft
                                     lineHeight: 15
                                     lineHeightMode: Text.FixedHeight
                                     text: Td.returnValveOpeningP
@@ -2678,6 +2692,7 @@ Rectangle {
                                     // verticalAlignment: Text.AlignVCenter
                                 }
                                 Rectangle {
+                                    visible: false
                                     Layout.preferredWidth: 1
                                     Layout.preferredHeight: 20
                                     color: "#94a3b8"
@@ -2685,6 +2700,7 @@ Rectangle {
                                     Layout.leftMargin: 60
                                 }
                                 Text {
+                                    visible: false
 
                                     // id: element_26
                                     // height: 15
@@ -2704,6 +2720,7 @@ Rectangle {
                                 }
                             TextInput {
                                 id: returnValveTxtInput
+                                    visible: false
 
                                     Layout.leftMargin: -400
                                     Layout.preferredWidth: parent.width
@@ -2723,6 +2740,7 @@ Rectangle {
                     }
                     Rectangle {
                         id: button_3
+                        visible: false
 
                         x: 21
                         y: 199
@@ -2820,6 +2838,7 @@ Rectangle {
                         }
                         Button {
                             id: resetBtn
+                            visible: false
                             x: 379
                             y: -3
 
@@ -2861,6 +2880,7 @@ Rectangle {
                         }
                         Image {
                             id: motorFreqSwitch
+                            visible: false
                             x: 499.32
                             y: 2
 
@@ -2920,6 +2940,7 @@ Rectangle {
                                     id: element_39
 
                                         Layout.leftMargin: 10
+                                        Layout.preferredWidth: 44
 
                                     color: "#94a3b8"
                                     font.capitalization: Font.AllUppercase
@@ -2937,13 +2958,12 @@ Rectangle {
 
                                         // id: element_26
                                         // height: 15
-                                        Layout.leftMargin: 50
                                         color: "#94a3b8"
                                         font.capitalization: Font.AllUppercase
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: "PV"
@@ -2960,8 +2980,7 @@ Rectangle {
                                         font.family: "Noto Sans TC"
                                         font.pixelSize: 20
                                         font.weight: Font.Medium
-                                        Layout.leftMargin: 0
-                                        // horizontalAlignment: Text.AlignLeft
+                                        horizontalAlignment: Text.AlignLeft
                                         lineHeight: 15
                                         lineHeightMode: Text.FixedHeight
                                         text: Td.motorFrequencyP
@@ -2969,6 +2988,7 @@ Rectangle {
                                         // verticalAlignment: Text.AlignVCenter
                                     }
                                     Rectangle {
+                                        visible: false
                                         Layout.preferredWidth: 1
                                         Layout.preferredHeight: 20
                                         color: "#94a3b8"
@@ -2976,6 +2996,7 @@ Rectangle {
                                         Layout.leftMargin: 50
                                     }
                                     Text {
+                                        visible: false
 
                                         // id: element_26
                                         // height: 15
@@ -2995,6 +3016,7 @@ Rectangle {
                                     }
                                     TextInput {
                                         id: motorFreqTextInput
+                                        visible: false
                                         Layout.leftMargin: -400
                                         Layout.preferredWidth: parent.width
                                         color: "#1e293b"
@@ -3025,6 +3047,7 @@ Rectangle {
                             }
                             Rectangle {
                                 id: button_4
+                                visible: false
 
                                 x: 473.33
                                 y: 7.08

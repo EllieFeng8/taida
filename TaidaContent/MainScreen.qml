@@ -429,12 +429,13 @@ MainScreenUI {
         console.log("Td.fanCorrectionSwitchOn",Td.fanCorrectionSwitchOn)
     }
     outWaterTargetTempBtnMouseArea.onClicked: {
-        if(outWaterTargetTempTxtInput.text>0) {
-            Td.outWaterTargetTemp = outWaterTargetTempTxtInput.text
-            console.log("11 Td.outWaterTargetTempTxtInput changed~~~",
-                Td.outWaterTargetTemp,
-                typeof (Td.outWaterTargetTemp));
-        }
+        var outletAirTemp = parseInt(outWaterTargetTempTxtInput.text, 10)
+        if (isNaN(outletAirTemp))
+            outletAirTemp = 10
+
+        outletAirTemp = Math.max(10, Math.min(30, outletAirTemp))
+        outWaterTargetTempTxtInput.text = outletAirTemp.toString()
+        Td.outWaterTargetTemp = outletAirTemp
         outWaterTargetTempTxtInput.focus = false
     }
 
