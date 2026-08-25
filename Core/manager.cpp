@@ -492,6 +492,7 @@ void Manager::set_sv(int v)
 {
 	double value = v;
 	m_serverWorker->updateHoldingRegister(60, value);
+	qDebug() << value;
 	//m_serverWorker->updateCoils(16,true);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_SV1( v*10); },

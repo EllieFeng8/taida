@@ -4,7 +4,16 @@
 
 clientWorker::clientWorker(QObject* parent)
 {
+    auto& heartbeat = WatchdogHeartbeatClient::instance();
 
+    WatchdogHeartbeatClient::Settings settings;
+    settings.hostName = "127.0.0.1";
+    settings.port = 45454;
+    settings.sourceName = "CurrentFlow";
+    settings.automaticHeartbeatEnabled = false;
+
+    heartbeat.initialize(settings);
+    heartbeat.start();
 }
 
 clientWorker::~clientWorker()
@@ -1067,6 +1076,7 @@ void clientWorker::poll()
     m_pollTimer->stop(); // �Ȱ��p�ɾ��A�קK���J
     bool is5000Connected = (m_5000 && m_5000->state() == QModbusDevice::ConnectedState);
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
+    WatchdogHeartbeatClient::instance().pulse("is polling");
 
     if (!is5000Connected || !is6022Connected) {
         qDebug() << "Device disconnected, skipping poll and attempting reconnect...";

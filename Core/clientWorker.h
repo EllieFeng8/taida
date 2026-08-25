@@ -8,6 +8,7 @@
 #include <QModbusTcpClient>
 #include <QModbusReply>
 #include <QQueue>
+#include "watchdogheartbeatclient.h"
 
 struct HoldingRegisterRequest {
     bool target;
