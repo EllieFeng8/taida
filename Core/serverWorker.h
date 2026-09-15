@@ -15,27 +15,28 @@ public:
     ~ServerWorker();
     QModbusTcpServer* m_server = nullptr;
     QVector<quint16> SaveData;
-    void init(int port,QVariant ip, quint16 v1, quint16 v2, quint16 v3, quint16 years,quint16 date); // ªì©l¤Æ Server
+    void init(int port,QVariant ip, quint16 v1, quint16 v2, quint16 v3, quint16 years,quint16 date); // åˆå§‹åŒ– Server
     //void connectDevice();
     QVector<quint16> getSavedata();
 signals:
     void modbusDataChanged(QModbusDataUnit::RegisterType table, int address, quint16 value);
     void server_stat(bool v);
 public slots:
-    // ±µ¦¬¨Ó¦Û Client °õ¦æºüªº¸ê®Æ¨Ã§ó·s¦Ü Server ¼È¦s¾¹
+    // æ¥æ”¶ä¾†è‡ª Client åŸ·è¡Œç·’çš„è³‡æ–™ä¸¦æ›´æ–°è‡³ Server æš«å­˜å™¨
     void updateHoldingRegisters(int startAddr, const QVector<quint16>& data);
     void updateHoldingRegister(int startAddr, const quint16 data);
 
     void updateInputRegisters(int startAddr, const QVector<quint16>& data);
     void updateInputRegister(int startAddr, const quint16 data);
     void updateCoils(int startAddr, const bool data);
+    bool readHoldingRegister(int startAddr, quint16 *data);
 
     void onDataWritten(QModbusDataUnit::RegisterType table, int address, int size);
 
 
 private:
     QMutex lock;
-    const int m_serverPort = 502; // «ØÄ³¥ı¥Î 5020 ´ú¸Õ
+    const int m_serverPort = 502; // å»ºè­°å…ˆç”¨ 5020 æ¸¬è©¦
     const int m_slaveId = 1;
     bool status = false;
 };

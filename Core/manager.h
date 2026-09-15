@@ -15,6 +15,8 @@ public:
     ~Manager();
 
     bool new_PD = false;
+    int dryTime = 3600;
+    int dryValue = 40;
     QString ip;
     void init();
     void set_mode1(bool v);
@@ -54,6 +56,9 @@ public:
     void set_AO1(double v);
     void set_Estop(bool v);
     void set_Reset(bool v);
+    void set_dry(bool v);
+    void set_dryTime(int v);
+    void set_dryValue(int v);
 signals:
     void server_on();
     void Coil(QVector <quint16> result);
@@ -70,12 +75,20 @@ signals:
     void update_switch(int index, bool v);
     void update_input(QVector <quint16> result);
     void update_savedata(QVector <quint16> result);
+    void Elapsed(int v);
+
     void STOset0();
     void E_STOPset0();
     void pidcontrolFan(double v);
     void pidcontroloutvalue(double v);
+    void requestServerHoldingRegister(int address, quint16 value);
+    void requestServerHoldingRegisters(int address, const QVector<quint16>& values);
+    void requestServerInputRegister(int address, quint16 value);
+    void requestServerInputRegisters(int address, const QVector<quint16>& values);
+    void requestServerCoil(int address, bool value);
 
 private:
+    bool readServerHoldingRegister(int address, quint16 *value) const;
     bool _E_STOP = false;
     bool _STO = false;
     bool server_OK = false;
@@ -100,7 +113,11 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 0;
     quint16 version_num2 = 14;
-    quint16 version_num3 = 32;
+    quint16 version_num3 = 34;
     quint16 version_year = 2026;
-    quint16 version_date = 709;
+    quint16 version_date = 910;
+    quint16 openValveP1 = 60;
+    quint16 openValveP2 = 60;
+    QElapsedTimer timer;
+    bool dry_Over = false;
 };

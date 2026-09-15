@@ -4,7 +4,7 @@ ServerWorker::ServerWorker(QObject* parent) : QObject(parent) {}
 
 ServerWorker::~ServerWorker() {
     if (m_server) {
-        m_server->disconnectDevice(); // ¤¤Â_©Ò¦³³s½u
+        m_server->disconnectDevice(); // ä¸­æ–·æ‰€æœ‰é€£ç·š
         delete m_server;
         m_server = nullptr;
     }
@@ -22,12 +22,12 @@ void ServerWorker::init(int port,QVariant ip,quint16 v1, quint16 v2, quint16 v3,
     }
     m_server = new QModbusTcpServer(this);
 
-    // ³]©w¼È¦s¾¹½d³ò¡GHoldingRegisters ±q¦ì§} 0 ¶}©l¡A¦@ 100 µ§
+    // è¨­å®šæš«å­˜å™¨ç¯„åœï¼šHoldingRegisters å¾ä½å€ 0 é–‹å§‹ï¼Œå…± 100 ç­†
     QModbusDataUnitMap reg;
     reg.insert(QModbusDataUnit::Coils,
         { QModbusDataUnit::Coils, 0, 20 });
     reg.insert(QModbusDataUnit::InputRegisters,
-        { QModbusDataUnit::InputRegisters, 0, 36 });
+        { QModbusDataUnit::InputRegisters, 0, 41     });
     reg.insert(QModbusDataUnit::HoldingRegisters,
         { QModbusDataUnit::HoldingRegisters, 0, 80 });
 
@@ -59,11 +59,22 @@ QVector<quint16>  ServerWorker::getSavedata()
 
 }
 
+bool ServerWorker::readHoldingRegister(int startAddr, quint16 *data)
+{
+    if (!m_server || !data) {
+        return false;
+    }
+
+    QMutexLocker m_lock(&lock);
+    return m_server->data(QModbusDataUnit::HoldingRegisters, startAddr, data);
+}
+
 void ServerWorker::updateCoils(int startAddr, const bool data)
 {
+    if (!m_server) return;
     //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
-    // ±N ClientWorker Åª¨ìªº¸ê®Æ¦P¨B¨ì Server 
+    // å°‡ ClientWorker è®€åˆ°çš„è³‡æ–™åŒæ­¥åˆ° Server
 
     //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
     m_server->setData(QModbusDataUnit::Coils, startAddr, data);
@@ -71,10 +82,11 @@ void ServerWorker::updateCoils(int startAddr, const bool data)
 
 void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& data)
 {
+    if (!m_server) return;
     {
         //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
-        // ±N ClientWorker Åª¨ìªº¸ê®Æ¦P¨B¨ì Server 
+        // å°‡ ClientWorker è®€åˆ°çš„è³‡æ–™åŒæ­¥åˆ° Server
         for (int i = 0; i < data.size(); ++i) {
             //qDebug() << "set InputRegisters";
             m_server->setData(QModbusDataUnit::InputRegisters,startAddr+i, data[i]);
@@ -83,10 +95,11 @@ void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& d
 }
 void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>& data)
 {
+    if (!m_server) return;
     {
         //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
         QMutexLocker m_lock(&lock);
-        // ±N ClientWorker Åª¨ìªº¸ê®Æ¦P¨B¨ì Server 
+        // å°‡ ClientWorker è®€åˆ°çš„è³‡æ–™åŒæ­¥åˆ° Server
         for (int i = 0; i < data.size(); ++i) {
             //qDebug() << "set HoldingRegisters";
             m_server->setData(QModbusDataUnit::HoldingRegisters, startAddr + i, data[i]);
@@ -96,9 +109,10 @@ void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>&
 }
 void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
 {
+        if (!m_server) return;
         //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
-        // ±N ClientWorker Åª¨ìªº¸ê®Æ¦P¨B¨ì Server 
+        // å°‡ ClientWorker è®€åˆ°çš„è³‡æ–™åŒæ­¥åˆ° Server
     QMutexLocker m_lock(&lock);
 
         //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
@@ -108,9 +122,10 @@ void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
 }
 void ServerWorker::updateInputRegister(int startAddr, const quint16 data)
 {
+    if (!m_server) return;
     //if (!m_server || m_server->state() != QModbusDevice::ConnectedState) return;
 
-    // ±N ClientWorker Åª¨ìªº¸ê®Æ¦P¨B¨ì Server 
+    // å°‡ ClientWorker è®€åˆ°çš„è³‡æ–™åŒæ­¥åˆ° Server
 
     //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
     m_server->setData(QModbusDataUnit::InputRegisters, startAddr, data);
@@ -122,13 +137,13 @@ void ServerWorker::onDataWritten(QModbusDataUnit::RegisterType table, int addres
         int currentAddr = address + i;
         quint16 value;
 
-        // ±q Server ªº¤º³¡¸ê®ÆªíÅª¨ú¸Ó¦ì§}ªº·s¼Æ­È
+        // å¾ Server çš„å…§éƒ¨è³‡æ–™è¡¨è®€å–è©²ä½å€çš„æ–°æ•¸å€¼
         if (m_server->data(table, currentAddr, &value)) {
             //qDebug() << " server :  set " << table
             //    << " addr:" << currentAddr
             //    << " new value:" << value;
 
-            // «ØÄ³¡Gµo°e¤@­Ó±a¦³¦ì§}»P¼Æ­Èªº¦Û©w¸q°T¸¹µ¹ Manager
+            // å»ºè­°ï¼šç™¼é€ä¸€å€‹å¸¶æœ‰ä½å€èˆ‡æ•¸å€¼çš„è‡ªå®šç¾©è¨Šè™Ÿçµ¦ Manager
             //qDebug() << table << " set " << currentAddr << " = " << value;
             emit modbusDataChanged(table, currentAddr, value);
         }

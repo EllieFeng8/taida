@@ -123,5 +123,5 @@ private:
     SqlManager* m_sqlManager;
     RESTManager* m_restManager;
     Manager* m_manager = nullptr;
-    bool new_PD = false;
+    bool new_PD = true;
 };

@@ -65,7 +65,7 @@ void clientWorker::init()
         m_5000->setConnectionParameter(QModbusDevice::NetworkAddressParameter, m_ip);
         m_5000->setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);
         m_5000->setTimeout(500);
-        //m_5000->setNumberOfRetries(2);
+        //m_5000->setNumberOfRetries(2);    
         connect(m_5000, &QModbusTcpClient::stateChanged,
             this, &clientWorker::onStateChanged);
         connect(m_5000, &QModbusTcpClient::errorOccurred,

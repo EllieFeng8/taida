@@ -156,9 +156,10 @@ void Core::init()
         m_proxy->setFan9TargetRpm(v);
         mv1 = v;
         });
-    QObject::connect(m_manager, &Manager::pidcontroloutvalue, this, [this](double v) {
-        m_proxy->setOutValveOpening(qRound((v* 1) / 1));
-        });
+    // PID-2 owns H11 in automatic mode.  Its MV is already applied by the
+    // controller, so it must not be fed into the manual AO command property:
+    // outValveOpeningChanged would otherwise scale the value and write H11
+    // again on the next polling cycle.
 
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
     QObject::connect(m_manager, &Manager::update_switch, this, [=](int index, bool v)
@@ -203,6 +204,12 @@ void Core::init()
     //QObject::connect(m_manager, &Manager::_MV, this, [=](QVector<quint16> v) {
         //m_proxy->setOutValveOpeningP(v[1]);
         //});
+
+    QObject::connect(m_manager, &Manager::Elapsed,
+        this, [this](int v)
+        {
+            m_proxy->setDryModeCountdown(v);
+        });
 
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, m_manager, &Manager::set_motor);
     QObject::connect(m_proxy, &TdProxy::motorFrequencySwitchOnChanged, this, [this](bool v)
@@ -252,6 +259,12 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::fanPidSetSignal, this, &Core::set_PID_click);
     //QObject::connect(m_proxy, &TdProxy::fanPidDChanged, this, &Core::set_PID);
     QObject::connect(m_proxy, &TdProxy::outValveDChanged, this,&Core::set_PID2);
+    QObject::connect(m_proxy, &TdProxy::dryModeChanged, m_manager, &Manager::set_dry);
+    QObject::connect(m_proxy, &TdProxy::dryModeChanged, this, [this](bool enabled) {
+        if (enabled) {
+            m_proxy->setMotorFrequency(0);
+        }
+        });
 
     
     //Analog Output 
@@ -776,6 +789,8 @@ void Core::updateProxyProperty2(int index, quint16 value)
         m_proxy->setOutWaterTargetTemp(qRound((value) * 10.0) / 10.0); break;
     case 16:
         m_proxy->setTargetPressureDiff(qRound((value) * 10.0) / 10.0); break;
+    case 17:
+        m_proxy->setDryMode(value); break;
     default:
         break;
     }
@@ -804,6 +819,9 @@ void Core::saveProductionSettings()
     settings.setValue("Production/P2", m_proxy->m_outValveP);
     settings.setValue("Production/I2", m_proxy->m_outValveI);
     settings.setValue("Production/D2", m_proxy->m_outValveD);
+    settings.setValue("Production/New_DP", new_PD);
+    settings.setValue("Production/Dry_time", m_manager->dryTime);
+    settings.setValue("Production/Dry_value", m_manager->dryValue);
     //settings.setValue("Production/New_DP",new_PD );
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -839,4 +857,6 @@ void Core::loadProductionSettings()
     m_proxy->setFanEmergencySwitchOn(settings.value("Production/ESTOP", true).toBool());
     m_proxy->setMotorFrequencySwitchOn(settings.value("Production/motorpower", true).toBool());
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
+    m_manager->set_dryTime(settings.value("Production/Dry_time", 1800).toInt());
+    m_manager->set_dryValue(settings.value("Production/Dry_value", 40).toInt());
 }
