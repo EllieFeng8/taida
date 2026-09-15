@@ -2,6 +2,7 @@
 #include<qsettings.h>
 #include <qobject>
 #include <Qvector>
+#include <QTimer>
 #include "manager.h"
 #include "TdProxy.h"
 #include "SqlManager.h"
@@ -41,6 +42,7 @@ public slots:
         m_proxy->setPressureDiff(qRound(pv0 * 100.0) / 100.0);
         senserData[17] = pv0;
         m_proxy->setOutletAirTemp(qRound(pv3 * 100.0) / 100.0);
+        m_hasOutletAirTemperature = true;
         senserData[16] = pv3;
     }
     void Coil_Data(QVector <quint16> result);
@@ -75,6 +77,7 @@ private:
     void saveProductionSettings();
     void loadProductionSettings();
     void applyOutletTemperaturePreset(double targetTemperature);
+    void stopAutomaticOutletTemperatureControl();
     quint16 v_0;
     quint16 v_1;
     quint16 v_2;
@@ -139,4 +142,12 @@ private:
     bool new_PD = false;
     bool m_productionSettingsLoaded = false;
     bool m_loadingProductionSettings = false;
+    bool m_applyingAutomaticOutletTemperatureSettings = false;
+    bool m_hasOutletAirTemperature = false;
+    bool m_hasPreviousOutletAirTemperature = false;
+    double m_outletTemperatureTarget = 0.0;
+    double m_previousOutletAirTemperature = 0.0;
+    QTimer* m_outletTemperatureControlTimer = nullptr;
+    QTimer* m_outletValveControlTimer = nullptr;
+    double m_pendingOutletValveOpening = 0.0;
 };

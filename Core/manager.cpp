@@ -792,6 +792,7 @@ void Manager::fan1TargetRpm(double v)
 		queueServerHoldingRegisters(32, { 0 });
 	}
 	else {
+		qDebug() << "set fan1 ="<< data;
 		queueServerHoldingRegisters(32, data);
 	}
 }
@@ -809,6 +810,8 @@ void Manager::fan2TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan2 =" << data;
+
 		queueServerHoldingRegisters(33, data);
 	}
 }
@@ -824,6 +827,7 @@ void Manager::fan3TargetRpm(double v)
 		qDebug() << "set fan3 but E_STOP ON";
 	}
 	else {
+		qDebug() << "set fan3 =" << data;
 		queueServerHoldingRegisters(34, data);
 	}
 }
@@ -840,6 +844,7 @@ void Manager::fan4TargetRpm(double v)
 		qDebug() << "set fan4 but E_STOP ON";
 	}
 	else {
+		qDebug() << "set fan4 =" << data;
 		queueServerHoldingRegisters(39, data);
 	}
 }
@@ -856,6 +861,7 @@ void Manager::fan5TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan5 =" << data;
 		queueServerHoldingRegisters(40, data);
 	}
 }
@@ -872,6 +878,7 @@ void Manager::fan6TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan6 =" << data;
 		queueServerHoldingRegisters(41, data);
 	}
 }
@@ -888,6 +895,7 @@ void Manager::fan7TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan7 =" << data;
 		queueServerHoldingRegisters(42, data);
 	}
 }
@@ -904,6 +912,7 @@ void Manager::fan8TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan8 =" << data;
 		queueServerHoldingRegisters(47, data);
 	}
 }
@@ -920,6 +929,7 @@ void Manager::fan9TargetRpm(double v)
 
 	}
 	else {
+		qDebug() << "set fan9 =" << data;
 		queueServerHoldingRegisters(48, data);
 	}
 }

@@ -60,6 +60,7 @@ public:
     void set_Fan9Open(bool v);
     void set_allFan(double v);
     void set_AO1(double v);
+    bool areAllFanPvsAboveThreshold() const;
     void set_motorEstop(bool v);
     void set_FanEstop(bool v);
 
@@ -99,7 +100,6 @@ private:
     void queueServerCoil(int startAddr, bool data);
     bool readServerHoldingRegister(int address, quint16 *value) const;
     QVector<quint16> serverSaveData() const;
-    bool areAllFanPvsAboveThreshold() const;
     bool _FAN_STOP = false;
     bool _motor_STO = false;
     bool server_OK = false;
@@ -124,9 +124,9 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 26;
+    quint16 version_num3 = 28;
     quint16 version_year = 2026;
-    quint16 version_date = 803;
+    quint16 version_date = 902;
     quint16 openValveP1 = 60;
     quint16 openValveP2 = 60;
     QElapsedTimer timer;
