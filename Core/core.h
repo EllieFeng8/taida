@@ -43,6 +43,7 @@ public slots:
         senserData[17] = pv0;
         m_proxy->setOutletAirTemp(qRound(pv3 * 100.0) / 100.0);
         m_hasOutletAirTemperature = true;
+        tryStartOutletTemperaturePumpSequence();
         senserData[16] = pv3;
     }
     void Coil_Data(QVector <quint16> result);
@@ -78,6 +79,7 @@ private:
     void loadProductionSettings();
     void applyOutletTemperaturePreset(double targetTemperature);
     void stopAutomaticOutletTemperatureControl();
+    void tryStartOutletTemperaturePumpSequence();
     quint16 v_0;
     quint16 v_1;
     quint16 v_2;
@@ -149,5 +151,10 @@ private:
     double m_previousOutletAirTemperature = 0.0;
     QTimer* m_outletTemperatureControlTimer = nullptr;
     QTimer* m_outletValveControlTimer = nullptr;
+    QTimer* m_outletTemperaturePumpStartTimer = nullptr;
     double m_pendingOutletValveOpening = 0.0;
+    double m_pendingReturnValveOpening = 0.0;
+    double m_pendingMotorFrequency = 0.0;
+    bool m_waitingForOutletTemperatureToStart = false;
+    bool m_outletTemperaturePumpStartPending = false;
 };

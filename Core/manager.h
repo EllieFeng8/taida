@@ -124,9 +124,9 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 28;
+    quint16 version_num3 = 32;
     quint16 version_year = 2026;
-    quint16 version_date = 902;
+    quint16 version_date = 924;
     quint16 openValveP1 = 60;
     quint16 openValveP2 = 60;
     QElapsedTimer timer;

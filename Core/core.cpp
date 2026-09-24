@@ -45,6 +45,10 @@ void Core::init()
         if (m_hasOutletAirTemperature == false) {
             return;
         }
+        if (m_waitingForOutletTemperatureToStart ||
+            m_outletTemperaturePumpStartPending) {
+            return;
+        }
 
         const double outletTemperature = m_proxy->getOutletAirTemp();
         double targetDifference = outletTemperature - m_outletTemperatureTarget;
@@ -103,6 +107,18 @@ void Core::init()
         m_proxy->setOutValveOpening(m_pendingOutletValveOpening);
         m_applyingAutomaticOutletTemperatureSettings = false;
     });
+    m_outletTemperaturePumpStartTimer = new QTimer(this);
+    m_outletTemperaturePumpStartTimer->setSingleShot(true);
+    QObject::connect(m_outletTemperaturePumpStartTimer, &QTimer::timeout, this, [this]() {
+        if (m_outletTemperaturePumpStartPending == false) {
+            return;
+        }
+
+        m_outletTemperaturePumpStartPending = false;
+        m_applyingAutomaticOutletTemperatureSettings = true;
+        m_proxy->setMotorFrequency(m_pendingMotorFrequency);
+        m_applyingAutomaticOutletTemperatureSettings = false;
+    });
     m_sqlManager->initialize();
     senserData.resize(40);
     senserData.fill(0);
@@ -145,7 +161,9 @@ void Core::init()
         mv1 = v;
         });
     QObject::connect(m_manager, &Manager::pidcontroloutvalue, this, [this](double v) {
+        m_applyingAutomaticOutletTemperatureSettings = true;
         m_proxy->setOutValveOpening(qRound((v* 1) / 1));
+        m_applyingAutomaticOutletTemperatureSettings = false;
         });
 
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
@@ -283,6 +301,12 @@ void Core::init()
         this->stopAutomaticOutletTemperatureControl();
     };
     QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, this, stopAutomaticOutletTemperatureControl);
+    QObject::connect(m_proxy, &TdProxy::outValveOpeningChanged, this, [this](double) {
+        if (!m_applyingAutomaticOutletTemperatureSettings &&
+            m_proxy->getOutValvePidOn()) {
+            m_proxy->setOutValvePidOn(false);
+        }
+    });
     QObject::connect(m_proxy, &TdProxy::returnValveOpeningChanged, this, stopAutomaticOutletTemperatureControl);
     QObject::connect(m_proxy, &TdProxy::motorFrequencyChanged, this, stopAutomaticOutletTemperatureControl);
     QObject::connect(m_proxy, &TdProxy::fan1TargetRpmChanged, this, stopAutomaticOutletTemperatureControl);
@@ -1218,7 +1242,7 @@ void Core::loadProductionSettings()
     OutSV_maxValue = settings.value("Production/OutSV_max", 4095).toDouble();
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
     m_manager->set_dryTime(settings.value("Production/Dry_time", 3600).toInt());
-    m_manager->set_dryValue(settings.value("Production/Dry_value", 40).toInt());
+    m_manager->set_dryValue(settings.value("Production/Dry_value", 55).toInt());
     m_loadingProductionSettings = false;
 }
 void Core::stopAutomaticOutletTemperatureControl()
@@ -1228,13 +1252,33 @@ void Core::stopAutomaticOutletTemperatureControl()
     }
 
     if (!m_outletTemperatureControlTimer->isActive() &&
-        !m_outletValveControlTimer->isActive()) {
+        !m_outletValveControlTimer->isActive() &&
+        !m_waitingForOutletTemperatureToStart &&
+        !m_outletTemperaturePumpStartPending) {
         return;
     }
 
     m_outletTemperatureControlTimer->stop();
     m_outletValveControlTimer->stop();
+    m_outletTemperaturePumpStartTimer->stop();
+    m_waitingForOutletTemperatureToStart = false;
+    m_outletTemperaturePumpStartPending = false;
     qInfo() << "Automatic outlet temperature control stopped by manual adjustment.";
+}
+
+void Core::tryStartOutletTemperaturePumpSequence()
+{
+    if (!m_waitingForOutletTemperatureToStart ||
+        m_proxy->getOutletAirTemp() <= m_outletTemperatureTarget) {
+        return;
+    }
+
+    m_waitingForOutletTemperatureToStart = false;
+    m_outletTemperaturePumpStartPending = true;
+    m_applyingAutomaticOutletTemperatureSettings = true;
+    m_proxy->setReturnValveOpening(m_pendingReturnValveOpening);
+    m_applyingAutomaticOutletTemperatureSettings = false;
+    m_outletTemperaturePumpStartTimer->start(10000);
 }
 
 void Core::applyOutletTemperaturePreset(double targetTemperature)
@@ -1290,27 +1334,34 @@ void Core::applyOutletTemperaturePreset(double targetTemperature)
                    << preset.targetTemperature << "C.";
     }
 
-    m_proxy->setOutValvePidOn(false);
-    m_proxy->setReturnValveOpening(preset.returnValveOpening);
-    m_proxy->setMotorFrequency(preset.motorFrequency);
-    m_proxy->setFan1TargetRpm(40);
-    m_proxy->setFan2TargetRpm(40);
-    m_proxy->setFan3TargetRpm(40);
-    m_proxy->setFan4TargetRpm(40);
-    m_proxy->setFan5TargetRpm(40);
-    m_proxy->setFan6TargetRpm(40);
-    m_proxy->setFan7TargetRpm(40);
-    m_proxy->setFan8TargetRpm(40);
-    m_proxy->setFan9TargetRpm(40);
-    m_pendingOutletValveOpening = preset.outValveOpening;
-    if (m_manager->areAllFanPvsAboveThreshold()) {
-        m_outletValveControlTimer->stop();
-        m_proxy->setOutValveOpening(m_pendingOutletValveOpening);
-    } else {
-        m_proxy->setOutValveOpening(0);
-        m_outletValveControlTimer->start();
-    }
+    m_proxy->setOutValvePidOn(true);
     m_outletTemperatureTarget = preset.targetTemperature;
+    m_pendingReturnValveOpening = preset.returnValveOpening;
+    m_pendingMotorFrequency = preset.motorFrequency;
+    m_waitingForOutletTemperatureToStart = true;
+    m_outletTemperaturePumpStartPending = false;
+    m_outletTemperaturePumpStartTimer->stop();
+    m_proxy->setMotorFrequency(0);
+    if (m_hasOutletAirTemperature &&
+        m_proxy->getOutletAirTemp() > m_outletTemperatureTarget) {
+        m_waitingForOutletTemperatureToStart = false;
+        m_outletTemperaturePumpStartPending = true;
+        m_proxy->setReturnValveOpening(m_pendingReturnValveOpening);
+        m_outletTemperaturePumpStartTimer->start(10000);
+    } else {
+        m_proxy->setReturnValveOpening(0);
+    }
+    constexpr double outletTemperatureFanTarget = 40.0;
+    if (m_proxy->getFan1TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan1TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan2TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan2TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan3TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan3TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan4TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan4TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan5TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan5TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan6TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan6TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan7TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan7TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan8TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan8TargetRpm(outletTemperatureFanTarget);
+    if (m_proxy->getFan9TargetRpmP() <= outletTemperatureFanTarget) m_proxy->setFan9TargetRpm(outletTemperatureFanTarget);
+    m_outletValveControlTimer->stop();
     m_hasPreviousOutletAirTemperature = false;
     m_outletTemperatureControlTimer->start();
     m_applyingAutomaticOutletTemperatureSettings = false;

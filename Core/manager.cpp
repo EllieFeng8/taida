@@ -8,19 +8,19 @@ Manager::Manager(QObject* parent )
 
 Manager::~Manager()
 {
-	// ¦w¥þ°±¤î Server °õ¦æºü
+	// ï¿½wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Server ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (m_ms300Thread) {
 		m_ms300Thread->quit();
 		m_ms300Thread->wait();
 	}
 
-	// ¦w¥þ°±¤î Client °õ¦æºü
+	// ï¿½wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Client ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (m_clientThread) {
 		m_clientThread->quit();
-		m_clientThread->wait(); // µ¥«Ý°õ¦æºü§¹¥þµ²§ô
+		m_clientThread->wait(); // ï¿½ï¿½ï¿½Ý°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
 
-	// ¦w¥þ°±¤î Server °õ¦æºü
+	// ï¿½wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Server ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (m_serverThread) {
 		m_serverThread->quit();
 		m_serverThread->wait();
@@ -160,11 +160,11 @@ void Manager::init()
 			switch (address) {
 			case 31: //
 				if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830 + 65535 * 0.2)){
-				this->WriteHoldingRegister_204(0, 0); // ¦P¨B¦^ Client ¼g¤J¹êÅé³]³Æ
+				this->WriteHoldingRegister_204(0, 0); // ï¿½Pï¿½Bï¿½^ Client ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½
 				}
 				else {
 					qDebug() << "1111111111"<< openValveP1<< openValveP2<< (9830 + 65535 * 0.2);
-					this->WriteHoldingRegister_204(0, value); // ¦P¨B¦^ Client ¼g¤J¹êÅé³]³Æ
+					this->WriteHoldingRegister_204(0, value); // ï¿½Pï¿½Bï¿½^ Client ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½
 
 				}
 				break;
@@ -226,38 +226,38 @@ void Manager::init()
 				this->WriteHoldingRegister_206(2, value);
 				break;
 			case 50:
-				this->WriteHoldingRegister_6022(11, value);// 6022 ªºAO1 (¥X¤ô»Ö¶}«×)
+				this->WriteHoldingRegister_6022(11, value);// 6022 ï¿½ï¿½AO1 (ï¿½Xï¿½ï¿½ï¿½Ö¶}ï¿½ï¿½)
 				break;
 			case 51:
 				qDebug() << value;
 				p1 = value;
-				//²Ä¤@²ÕPID--P
+				//ï¿½Ä¤@ï¿½ï¿½PID--P
 				break;
 			case 52:
 				i1 = value;
-				//²Ä¤@²ÕPID--I
+				//ï¿½Ä¤@ï¿½ï¿½PID--I
 				break;
 			case 53:
 				d1 = value;
-				//²Ä¤@²ÕPID--D
+				//ï¿½Ä¤@ï¿½ï¿½PID--D
 				break;
 			case 54:
 				p2 = value;
-				//²Ä¤G²ÕPID--P
+				//ï¿½Ä¤Gï¿½ï¿½PID--P
 				break;
 			case 55:
 				i2 = value;
-				//²Ä¤G²ÕPID--I
+				//ï¿½Ä¤Gï¿½ï¿½PID--I
 				break;
 			case 56:
 				d2 = value;
-				//²Ä¤G²ÕPID--D
+				//ï¿½Ä¤Gï¿½ï¿½PID--D
 				break;
 			case 58:
-				//this->set_sv2(value/40.96); //¥Ø¼Ð¥X­··Å >> ¥X¤ô»Ö (²Ä¤G²ÕPIDªºSV)
+				//this->set_sv2(value/40.96); //ï¿½Ø¼Ð¥Xï¿½ï¿½ï¿½ï¿½ >> ï¿½Xï¿½ï¿½ï¿½ï¿½ (ï¿½Ä¤Gï¿½ï¿½PIDï¿½ï¿½SV)
 				break;
 			case 60:
-				//this->set_sv(value/4.096);//À£®t >> ­·®° (²Ä¤@²ÕPIDªºSV)
+				//this->set_sv(value/4.096);//ï¿½ï¿½ï¿½t >> ï¿½ï¿½ï¿½ï¿½ (ï¿½Ä¤@ï¿½ï¿½PIDï¿½ï¿½SV)
 				break;
 			case 63:
 				if (value == 0)
@@ -520,8 +520,8 @@ void Manager::init()
 			}
 		}
 		});
-	// ±N Client Åª¨ìªº¸ê®Æ¡u±µ¡vµ¹ Server 
-	// ·í Client Åª¨ì¸ê®Æµo¥X m_5000data °T¸¹®É¡A¦Û°Ê©I¥s Server ªº§ó·s¨ç¼Æ
+	// ï¿½N Client Åªï¿½ìªºï¿½ï¿½Æ¡uï¿½ï¿½ï¿½vï¿½ï¿½ Server 
+	// ï¿½ï¿½ Client Åªï¿½ï¿½ï¿½Æµoï¿½X m_5000data ï¿½Tï¿½ï¿½ï¿½É¡Aï¿½Û°Ê©Iï¿½s Server ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½
 	connect(m_clientWorker, &clientWorker::connected, this, [this]() { 
 			WatchdogHeartbeatClient::instance().pulse("start connect"); 
 			normal = true;
@@ -538,16 +538,16 @@ void Manager::init()
 		}
 		emit R_PV(data); });
 	// TODO :
-// ¥H¤Uconnect­n´À´«¦¨adam6000ª©¥» Åª¨úDI«á ±NÅª­È¼g¤J¹ïÀ³serverªº¥¿½T¦ì¸m 
+// ï¿½Hï¿½Uconnectï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½adam6000ï¿½ï¿½ï¿½ï¿½ Åªï¿½ï¿½DIï¿½ï¿½ ï¿½NÅªï¿½È¼gï¿½Jï¿½ï¿½ï¿½ï¿½serverï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½ï¿½m 
 
 	connect(m_clientWorker, &clientWorker::input_DATA, this, [this](readInput_Data data)
 		{
 			WatchdogHeartbeatClient::instance().pulse("start connect");
 			if(data.AI_202.isEmpty())
-			if (data.DI_201[0] = 0 && normal)//§PÂ_¤í°f¬ÛÀË¥X 
+			if (data.DI_201[0] = 0 && normal)//ï¿½Pï¿½_ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ë¥X 
 			{
 				QMetaObject::invokeMethod(
-					m_clientWorker, [this] { m_clientWorker->set_FanPower(false); m_clientWorker->set_MotorRun(false); }, //Ãö³¬­·®°¤Î°¨¹F¹q·½
+					m_clientWorker, [this] { m_clientWorker->set_FanPower(false); m_clientWorker->set_MotorRun(false); }, //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î°ï¿½ï¿½Fï¿½qï¿½ï¿½
 					Qt::QueuedConnection
 				);
 				normal = false;
@@ -555,7 +555,7 @@ void Manager::init()
 			else if (data.DI_201[0] = 1 && !normal)
 			{
 				QMetaObject::invokeMethod(
-					m_clientWorker, [this] { m_clientWorker->set_FanPower(true); m_clientWorker->set_MotorRun(true); }, //¶}±Ò­·®°¤Î°¨¹F¹q·½
+					m_clientWorker, [this] { m_clientWorker->set_FanPower(true); m_clientWorker->set_MotorRun(true); }, //ï¿½}ï¿½Ò­ï¿½ï¿½ï¿½ï¿½Î°ï¿½ï¿½Fï¿½qï¿½ï¿½
 					Qt::QueuedConnection
 				);
 				normal = true;
@@ -563,7 +563,7 @@ void Manager::init()
 			openValveP1 = data.AI_203[5];
 			openValveP2 = data.AI_203[6];
 			if (openValveP1 < (9830 + 65535 * 0.2) && openValveP2 < (9830 + 65535 * 0.2)) {
-				this->WriteHoldingRegister_204(0, 0); // ¦P¨B¦^ Client ¼g¤J¹êÅé³]³Æ
+				this->WriteHoldingRegister_204(0, 0); // ï¿½Pï¿½Bï¿½^ Client ï¿½gï¿½Jï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½
 			}
 			
 			auto ElapsedTimer = timer.elapsed() / 1000;
@@ -597,22 +597,22 @@ void Manager::init()
 				
 
 			}
-			//±NÅª¨ú¨ìªº¼Æ­È§ó·s¨ìserver
+			//ï¿½NÅªï¿½ï¿½ï¿½ìªºï¿½Æ­È§ï¿½sï¿½ï¿½server
 			if (server_OK) {
 				queueServerHoldingRegisters(1,data.AO_204);
 				queueServerHoldingRegisters(9, data.AO_205);
 				queueServerHoldingRegisters(17, data.AO_206);
-				queueServerInputRegister(0, data.DI_201[0]);//¬Û¦ìÀË¥X
-				queueServerInputRegister(1, data.DI_201[1]);//­·®°1²§±`
-				queueServerInputRegister(2, data.DI_201[2]);//­·®°2²§±`
-				queueServerInputRegister(3, data.DI_201[3]);//­·®°3²§±`
-				queueServerInputRegister(4, data.DI_201[4]);//­·®°4²§±`
-				queueServerInputRegister(5, data.DI_201[5]);//­·®°5²§±`
-				queueServerInputRegister(6, data.DI_201[6]);//­·®°6²§±`
-				queueServerInputRegister(7, data.DI_201[7]);//­·®°7²§±`
-				queueServerInputRegister(8, data.DI_204[0]);//­·®°8²§±`
-				queueServerInputRegister(9, data.DI_204[1]);//­·®°9²§±`
-				queueServerInputRegister(10, data.DI_204[2]);//¤ô¬¦²§±`
+				queueServerInputRegister(0, data.DI_201[0]);//ï¿½Û¦ï¿½ï¿½Ë¥X
+				queueServerInputRegister(1, data.DI_201[1]);//ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½`
+				queueServerInputRegister(2, data.DI_201[2]);//ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½`
+				queueServerInputRegister(3, data.DI_201[3]);//ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½`
+				queueServerInputRegister(4, data.DI_201[4]);//ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½`
+				queueServerInputRegister(5, data.DI_201[5]);//ï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½`
+				queueServerInputRegister(6, data.DI_201[6]);//ï¿½ï¿½ï¿½ï¿½6ï¿½ï¿½ï¿½`
+				queueServerInputRegister(7, data.DI_201[7]);//ï¿½ï¿½ï¿½ï¿½7ï¿½ï¿½ï¿½`
+				queueServerInputRegister(8, data.DI_204[0]);//ï¿½ï¿½ï¿½ï¿½8ï¿½ï¿½ï¿½`
+				queueServerInputRegister(9, data.DI_204[1]);//ï¿½ï¿½ï¿½ï¿½9ï¿½ï¿½ï¿½`
+				queueServerInputRegister(10, data.DI_204[2]);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`
 				queueServerInputRegisters(11, data.AI_202);
 				queueServerInputRegisters(19, data.AI_203);
 				emit senserData(data, serverSaveData());
@@ -632,7 +632,7 @@ void Manager::init()
 		}
 		emit _PID2(data);
 		});
-	//  Adam6022 ¸ê®Æ©ñ¦b Server ªºInputRegister 27,28
+	//  Adam6022 ï¿½ï¿½Æ©ï¿½b Server ï¿½ï¿½InputRegister 27,28
 	connect(m_clientWorker, &clientWorker::m_6022PV1, this, [this](const QVector<quint16>& data) {
 		if (server_OK && !data.isEmpty()) {
 			//queueServerInputRegister(27, data[0]);
@@ -699,10 +699,10 @@ void Manager::set_sv2(int v)
 	queueServerHoldingRegister(58, v);
 	//queueServerCoil(15, true);
 
-/*	QMetaObject::invokeMethod(
+	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_SV2(v*10); },
 		Qt::QueuedConnection
-	);*/
+	);
 }
 void Manager::set_PID(double p, double i, double d)
 {
@@ -1083,7 +1083,7 @@ void Manager::set_server(int value)
 {
 }
 void Manager::set_motor(bool v)
-{//¤ô¬¦STO
+{//ï¿½ï¿½ï¿½ï¿½STO
 	_motor_STO = v;
 	quint16 value = v ? 1 : 0;
 	queueServerHoldingRegister(72, value);
@@ -1095,7 +1095,7 @@ void Manager::set_FanPower(bool v)
 	if (_FAN_STOP) {
 		set_allFan(0);
 	}
-	quint16 value = v ? 1 : 0;	//ºò«æ°±¤î¶}±Ò = °¨¹F¹q·½Ãö³¬
+	quint16 value = v ? 1 : 0;	//ï¿½ï¿½æ°±ï¿½ï¿½}ï¿½ï¿½ = ï¿½ï¿½ï¿½Fï¿½qï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	queueServerHoldingRegister(71, value);
 	qDebug() << "set fan E_STOP " <<_FAN_STOP;
 }
