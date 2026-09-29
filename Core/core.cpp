@@ -161,9 +161,7 @@ void Core::init()
         mv1 = v;
         });
     QObject::connect(m_manager, &Manager::pidcontroloutvalue, this, [this](double v) {
-        m_applyingAutomaticOutletTemperatureSettings = true;
-        m_proxy->setOutValveOpening(qRound((v* 1) / 1));
-        m_applyingAutomaticOutletTemperatureSettings = false;
+        m_manager->set_AO1(v);
         });
 
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
@@ -347,6 +345,7 @@ void Core::init()
     QObject::connect(m_proxy, &TdProxy::dryModeChanged, m_manager, &Manager::set_dry);
     QObject::connect(m_proxy, &TdProxy::dryModeChanged, this, [this](bool enabled) {
         if (enabled) {
+            m_proxy->setOutValvePidOn(false);
             m_proxy->setMotorFrequency(0);
         }
     });
@@ -1186,6 +1185,7 @@ void Core::saveProductionSettings()
     settings.setValue("Production/D1", m_proxy->m_fanPidD);
     settings.setValue("Production/P2", m_proxy->m_outValveP);
     settings.setValue("Production/I2", m_proxy->m_outValveI);
+    settings.setValue("Production/D2", m_proxy->m_outValveD);
     settings.setValue("Production/Mix_min", Mix_minValue);
     settings.setValue("Production/Mix_max", Mix_maxValue);
     settings.setValue("Production/MixSV_min", MixSV_minValue);

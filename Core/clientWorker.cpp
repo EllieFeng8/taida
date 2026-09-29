@@ -363,6 +363,55 @@ void clientWorker::Fan_PowerControl(bool v)
         reply->deleteLater();
     }
 }
+void clientWorker::Read6022Mode1()
+{
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) return;
+
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 999, 2);
+    QEventLoop loop;
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError && reply->result().valueCount() >= 2) {
+                m_6022Mode1 = reply->result().value(1) != 0;
+                if (m_6022Mode1 != m_mode1) {
+                    qDebug() << "PID loop 1 mode differs; restoring mode:" << m_mode1;
+                    set6022Mode_1(m_mode1);
+                }
+            }
+            else {
+                qDebug() << "Modbus read PID loop 1 mode error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+        });
+        loop.exec();
+    }
+}
+
+void clientWorker::Read6022Mode2()
+{
+    if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) return;
+
+    QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 1255, 2);
+    QEventLoop loop;
+    if (auto reply = m_6022->sendReadRequest(readUnit, 1)) {
+        QObject::connect(reply, &QModbusReply::finished, &loop, [&]() {
+            if (reply->error() == QModbusDevice::NoError && reply->result().valueCount() >= 2) {
+                m_6022Mode2 = reply->result().value(1) != 0;
+                if (m_6022Mode2 != m_mode2) {
+                    qDebug() << "PID loop 2 mode differs; restoring mode:" << m_mode2;
+                    set6022Mode_2(m_mode2);
+                }
+            }
+            else {
+                qDebug() << "Modbus read PID loop 2 mode error:" << reply->errorString();
+            }
+            reply->deleteLater();
+            loop.quit();
+        });
+        loop.exec();
+    }
+}
 void clientWorker::ReadPID1()
 {
     if (!m_6022) return;
@@ -1105,12 +1154,10 @@ void clientWorker::set_FanPower(bool v)
 void clientWorker::set_Mode1(bool v)
 {
     m_mode1 = v;
-    f_setMode1 = true;
 }
 void clientWorker::set_Mode2(bool v)
 {
     m_mode2 = v;
-    f_setMode2 = true;
 }
 void clientWorker::set_204HoldingRegister(int addr, double v)
 {
@@ -1278,7 +1325,6 @@ void clientWorker::set_Fan9Open(bool v)
 }
 void clientWorker::init_flag()
 {
-    f_setMode1 = false;
     f_STO = false;
     f_setFAN = false;
     f_setSV1 = false;
@@ -1487,16 +1533,6 @@ void clientWorker::poll()
         m_Open9 = false;
     }
 
-    if (f_setMode1)
-    {
-        set6022Mode_1(m_mode1);
-        f_setMode1 = false;
-    }
-    if (f_setMode2)
-    {
-        set6022Mode_2(m_mode2);
-        f_setMode2 = false;
-    }
     if (m_mode1)
     {
         writeHoldingRegisters(m_204, 1, MV1, 3);
@@ -1506,7 +1542,7 @@ void clientWorker::poll()
     }
     if (m_mode2)
     {
-        emit pidcontroloutvalue(MV2/40.95);
+        emit pidcontroloutvalue(MV2);
     }
     if (f_setFAN)
     {
@@ -1562,6 +1598,8 @@ void clientWorker::poll()
     Read6022PV1();
     Read6022PV2();
     Read6022MV();
+    Read6022Mode1();
+    Read6022Mode2();
     ReadPID2();
     ReadPID1();
     //init_flag();

@@ -92,6 +92,8 @@ public:
     void Read6022PV1(); //第一組PV 
     void Read6022PV2(); //第二組PV
     void Read6022MV(); //PID 輸出
+    void Read6022Mode1();
+    void Read6022Mode2();
     //void readtest();
     void ReadPID1(); //第一組PID
     void ReadPID2(); //第二組PID 
@@ -106,6 +108,9 @@ public:
     void onErrorOccurred(QModbusDevice::Error error);
     bool m_mode1 = false;
     bool m_mode2 = false;
+
+    bool m_6022Mode1 = false;
+    bool m_6022Mode2 = false;
 
 signals:
     void connected();
@@ -179,8 +184,6 @@ private:
     bool motor = false;
     bool power = false;
     double m_setALL = 0.0;
-    bool f_setMode1 = false;
-    bool f_setMode2 = false;
     bool f_STO = false;
     bool f_STO2 = false;
 

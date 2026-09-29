@@ -51,6 +51,7 @@ public slots:
         if (id >= 1 && id <= 10) m_targetReset[id] = val;
     }
     void cleanup() {
+        m_isShuttingDown = true;
         if (m_pollTimer) {
             m_pollTimer->stop();
             m_pollTimer->deleteLater();
@@ -69,6 +70,7 @@ private slots:
     void onPollTimeout();
 
 private:
+    void scheduleReconnect();
     double m_targetFreqs[11]; //  2001H (ÀW²v)
     quint16 m_targetCmds[11]; //  2000H (mode)
     quint16 m_targetReset[11];//  2002H (Reset «ü¥O¦ì§})
@@ -78,4 +80,7 @@ private:
     int m_currentIndex = 1;
     double m_targetHz = 0.0;
     bool m_needWriteID2 = false;
+    bool m_requestInFlight = false;
+    bool m_reconnectScheduled = false;
+    bool m_isShuttingDown = false;
 };

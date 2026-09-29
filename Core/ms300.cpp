@@ -4,54 +4,93 @@
 MS300::MS300(QObject* parent) : QObject(parent) {}
 
 
-void MS300::initPort() {
-    m_modbus = new QModbusRtuSerialClient(this);
-    m_modbus->setConnectionParameter(QModbusDevice::SerialPortNameParameter, "COM2");
-    m_modbus->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, QSerialPort::Baud9600);
-    m_modbus->setConnectionParameter(QModbusDevice::SerialParityParameter, QSerialPort::NoParity);
-    m_modbus->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, QSerialPort::Data8);
-    m_modbus->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, QSerialPort::OneStop);
-    m_modbus->setTimeout(200);
-    m_modbus->setNumberOfRetries(3);
-    if (m_modbus->connectDevice()) {
-        qDebug() << "COM2 connect";
+void MS300::initPort()
+{
+    if (m_isShuttingDown) {
+        return;
+    }
+
+    if (!m_modbus) {
+        m_modbus = new QModbusRtuSerialClient(this);
+        m_modbus->setConnectionParameter(QModbusDevice::SerialPortNameParameter, "COM2");
+        m_modbus->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, QSerialPort::Baud9600);
+        m_modbus->setConnectionParameter(QModbusDevice::SerialParityParameter, QSerialPort::NoParity);
+        m_modbus->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, QSerialPort::Data8);
+        m_modbus->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, QSerialPort::OneStop);
+        m_modbus->setTimeout(200);
+        m_modbus->setNumberOfRetries(3);
         m_pollTimer = new QTimer(this);
         connect(m_pollTimer, &QTimer::timeout, this, &MS300::onPollTimeout);
-        m_pollTimer->start(100);
+        connect(m_modbus, &QModbusDevice::stateChanged, this, [this](QModbusDevice::State state) {
+            if (state == QModbusDevice::ConnectedState) {
+                qDebug() << "COM2 connect";
+                m_reconnectScheduled = false;
+                m_pollTimer->start(100);
+            } else if (state == QModbusDevice::UnconnectedState) {
+                m_pollTimer->stop();
+                m_requestInFlight = false;
+                scheduleReconnect();
+            }
+        });
     }
-    else
-    {
-        qDebug() << "connect COM2 fail";
+
+    if (m_modbus->state() == QModbusDevice::ConnectedState ||
+        m_modbus->state() == QModbusDevice::ConnectingState) {
+        return;
+    }
+
+    if (!m_modbus->connectDevice()) {
+        qWarning() << "COM2 connect failed:" << m_modbus->errorString();
+        scheduleReconnect();
     }
 }
+
+void MS300::scheduleReconnect()
+{
+    if (m_isShuttingDown || m_reconnectScheduled) {
+        return;
+    }
+
+    m_reconnectScheduled = true;
+    QTimer::singleShot(2000, this, [this]() {
+        m_reconnectScheduled = false;
+        initPort();
+    });
+}
+
 void MS300::onPollTimeout()
 {
+    if (!m_modbus ||
+        m_modbus->state() != QModbusDevice::ConnectedState ||
+        m_requestInFlight) {
+        return;
+    }
 
-    // 1. 設定讀取請求：目前的故障代碼地址為 0x2100，讀取 1 個暫存器
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0x2100, 1);
+    QModbusReply* reply = m_modbus->sendReadRequest(readUnit, 1);
+    if (!reply) {
+        m_modbus->disconnectDevice();
+        scheduleReconnect();
+        return;
+    }
 
-    // 2. 發送請求 (假設從站 ID 為 1，請根據實際參數 09-00 設定修改)
-    if (auto* reply = m_modbus->sendReadRequest(readUnit, 1)) {
-        if (!reply->isFinished()) {
-            connect(reply, &QModbusReply::finished, this, [this, reply]() {
-                if (reply->error() == QModbusDevice::NoError) {
-                    const QModbusDataUnit unit = reply->result();
-                    // 3. 取得異常代碼數值
-                    int errorCode = unit.value(0);
-
-                        //qDebug() << "error ID:" << errorCode;
-                        emit dataUpdated(errorCode);
-                }
-                else {
-                    //qDebug() << "讀取失敗:" << reply->errorString();
-                }
-                reply->deleteLater();
-                });
+    m_requestInFlight = true;
+    const auto handleReply = [this, reply]() {
+        m_requestInFlight = false;
+        if (reply->error() == QModbusDevice::NoError) {
+            const QModbusDataUnit unit = reply->result();
+            emit dataUpdated(unit.value(0));
+        } else {
+            qWarning() << "MS300 read failed:" << reply->errorString();
+            if (m_modbus && m_modbus->state() != QModbusDevice::UnconnectedState) {
+                m_modbus->disconnectDevice();
+            }
+            scheduleReconnect();
         }
-        else {
-            qDebug() << "error";
-
-            reply->deleteLater(); // 已結束但發生錯誤
-        }
+        reply->deleteLater();
+    };
+    connect(reply, &QModbusReply::finished, this, handleReply);
+    if (reply->isFinished()) {
+        handleReply();
     }
 }
