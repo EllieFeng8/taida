@@ -140,7 +140,6 @@ void Core::init()
                 // 注意：確保 saveSensorData 內部的資料庫連接是該線程私有的
                 m_sqlManager->saveSensorData(now, senserData2, result);
                 saveProductionSettings();
-                //qDebug() << "：" << now.toString("hh:mm:ss");
             }
             else
             {
@@ -160,10 +159,6 @@ void Core::init()
         m_proxy->setFan9TargetRpm(v);
         mv1 = v;
         });
-    QObject::connect(m_manager, &Manager::pidcontroloutvalue, this, [this](double v) {
-        m_manager->set_AO1(v);
-        });
-
     QObject::connect(m_manager, &Manager::updateToUi, this, &Core::updateProxyProperty2);
     QObject::connect(m_manager, &Manager::update_switch, this, [=](int index, bool v)
         {
@@ -374,11 +369,9 @@ void Core::init()
 
     if (ips.isEmpty())
     {
-        //qInfo() << "找不到 192 開頭的 IPv4 位址";
     }
     else
     {
-        qInfo() << "符合條件的 IP 位址:" << ips;
     }
     int freq = m_sqlManager->readFrequency();
     m_proxy->setCaptureFreq(freq);
@@ -566,7 +559,6 @@ void Core::updateSenserData(readInput_Data data, QVector <quint16> result)
         // 注意：確保 saveSensorData 內部的資料庫連接是該線程私有的
         m_sqlManager->saveSensorData(now, senserData2, result);
         saveProductionSettings();
-        //qDebug() << "：" << now.toString("hh:mm:ss");
     }
     else
     {
@@ -936,7 +928,6 @@ void Core::updateProxyProperty(int index, quint16 value)
         if (value < 1000)
         {
             m_proxy->setCurrentWaterFlow(qRound((0 / 655.35) * 80.0) / 10.0); break;// 流量計 0~800
-            //qDebug() << "CurrentWaterFlow " << value;
         }
         else 
         {
@@ -1137,6 +1128,11 @@ void Core::updateProxyProperty2(int index, quint16 value)
         m_proxy->setReturnValveOpening(qRound(value * 10.0) / 10.0); break;
     case 12:
 
+        if (m_proxy->getOutValvePidOn())
+        {
+            break;
+        }
+
         if (value <= OutSV_minValue)
         {
             value = 0.0;
@@ -1263,7 +1259,7 @@ void Core::stopAutomaticOutletTemperatureControl()
     m_outletTemperaturePumpStartTimer->stop();
     m_waitingForOutletTemperatureToStart = false;
     m_outletTemperaturePumpStartPending = false;
-    qInfo() << "Automatic outlet temperature control stopped by manual adjustment.";
+
 }
 
 void Core::tryStartOutletTemperaturePumpSequence()

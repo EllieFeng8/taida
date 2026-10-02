@@ -163,7 +163,6 @@ void Manager::init()
 				this->WriteHoldingRegister_204(0, 0); // �P�B�^ Client �g�J����]��
 				}
 				else {
-					qDebug() << "1111111111"<< openValveP1<< openValveP2<< (9830 + 65535 * 0.2);
 					this->WriteHoldingRegister_204(0, value); // �P�B�^ Client �g�J����]��
 
 				}
@@ -229,7 +228,6 @@ void Manager::init()
 				this->WriteHoldingRegister_6022(11, value);// 6022 ��AO1 (�X���ֶ}��)
 				break;
 			case 51:
-				qDebug() << value;
 				p1 = value;
 				//�Ĥ@��PID--P
 				break;
@@ -327,12 +325,10 @@ void Manager::init()
 			if(address==17)
 			{
 				if (value) {
-					qDebug() << "dryyyyyy";
 					set_AO1(0);
 
 					timer.restart();
 					dry_Over = false;
-					qDebug() << "dryyyyyy2";
 					//set_allFan(30);
 					fan1TargetRpm(dryValue);
 					fan2TargetRpm(dryValue);
@@ -343,10 +339,8 @@ void Manager::init()
 					fan7TargetRpm(dryValue);
 					fan8TargetRpm(dryValue);
 					fan9TargetRpm(dryValue);
-					qDebug() << "dryyyyyy3";
 				}
 				else {
-					qDebug() << "close dry mode";
 					set_AO1(0);
 					//set_allFan(0);
 					fan1TargetRpm(0);
@@ -567,7 +561,6 @@ void Manager::init()
 			}
 			
 			auto ElapsedTimer = timer.elapsed() / 1000;
-			qDebug() << "ElapsedTimer"<<ElapsedTimer;
 			auto t_str = dryTime - ElapsedTimer;
 			if (t_str < 0) {
 				t_str = 0;
@@ -593,7 +586,6 @@ void Manager::init()
 				queueServerCoil(17, false);
 				emit updateToUi(17, false);
 				dry_Over = true;
-				qDebug() << "dry_Over";
 				
 
 			}
@@ -667,7 +659,6 @@ void Manager::init()
 
 void Manager::set_mode1(bool v)
 {
-	qDebug() << "set pid-1  mode : " << v;
 	queueServerHoldingRegister(63, v);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Mode1(v); },
@@ -676,7 +667,6 @@ void Manager::set_mode1(bool v)
 }
 void Manager::set_mode2(bool v)
 {
-	qDebug() << "set pid-2  mode : " << v;
 	queueServerHoldingRegister(64, v);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Mode2(v); },
@@ -754,7 +744,6 @@ void Manager::set_AO1(double v)
 		qWarning() << "AO1 closed because at least one fan PV is not above 35%.";
 		modbusValue = 0;
 	}
-	qDebug() << "set Out Open SV"<<modbusValue;
 	queueServerHoldingRegister(50, modbusValue);
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, modbusValue] { m_clientWorker->set_AO1(modbusValue); },
@@ -768,12 +757,10 @@ void Manager::motorFrequency(double v)
 	if(_motor_STO)
 	{
 		queueServerHoldingRegister(31, 0);
-		qDebug() << "set motorFrequency =" << value<< " BUT! STO ON set 0" ;
 	}
 	else if(openValveP1<(65535*0.2) && openValveP2<(65535*0.2))
 	{
 		queueServerHoldingRegister(31, 0);
-		qDebug() << "set motorFrequency =" << value << " BUT! openningValve 0"<< openValveP1<< openValveP2;
 	}
 	else {
 		queueServerHoldingRegister(31, value);
@@ -788,29 +775,24 @@ void Manager::fan1TargetRpm(double v)
 	data[0] = value;
 	if(_FAN_STOP)
 	{
-		qDebug() << "set fan1 but E_STOP ON";
 		queueServerHoldingRegisters(32, { 0 });
 	}
 	else {
-		qDebug() << "set fan1 ="<< data;
 		queueServerHoldingRegisters(32, data);
 	}
 }
 void Manager::fan2TargetRpm(double v)
 {
 	double value = v * 40.95;
-	qDebug() << v;
 	QVector<quint16> data;
 	data.resize(1);
 	data[0] = value;
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(33, { 0 });
-		qDebug() << "set fan2 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan2 =" << data;
 
 		queueServerHoldingRegisters(33, data);
 	}
@@ -824,10 +806,8 @@ void Manager::fan3TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(34 ,{ 0 });
-		qDebug() << "set fan3 but E_STOP ON";
 	}
 	else {
-		qDebug() << "set fan3 =" << data;
 		queueServerHoldingRegisters(34, data);
 	}
 }
@@ -841,10 +821,8 @@ void Manager::fan4TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(39, { 0 });
-		qDebug() << "set fan4 but E_STOP ON";
 	}
 	else {
-		qDebug() << "set fan4 =" << data;
 		queueServerHoldingRegisters(39, data);
 	}
 }
@@ -857,11 +835,9 @@ void Manager::fan5TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(40, { 0 });
-		qDebug() << "set fan5 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan5 =" << data;
 		queueServerHoldingRegisters(40, data);
 	}
 }
@@ -874,11 +850,9 @@ void Manager::fan6TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(41, { 0 });
-		qDebug() << "set fan6 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan6 =" << data;
 		queueServerHoldingRegisters(41, data);
 	}
 }
@@ -891,11 +865,9 @@ void Manager::fan7TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(42, { 0 });
-		qDebug() << "set fan7 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan7 =" << data;
 		queueServerHoldingRegisters(42, data);
 	}
 }
@@ -908,11 +880,9 @@ void Manager::fan8TargetRpm(double v)
 	data[0] = value;
 	if (_FAN_STOP){
 		queueServerHoldingRegisters(47 ,{ 0 });
-		qDebug() << "set fan8 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan8 =" << data;
 		queueServerHoldingRegisters(47, data);
 	}
 }
@@ -925,18 +895,15 @@ void Manager::fan9TargetRpm(double v)
 	if (_FAN_STOP)
 	{
 		queueServerHoldingRegisters(48, { 0 });
-		qDebug() << "set fan9 but E_STOP ON";
 
 	}
 	else {
-		qDebug() << "set fan9 =" << data;
 		queueServerHoldingRegisters(48, data);
 	}
 }
 void Manager::returnValveOpening(double v) 
 {
 	quint16 modbusValue = v;
-	qDebug() << "set Mix Open SV" << modbusValue;
 
 	QVector<quint16> data;
 	data.resize(1);
@@ -974,7 +941,6 @@ void Manager::WriteHoldingRegister_6022(int addr, double value)
 }
 void Manager::set_Fan1Open(bool v)
 {
-	qDebug() << "set Fan1  " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan1Open(v); },
 		Qt::QueuedConnection
@@ -982,7 +948,6 @@ void Manager::set_Fan1Open(bool v)
 }
 void Manager::set_Fan2Open(bool v)
 {
-	qDebug() << "set Fan2 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan2Open(v); },
 		Qt::QueuedConnection
@@ -990,7 +955,6 @@ void Manager::set_Fan2Open(bool v)
 }
 void Manager::set_Fan3Open(bool v)
 {
-	qDebug() << "set Fan3 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan3Open(v); },
 		Qt::QueuedConnection
@@ -998,7 +962,6 @@ void Manager::set_Fan3Open(bool v)
 }
 void Manager::set_Fan4Open(bool v)
 {
-	qDebug() << "set Fan4 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan4Open(v); },
 		Qt::QueuedConnection
@@ -1006,7 +969,6 @@ void Manager::set_Fan4Open(bool v)
 }
 void Manager::set_Fan5Open(bool v)
 {
-	qDebug() << "set Fan5 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan5Open(v); },
 		Qt::QueuedConnection
@@ -1014,7 +976,6 @@ void Manager::set_Fan5Open(bool v)
 }
 void Manager::set_Fan6Open(bool v)
 {
-	qDebug() << "set Fan6 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan6Open(v); },
 		Qt::QueuedConnection
@@ -1022,7 +983,6 @@ void Manager::set_Fan6Open(bool v)
 }
 void Manager::set_Fan7Open(bool v)
 {
-	qDebug() << "set Fan7 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan7Open(v); },
 		Qt::QueuedConnection
@@ -1030,7 +990,6 @@ void Manager::set_Fan7Open(bool v)
 }
 void Manager::set_Fan8Open(bool v)
 {
-	qDebug() << "set Fan8 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan8Open(v); },
 		Qt::QueuedConnection
@@ -1038,7 +997,6 @@ void Manager::set_Fan8Open(bool v)
 }
 void Manager::set_Fan9Open(bool v)
 {
-	qDebug() << "set Fan9 " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_Fan9Open(v); },
 		Qt::QueuedConnection
@@ -1047,7 +1005,6 @@ void Manager::set_Fan9Open(bool v)
 void Manager::set_motorEstop(bool v)
 {
 	_motor_STO = v;
-	qDebug() << "set motor E-stop: " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_STO(v); },
 		Qt::QueuedConnection
@@ -1056,7 +1013,6 @@ void Manager::set_motorEstop(bool v)
 void Manager::set_FanEstop(bool v)
 {
 	_FAN_STOP = v;
-	qDebug() << "set FAN E-stop: " << v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this, v] { m_clientWorker->set_STO2(v); },
 		Qt::QueuedConnection
@@ -1064,7 +1020,6 @@ void Manager::set_FanEstop(bool v)
 }
 void Manager::set_Reset(bool v)
 {
-	qDebug() << "set Reset  ";
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this] { m_clientWorker->set_Reset(); },
 		Qt::QueuedConnection
@@ -1072,7 +1027,6 @@ void Manager::set_Reset(bool v)
 }
 void Manager::set_allFan(double v)
 {
-	qDebug() << "set all Fan  ="<<v;
 	QMetaObject::invokeMethod(
 		m_clientWorker, [this,v] { m_clientWorker->set_Fan(v); },
 		Qt::QueuedConnection
@@ -1087,7 +1041,6 @@ void Manager::set_motor(bool v)
 	_motor_STO = v;
 	quint16 value = v ? 1 : 0;
 	queueServerHoldingRegister(72, value);
-	qDebug() << "set motor ";
 }
 void Manager::set_FanPower(bool v)
 {
@@ -1097,7 +1050,6 @@ void Manager::set_FanPower(bool v)
 	}
 	quint16 value = v ? 1 : 0;	//��氱��}�� = ���F�q������
 	queueServerHoldingRegister(71, value);
-	qDebug() << "set fan E_STOP " <<_FAN_STOP;
 }
 void Manager::set_dry(bool v)
 {

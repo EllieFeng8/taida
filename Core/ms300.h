@@ -64,7 +64,6 @@ public slots:
         }
         QThread::currentThread()->quit();
 
-        qDebug() << "MS300 resources cleaned up.";
     }
 private slots:
     void onPollTimeout();

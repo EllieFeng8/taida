@@ -187,16 +187,13 @@ void clientWorker::init()
 void clientWorker::onStateChanged(QModbusDevice::State state)
 {
     if (state == QModbusDevice::ConnectedState) {
-        qDebug() << "clientWorker" << "connected.";
     }
     else if (state == QModbusDevice::UnconnectedState) {
-        qDebug() << "clientWorker" << "disconnected.";
     }
 }
 void clientWorker::onStateChanged_201(QModbusDevice::State state)
 {
     if (state == QModbusDevice::ConnectedState) {
-        qDebug() << "client 201" << "connected.";
         //writeSingleCoil(12, false);
         writeSingleCoil(m_201,19, true);//STO 點位  on=解除STO
         Fan_PowerControl(true);
@@ -215,50 +212,40 @@ void clientWorker::onStateChanged_201(QModbusDevice::State state)
         emit connected();
     }
     else if (state == QModbusDevice::UnconnectedState) {
-        qDebug() << "clientWorker" << "disconnected.";
     }
 }
 void clientWorker::onErrorOccurred(QModbusDevice::Error error)
 {
-    qDebug() << error;
 }
 
 void clientWorker::reconnectDevices()
 {
     // 如果不是正在連線或已連線，就發起連線請求
     if (m_201 && m_201->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6250 is offline, attempting to reconnect...";
         m_201->connectDevice();
     }
     if (m_202 && m_202->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6217-1 is offline, attempting to reconnect...";
         m_202->connectDevice();
     }
     if (m_203 && m_203->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6217-2 is offline, attempting to reconnect...";
         m_203->connectDevice();
     }
     if (m_204 && m_204->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6224-1 is offline, attempting to reconnect...";
         m_204->connectDevice();
     }
     if (m_205 && m_205->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6224-2 is offline, attempting to reconnect...";
         m_205->connectDevice();
     }
     if (m_206 && m_206->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6224-3 is offline, attempting to reconnect...";
         m_206->connectDevice();
     }
     if (m_6022 && m_6022->state() == QModbusDevice::UnconnectedState) {
-        qDebug() << "ADAM-6022 is offline, attempting to reconnect...";
         m_6022->connectDevice();
     }
 }
 
 void clientWorker::WriteSingleHoldingRegisters(QModbusTcpClient* client, int slave, int address, int value)
 {
-    qDebug() << "write HoldingRegister : " << address << " = " << value;
 
     if (!client || client->state() != QModbusDevice::ConnectedState) return;
 
@@ -278,14 +265,12 @@ void clientWorker::WriteSingleHoldingRegisters(QModbusTcpClient* client, int sla
 
         if (timeoutTimer.isActive()) {
             if (reply->error() == QModbusDevice::NoError) {
-                qDebug() << "success " << client->objectName() << "write :" << address << "value:" << value;
+                qInfo() << "Modbus write completed:" << client->objectName() << "HoldingRegister" << address << "=" << value;
             }
             else {
-                qDebug() << "failed:" << reply->errorString();
             }
         }
         else {
-            qDebug() << "timeout";
             reply->deleteLater();
         }
         reply->deleteLater();
@@ -314,14 +299,11 @@ void clientWorker::MotorControl(bool v)
 
     //    if (timeoutTimer.isActive()) {
     //        if (reply->error() == QModbusDevice::NoError) {
-    //            qDebug() << "success ";
     //        }
     //        else {
-    //            qDebug() << "failed:" << reply->errorString();
     //        }
     //    }
     //    else {
-    //        qDebug() << "timeout";
     //        reply->deleteLater();
     //    }
     //    reply->deleteLater();
@@ -350,14 +332,12 @@ void clientWorker::Fan_PowerControl(bool v)
 
         if (timeoutTimer.isActive()) {
             if (reply->error() == QModbusDevice::NoError) {
-                qDebug() << "success ";
+                qInfo() << "Modbus write completed:" << client->objectName() << "Coil" << 16 << "=" << v;
             }
             else {
-                qDebug() << "failed:" << reply->errorString();
             }
         }
         else {
-            qDebug() << "timeout";
             reply->deleteLater();
         }
         reply->deleteLater();
@@ -374,12 +354,10 @@ void clientWorker::Read6022Mode1()
             if (reply->error() == QModbusDevice::NoError && reply->result().valueCount() >= 2) {
                 m_6022Mode1 = reply->result().value(1) != 0;
                 if (m_6022Mode1 != m_mode1) {
-                    qDebug() << "PID loop 1 mode differs; restoring mode:" << m_mode1;
                     set6022Mode_1(m_mode1);
                 }
             }
             else {
-                qDebug() << "Modbus read PID loop 1 mode error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -399,12 +377,10 @@ void clientWorker::Read6022Mode2()
             if (reply->error() == QModbusDevice::NoError && reply->result().valueCount() >= 2) {
                 m_6022Mode2 = reply->result().value(1) != 0;
                 if (m_6022Mode2 != m_mode2) {
-                    qDebug() << "PID loop 2 mode differs; restoring mode:" << m_mode2;
                     set6022Mode_2(m_mode2);
                 }
             }
             else {
-                qDebug() << "Modbus read PID loop 2 mode error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -433,7 +409,6 @@ void clientWorker::ReadPID1()
                 quint32 P = ((static_cast<int32_t>(P0) << 16) | static_cast<int32_t>(P1));
                 quint32 I = ((static_cast<int32_t>(I0) << 16) | static_cast<int32_t>(I1));
                 quint32 D = ((static_cast<int32_t>(D0) << 16) | static_cast<int32_t>(D1));
-                qDebug() << "PID loop0 =" << P <<"," << I << "," << D;
                 result[0] = P;
                 result[1] = I;
                 result[2] = D;
@@ -442,7 +417,6 @@ void clientWorker::ReadPID1()
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -478,13 +452,11 @@ void clientWorker::ReadPID2()
                 result[0] = P;
                 result[1] = I;
                 result[2] = D;
-                qDebug() << "PID loop1 =" << P << "," << I << "," << D;
 
                 emit m_6022PID2(result);
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -513,11 +485,9 @@ void clientWorker::Read6022PV1()
                 result[0]= rel/10;
 
                 emit m_6022PV1(result);
-                qDebug() << "loop-0 SV*1000 = " << result[0];
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -545,12 +515,10 @@ void clientWorker::Read6022PV2()
                 quint16 reg1 = res.value(1);
                 quint32 rel = ((static_cast<int32_t>(reg0) << 16) | static_cast<int32_t>(reg1));
                 result[0] = rel/10;
-                qDebug() << "loop-1 SV*1000 = " << rel;
                 emit m_6022PV2(result);
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -576,13 +544,11 @@ void clientWorker::read_test()
                 {
                     result.append(res.value(i));
                 }
-                qDebug() << "PV0 = " << result[0] << "&&&" << " PV3 = " << result[3];
 
                 emit R_PV(result);
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -615,7 +581,6 @@ void clientWorker::Read6022MV()
 
             }
             else {
-                qDebug() << "Modbus read error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -633,7 +598,6 @@ QVector <quint16> clientWorker::readAdam6250DI()
     QVector <quint16> result;
     if (!m_201) return result;
     if (m_201->state() != QModbusDevice::ConnectedState) {
-        qDebug() << m_201 << "not connected";
         return result;
     }
     if (auto reply = m_201->sendReadRequest(readUnit, 1)) {
@@ -645,7 +609,6 @@ QVector <quint16> clientWorker::readAdam6250DI()
                 }
             }
             else {
-                qDebug() << "201 read DI error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -662,7 +625,6 @@ QVector <quint16> clientWorker::readAdam6250DO()
     QVector <quint16> result;
     if (!m_201) return result;
     if (m_201->state() != QModbusDevice::ConnectedState) {
-        qDebug() << m_201 << "not connected";
         return result;
     }
     if (auto reply = m_201->sendReadRequest(readUnit, 1)) {
@@ -674,7 +636,6 @@ QVector <quint16> clientWorker::readAdam6250DO()
                 }
             }
             else {
-                qDebug() << "201 read DO error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -688,7 +649,6 @@ QVector <quint16> clientWorker::readAdam6217AI(QModbusTcpClient* client)
     QVector <quint16> result;
     if (!client) return result;
     if (client->state() != QModbusDevice::ConnectedState) {
-        qDebug() << client->objectName() << "not connected";
         return result;
     }
     QModbusDataUnit readUnit(QModbusDataUnit::HoldingRegisters, 0, 8);
@@ -704,7 +664,6 @@ QVector <quint16> clientWorker::readAdam6217AI(QModbusTcpClient* client)
                 }
             }
             else {
-                qDebug() << client->objectName() << "read AI error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -720,7 +679,6 @@ QVector <quint16> clientWorker::readAdam6224AO(QModbusTcpClient* client)
     QVector <quint16> result;
     if (!client) return result;
     if (client->state() != QModbusDevice::ConnectedState) {
-        qDebug() << client->objectName() << "not connected";
         return result;
     }
 
@@ -733,7 +691,6 @@ QVector <quint16> clientWorker::readAdam6224AO(QModbusTcpClient* client)
                 }
             }
             else {
-                qDebug() << client->objectName() << "read AO error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -749,7 +706,6 @@ QVector <quint16> clientWorker::readAdam6224DI(QModbusTcpClient* client)
     QVector <quint16> result;
     if (!client) return result;
     if (client->state() != QModbusDevice::ConnectedState) {
-        qDebug() << client->objectName() << "not connected";
         return result;
     }
     if (auto reply = client->sendReadRequest(readUnit, 1)) {
@@ -761,7 +717,6 @@ QVector <quint16> clientWorker::readAdam6224DI(QModbusTcpClient* client)
                 }
             }
             else {
-                qDebug() << client->objectName() <<" read DI error:" << reply->errorString();
             }
             reply->deleteLater();
             loop.quit();
@@ -772,7 +727,6 @@ QVector <quint16> clientWorker::readAdam6224DI(QModbusTcpClient* client)
 }
 void clientWorker::writeSingleCoil(QModbusTcpClient* client ,int address, bool value)
 {
-    qDebug() << "Write single coil addr:" << address << " = " << value;
 
     if (client->state() != QModbusDevice::ConnectedState)
     {
@@ -798,28 +752,25 @@ void clientWorker::writeSingleCoil(QModbusTcpClient* client ,int address, bool v
 
     // 處理寫入結果
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "set coil = " << value;
+        qInfo() << "Modbus write completed:" << client->objectName() << "Coil" << address << "=" << value;
     }
     else {
-        qDebug() << "Worker" << "write single coil error:" << address << reply->errorString();
     }
     reply->deleteLater();
 }
 void clientWorker::writeHoldingRegisters(QModbusTcpClient* client,int address, double value, int number)
 {
-    //qDebug() << "Write single coil addr:" << address << " = " << value;
 
     if (client->state() != QModbusDevice::ConnectedState)
     {
         return;
     }
-    //qDebug() << "set all fan value = " << value;
     QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, address, number);
     for (int i = 0; i < 17; ++i) {
         writeUnit.setValue(i, value);
     }
     // 發送請求
-    QModbusReply* reply = client->sendWriteRequest(writeUnit, 1); // 1 為 Server ID
+    QModbusReply* reply = client->sendWriteRequest(writeUnit, 1); // 1
     if (!reply)
     {
         return;
@@ -833,10 +784,9 @@ void clientWorker::writeHoldingRegisters(QModbusTcpClient* client,int address, d
 
     // 處理寫入結果
     if (reply->error() == QModbusDevice::NoError) {
-
+        qInfo() << "Modbus write completed:" << client->objectName() << "HoldingRegisters" << address << "count" << number << "value" << value;
     }
     else {
-        qDebug() << "Worker" << "write single coil error:" << address << reply->errorString();
     }
     reply->deleteLater();
 }
@@ -844,7 +794,6 @@ void clientWorker::writeHoldingRegisters(QModbusTcpClient* client,int address, d
 void clientWorker::set6022Mode_1(bool v)
 {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -863,7 +812,6 @@ void clientWorker::set6022Mode_1(bool v)
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set mode failed = " << m_6022->errorString();
         return;
     }
 
@@ -874,10 +822,9 @@ void clientWorker::set6022Mode_1(bool v)
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set 6022 Loop-0  Mode  = " << v;
+        qInfo() << "Modbus write completed: ADAM-6022 PID1 mode =" << v;
     }
     else {
-        qDebug() << "set mode failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -887,7 +834,6 @@ void clientWorker::set6022Mode_1(bool v)
 void clientWorker::set_MV(double value) // 假設傳入的是 16bit 數值
 {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connected";
         return;
     }
 
@@ -900,7 +846,6 @@ void clientWorker::set_MV(double value) // 假設傳入的是 16bit 數值
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
 
     if (!reply) {
-        qDebug() << "Send request failed:" << m_6022->errorString();
         return;
     }
 
@@ -910,10 +855,9 @@ void clientWorker::set_MV(double value) // 假設傳入的是 16bit 數值
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "Successfully wrote AO 1 value:" << value;
+        qInfo() << "Modbus write completed: ADAM-6022 AO1 =" << value;
     }
     else {
-        qDebug() << "Write failed:" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -922,7 +866,6 @@ void clientWorker::set_MV(double value) // 假設傳入的是 16bit 數值
 void clientWorker::set6022Mode_2(bool v)
 {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -938,7 +881,6 @@ void clientWorker::set6022Mode_2(bool v)
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set mode failed = " << m_6022->errorString();
         return;
     }
 
@@ -949,10 +891,9 @@ void clientWorker::set6022Mode_2(bool v)
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set 6022 Loop-1  Mode  = " << v;
+        qInfo() << "Modbus write completed: ADAM-6022 PID2 mode =" << v;
     }
     else {
-        qDebug() << "set mode failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -961,7 +902,6 @@ void clientWorker::set6022Mode_2(bool v)
 
 void clientWorker::writeSV1(float targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -979,7 +919,6 @@ void clientWorker::writeSV1(float targetSV) {
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set SV failed = " << m_6022->errorString();
         return;
     }
 
@@ -990,10 +929,9 @@ void clientWorker::writeSV1(float targetSV) {
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set SV =" << targetSV;
+        qInfo() << "Modbus write completed: ADAM-6022 SV =" << targetSV;
     }
     else {
-        qDebug() << "set SV failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -1002,7 +940,6 @@ void clientWorker::writeSV1(float targetSV) {
 
 void clientWorker::writeSV2(float targetSV) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -1020,7 +957,6 @@ void clientWorker::writeSV2(float targetSV) {
 
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set SV failed = " << m_6022->errorString();
         return;
     }
 
@@ -1031,10 +967,9 @@ void clientWorker::writeSV2(float targetSV) {
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set SV =" << targetSV;
+        qInfo() << "Modbus write completed: ADAM-6022 SV =" << targetSV;
     }
     else {
-        qDebug() << "set SV failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -1043,7 +978,6 @@ void clientWorker::writeSV2(float targetSV) {
 
 void clientWorker::writePID1(double p, double i, double d) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -1070,7 +1004,6 @@ void clientWorker::writePID1(double p, double i, double d) {
     // 2. 發送寫入請求
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set PID-0 failed :" << m_6022->errorString();
         return;
     }
 
@@ -1081,10 +1014,9 @@ void clientWorker::writePID1(double p, double i, double d) {
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set loop-0  P = " << p << "I = "<<i<<"D = "<<d;
+        qInfo() << "Modbus write completed: ADAM-6022 PID1 =" << p << i << d;
     }
     else {
-        qDebug() << "set PID-0 failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -1092,7 +1024,6 @@ void clientWorker::writePID1(double p, double i, double d) {
 
 void clientWorker::writePID2(double p, double i, double d) {
     if (!m_6022 || m_6022->state() != QModbusDevice::ConnectedState) {
-        qDebug() << "Modbus is not connect";
         return;
     }
 
@@ -1119,7 +1050,6 @@ void clientWorker::writePID2(double p, double i, double d) {
     // 2. 發送寫入請求
     QModbusReply* reply = m_6022->sendWriteRequest(writeUnit, 1);
     if (!reply) {
-        qDebug() << "set PID-1 failed :" << m_6022->errorString();
         return;
     }
 
@@ -1130,10 +1060,9 @@ void clientWorker::writePID2(double p, double i, double d) {
     loop.exec();
 
     if (reply->error() == QModbusDevice::NoError) {
-        qDebug() << "success set loop-1  P = " << p << "I = " << i << "D = " << d;
+        qInfo() << "Modbus write completed: ADAM-6022 PID2 =" << p << i << d;
     }
     else {
-        qDebug() << "set PID-1 failed :" << reply->errorString();
     }
 
     reply->deleteLater();
@@ -1220,7 +1149,6 @@ void clientWorker::set_STO(bool v)
     {
         m_STO = true;
     }
-    qDebug() << "set motor power = " << m_STO;
 
 }
 void clientWorker::set_STO2(bool v)
@@ -1235,7 +1163,6 @@ void clientWorker::set_STO2(bool v)
     {
         m_STO2 = true;
     }
-    qDebug() << "set fan power = "<<m_STO2;
 }
 void clientWorker::set_Reset()
 {
@@ -1243,7 +1170,6 @@ void clientWorker::set_Reset()
 }
 void clientWorker::set_SV1(double v)
 {
-    qDebug() << v;
     SV1 = v;
     f_setSV1 = true;
 }
@@ -1254,7 +1180,6 @@ void clientWorker::set_SV2(double v)
 }
 void clientWorker::set_AO1(double v)
 {
-    qDebug() << "set AO1 = "<<v;
     AO1 = v;
     f_setAO1 = true;
 }
@@ -1274,7 +1199,6 @@ void clientWorker::set_PID2(double p, double i, double d)
 }
 void clientWorker::set_Fan(double v)
 {
-    qDebug() << "set fan =" << v;
     m_setALL = v * 40.95;
     f_setFAN = true;
 }
@@ -1346,7 +1270,6 @@ void clientWorker::poll()
     bool is6022Connected = (m_6022 && m_6022->state() == QModbusDevice::ConnectedState);
 
     if (!is201Connected || !is6022Connected|| !is202Connected || !is203Connected || !is204Connected || !is205Connected || !is206Connected  ) {
-        qDebug() << "Device disconnected, skipping poll and attempting reconnect...";
         reconnectDevices();
         // 斷線時，加長下次 poll 的間隔（例如 2秒），避免過度頻繁重試
         m_pollTimer->start(500);

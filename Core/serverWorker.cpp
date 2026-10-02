@@ -40,10 +40,8 @@ void ServerWorker::init(int port,QVariant ip,quint16 v1, quint16 v2, quint16 v3,
     connect(m_server, &QModbusServer::dataWritten, this, &ServerWorker::onDataWritten);
 
     if (!m_server->connectDevice()) {
-        qDebug() << "FAILED  Modbus Server :" << m_server->errorString();
     }
     else {
-        qDebug() << "Modbus Server is START ,ip: " << ip <<" Port:" << port;
         status = true;
         emit server_stat(status);
         updateInputRegisters(31, { v1,v2,v3,years,date });
@@ -77,7 +75,6 @@ void ServerWorker::updateCoils(int startAddr, const bool data)
 
     // 將 ClientWorker 讀到的資料同步到 Server 
 
-    //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
     m_server->setData(QModbusDataUnit::Coils, startAddr, data);
 }
 
@@ -88,7 +85,6 @@ void ServerWorker::updateInputRegisters(int startAddr, const QVector<quint16>& d
 
         // 將 ClientWorker 讀到的資料同步到 Server 
         for (int i = 0; i < data.size(); ++i) {
-            //qDebug() << "set InputRegisters";
             m_server->setData(QModbusDataUnit::InputRegisters,startAddr+i, data[i]);
         }
     }
@@ -100,7 +96,6 @@ void ServerWorker::updateHoldingRegisters(int startAddr, const QVector<quint16>&
         QMutexLocker m_lock(&lock);
         // 將 ClientWorker 讀到的資料同步到 Server 
         for (int i = 0; i < data.size(); ++i) {
-            //qDebug() << "set HoldingRegisters";
             m_server->setData(QModbusDataUnit::HoldingRegisters, startAddr + i, data[i]);
             SaveData[startAddr + i] = data[i];
         }
@@ -113,7 +108,6 @@ void ServerWorker::updateHoldingRegister(int startAddr, const quint16 data)
         // 將 ClientWorker 讀到的資料同步到 Server 
     QMutexLocker m_lock(&lock);
 
-        //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
         m_server->setData(QModbusDataUnit::HoldingRegisters, startAddr, data);   
         SaveData[startAddr] = data;
 
@@ -124,7 +118,6 @@ void ServerWorker::updateInputRegister(int startAddr, const quint16 data)
 
     // 將 ClientWorker 讀到的資料同步到 Server 
 
-    //qDebug() << "set HoldingRegisters " << startAddr << "value" << data;
     m_server->setData(QModbusDataUnit::InputRegisters, startAddr, data);
 }
 
@@ -136,12 +129,10 @@ void ServerWorker::onDataWritten(QModbusDataUnit::RegisterType table, int addres
 
         // 從 Server 的內部資料表讀取該位址的新數值
         if (m_server->data(table, currentAddr, &value)) {
-            //qDebug() << " server :  set " << table
             //    << " addr:" << currentAddr
             //    << " new value:" << value;
 
             // 建議：發送一個帶有位址與數值的自定義訊號給 Manager
-            //qDebug() << table << " set " << currentAddr << " = " << value;
             emit modbusDataChanged(table, currentAddr, value);
         }
     }

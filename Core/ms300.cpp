@@ -23,7 +23,6 @@ void MS300::initPort()
         connect(m_pollTimer, &QTimer::timeout, this, &MS300::onPollTimeout);
         connect(m_modbus, &QModbusDevice::stateChanged, this, [this](QModbusDevice::State state) {
             if (state == QModbusDevice::ConnectedState) {
-                qDebug() << "COM2 connect";
                 m_reconnectScheduled = false;
                 m_pollTimer->start(100);
             } else if (state == QModbusDevice::UnconnectedState) {
@@ -40,7 +39,6 @@ void MS300::initPort()
     }
 
     if (!m_modbus->connectDevice()) {
-        qWarning() << "COM2 connect failed:" << m_modbus->errorString();
         scheduleReconnect();
     }
 }
@@ -81,7 +79,6 @@ void MS300::onPollTimeout()
             const QModbusDataUnit unit = reply->result();
             emit dataUpdated(unit.value(0));
         } else {
-            qWarning() << "MS300 read failed:" << reply->errorString();
             if (m_modbus && m_modbus->state() != QModbusDevice::UnconnectedState) {
                 m_modbus->disconnectDevice();
             }
