@@ -45,6 +45,49 @@ bool Manager::readServerHoldingRegister(int address, quint16 *value) const
 	return invoked && wasRead;
 }
 
+double Manager::adjustPressureLinear(double pressure, double scale, double offset) const
+{
+	return pressure * scale + offset;
+}
+
+QVector<quint16> Manager::adjustPressureRegisters(QVector<quint16> values) const
+{
+	constexpr double registerCountsPerPressureUnit = 6553.5;
+
+	for (const int index : { 1, 3, 5 }) {
+		if (index >= values.size()) {
+			continue;
+		}
+
+		double scale = 1.0;
+		double offset = 0.0;
+		switch (index) {
+		case 1:
+			scale = inWaterPressureScale;
+			offset = inWaterPressureOffset;
+			break;
+		case 3:
+			scale = returnWaterPressureScale;
+			offset = returnWaterPressureOffset;
+			break;
+		case 5:
+			scale = outWaterPressureScale;
+			offset = outWaterPressureOffset;
+			break;
+		}
+
+		const double rawPressure = values.at(index) / registerCountsPerPressureUnit;
+		const double adjustedPressure = adjustPressureLinear(rawPressure, scale, offset);
+		const int adjustedRegister = qBound(
+			0,
+			qRound(adjustedPressure * registerCountsPerPressureUnit),
+			65535);
+		values[index] = static_cast<quint16>(adjustedRegister);
+	}
+
+	return values;
+}
+
 void Manager::init()
 {
 	m_ms300Thread = new QThread(this);
@@ -491,7 +534,8 @@ void Manager::init()
 			m_serverWorker->updateInputRegisters(0, datainput); //將input的部分 傳入InputRegisters (從0開始)
 			//m_serverWorker->updateHoldingRegisters(71, dataoutput);//將output的部分 傳入HoldingRegisters (從71開始)
 		}});
-	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, this, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
+	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, this, [this](QVector<quint16> data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
+		data = adjustPressureRegisters(data);
 		emit HodingRegister(data); //傳送給Core
 
 		openValveP1 = data[13];
@@ -532,7 +576,8 @@ void Manager::init()
 
 		}
 		});
-	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, m_serverWorker, [this](const QVector<quint16>& data, const QVector<quint16>& datainput, const QVector<quint16>& dataoutput) {
+	connect(m_clientWorker, &clientWorker::m_5000HodingRegister, m_serverWorker, [this](const QVector<quint16>& data, QVector<quint16> datainput, const QVector<quint16>& dataoutput) {
+		datainput = adjustPressureRegisters(datainput);
 		if (server_OK) {
 
 			emit update_input(datainput);

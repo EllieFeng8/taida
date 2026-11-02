@@ -822,6 +822,12 @@ void Core::saveProductionSettings()
     settings.setValue("Production/New_DP", new_PD);
     settings.setValue("Production/Dry_time", m_manager->dryTime);
     settings.setValue("Production/Dry_value", m_manager->dryValue);
+    settings.setValue("Production/InWaterPressureScale", m_manager->inWaterPressureScale);
+    settings.setValue("Production/InWaterPressureOffset", m_manager->inWaterPressureOffset * 100.0);
+    settings.setValue("Production/ReturnWaterPressureScale", m_manager->returnWaterPressureScale);
+    settings.setValue("Production/ReturnWaterPressureOffset", m_manager->returnWaterPressureOffset * 100.0);
+    settings.setValue("Production/OutWaterPressureScale", m_manager->outWaterPressureScale);
+    settings.setValue("Production/OutWaterPressureOffset", m_manager->outWaterPressureOffset * 100.0);
     //settings.setValue("Production/New_DP",new_PD );
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -859,4 +865,18 @@ void Core::loadProductionSettings()
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
     m_manager->set_dryTime(settings.value("Production/Dry_time", 1800).toInt());
     m_manager->set_dryValue(settings.value("Production/Dry_value", 40).toInt());
+    m_manager->inWaterPressureScale = settings.value("Production/InWaterPressureScale", 1.0).toDouble();
+    m_manager->inWaterPressureOffset = settings.value("Production/InWaterPressureOffset", 0.0).toDouble() * 0.01;
+    m_manager->returnWaterPressureScale = settings.value("Production/ReturnWaterPressureScale", 1.0).toDouble();
+    m_manager->returnWaterPressureOffset = settings.value("Production/ReturnWaterPressureOffset", 0.0).toDouble() * 0.01;
+    m_manager->outWaterPressureScale = settings.value("Production/OutWaterPressureScale", 1.0).toDouble();
+    m_manager->outWaterPressureOffset = settings.value("Production/OutWaterPressureOffset", 0.0).toDouble() * 0.01;
+
+    settings.setValue("Production/InWaterPressureScale", m_manager->inWaterPressureScale);
+    settings.setValue("Production/InWaterPressureOffset", m_manager->inWaterPressureOffset * 100.0);
+    settings.setValue("Production/ReturnWaterPressureScale", m_manager->returnWaterPressureScale);
+    settings.setValue("Production/ReturnWaterPressureOffset", m_manager->returnWaterPressureOffset * 100.0);
+    settings.setValue("Production/OutWaterPressureScale", m_manager->outWaterPressureScale);
+    settings.setValue("Production/OutWaterPressureOffset", m_manager->outWaterPressureOffset * 100.0);
+    settings.sync();
 }

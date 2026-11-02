@@ -17,6 +17,12 @@ public:
     bool new_PD = false;
     int dryTime = 3600;
     int dryValue = 40;
+    double inWaterPressureScale = 1.0;
+    double inWaterPressureOffset = 0.0;
+    double returnWaterPressureScale = 1.0;
+    double returnWaterPressureOffset = 0.0;
+    double outWaterPressureScale = 1.0;
+    double outWaterPressureOffset = 0.0;
     QString ip;
     void init();
     void set_mode1(bool v);
@@ -89,6 +95,8 @@ signals:
 
 private:
     bool readServerHoldingRegister(int address, quint16 *value) const;
+    double adjustPressureLinear(double pressure, double scale, double offset) const;
+    QVector<quint16> adjustPressureRegisters(QVector<quint16> values) const;
     bool _E_STOP = false;
     bool _STO = false;
     bool server_OK = false;
@@ -113,9 +121,9 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 0;
     quint16 version_num2 = 14;
-    quint16 version_num3 = 34;
+    quint16 version_num3 = 38;
     quint16 version_year = 2026;
-    quint16 version_date = 910;
+    quint16 version_date = 1029;
     quint16 openValveP1 = 60;
     quint16 openValveP2 = 60;
     QElapsedTimer timer;
