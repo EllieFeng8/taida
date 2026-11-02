@@ -74,6 +74,7 @@ private:
     void update206Proxy(int index, quint16 value);
     void updateSenserData(readInput_Data data, QVector<quint16> result);
     void updateProxyProperty2(int index, quint16 value);
+    double adjustPressure(double value, double scale, double offset) const;
 
     void saveProductionSettings();
     void loadProductionSettings();
@@ -141,6 +142,12 @@ private:
     double MixSV_maxValue = 4095 * 0.95;
     double OutSV_minValue = 4095 * 0.20; 
     double OutSV_maxValue = 4095 * 0.95; 
+    double m_inWaterPressureScale = 1.0;
+    double m_inWaterPressureOffset = 0.0;
+    double m_outWaterPressureScale = 1.0;
+    double m_outWaterPressureOffset = 0.0;
+    double m_returnWaterPressureScale = 1.0;
+    double m_returnWaterPressureOffset = 0.0;
     bool new_PD = false;
     bool m_productionSettingsLoaded = false;
     bool m_loadingProductionSettings = false;

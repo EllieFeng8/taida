@@ -440,6 +440,11 @@ void Core::set_PID2(double v)
     m_manager->set_PID2(Pid*1000, pId * 1000, piD * 1000);
 }
 
+double Core::adjustPressure(double value, double scale, double offset) const
+{
+    return value * scale + offset;
+}
+
 void Core::onSenserData(readInput_Data data, QVector <quint16> result)
 {
     on202data(data.AI_202);
@@ -467,7 +472,13 @@ void Core::updateSenserData(readInput_Data data, QVector <quint16> result)
             }
             else
             {
-                senserData[i] = qRound(data.AI_202[i] / 65.535 * 100.0) / 100.0;
+                const double rawPressure = data.AI_202[i] / 65.535;
+                const double pressure = i == 1
+                    ? adjustPressure(rawPressure, m_inWaterPressureScale, m_inWaterPressureOffset)
+                    : i == 3
+                    ? adjustPressure(rawPressure, m_outWaterPressureScale, m_outWaterPressureOffset)
+                    : adjustPressure(rawPressure, m_returnWaterPressureScale, m_returnWaterPressureOffset);
+                senserData[i] = qRound(pressure * 100.0) / 100.0;
             }
         }
         //以上為202
@@ -621,7 +632,7 @@ void Core::update202Proxy(int index, quint16 value)
         if (value == 100 && c_1 < 3) { c_1++; return; }
         c_1 = 0;
 
-        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //入水壓力
+        v_1 = value; m_proxy->setInWaterPressure(qRound(adjustPressure(value / 65.535, m_inWaterPressureScale, m_inWaterPressureOffset) * 10.0) / 10.0); break; //入水壓力
     case 2:
         if (value == v_2) { return; }
         if (value == 0 && c_2 < 3) { c_2++; return; }
@@ -637,7 +648,7 @@ void Core::update202Proxy(int index, quint16 value)
         c_3 = 0;
 
         v_3 = value;
-        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //出水口壓力
+        m_proxy->setOutWaterPressure(qRound(adjustPressure(value / 65.535, m_outWaterPressureScale, m_outWaterPressureOffset) * 10.0) / 10.0); break; //出水口壓力
 
     case 4:
         if (value == v_4) { return; }
@@ -654,7 +665,7 @@ void Core::update202Proxy(int index, quint16 value)
         if (value == 100 && c_5 < 3) { c_5++; return; }
         c_5 = 0;
         v_5 = value;
-        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //回水口壓力
+        m_proxy->setReturnWaterPressure(qRound(adjustPressure(value / 65.535, m_returnWaterPressureScale, m_returnWaterPressureOffset) * 10.0) / 10.0); break; //回水口壓力
 
     case 6:
         if (value == v_6) { return; }
@@ -881,7 +892,7 @@ void Core::updateProxyProperty(int index, quint16 value)
         m_proxy->setInWaterTemp(qRound((value / 655.35) * 10.0) / 10.0); break; //入水溫度
     case 1: 
         if (value == v_1) { return; }
-        v_1 = value; m_proxy->setInWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //入水壓力
+        v_1 = value; m_proxy->setInWaterPressure(qRound(adjustPressure(value / 65.535, m_inWaterPressureScale, m_inWaterPressureOffset) * 10.0) / 10.0); break; //入水壓力
     case 2:
         if (value == v_2) { return; }
         v_2 = value; 
@@ -889,7 +900,7 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 3:
         if (value == v_3) { return; }
         v_3 = value; 
-        m_proxy->setReturnWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //回水口壓力
+        m_proxy->setReturnWaterPressure(qRound(adjustPressure(value / 65.535, m_returnWaterPressureScale, m_returnWaterPressureOffset) * 10.0) / 10.0); break; //回水口壓力
     case 4:
         if (value == v_4) { return; }
         v_4 = value; 
@@ -897,7 +908,7 @@ void Core::updateProxyProperty(int index, quint16 value)
     case 5:
         if (value == v_5) { return; }
         v_5 = value; 
-        m_proxy->setOutWaterPressure(qRound((value / 65.535) * 10.0) / 10.0); break; //出水口壓力
+        m_proxy->setOutWaterPressure(qRound(adjustPressure(value / 65.535, m_outWaterPressureScale, m_outWaterPressureOffset) * 10.0) / 10.0); break; //出水口壓力
     case 6: 
         if (value == v_6) { return; }
         v_6 = value; 
@@ -1193,6 +1204,12 @@ void Core::saveProductionSettings()
     settings.setValue("Production/New_DP",new_PD );
     settings.setValue("Production/Dry_time", m_manager->dryTime);
     settings.setValue("Production/Dry_value", m_manager->dryValue);
+    settings.setValue("Production/InWaterPressureScale", m_inWaterPressureScale);
+    settings.setValue("Production/InWaterPressureOffset", m_inWaterPressureOffset);
+    settings.setValue("Production/OutWaterPressureScale", m_outWaterPressureScale);
+    settings.setValue("Production/OutWaterPressureOffset", m_outWaterPressureOffset);
+    settings.setValue("Production/ReturnWaterPressureScale", m_returnWaterPressureScale);
+    settings.setValue("Production/ReturnWaterPressureOffset", m_returnWaterPressureOffset);
     //settings.setValue("Production/ESTOP", m_proxy->m_fanEmergencySwitchOn);
     //settings.setValue("Production/motorpower", m_proxy->m_motorFrequencySwitchOn);
 
@@ -1236,6 +1253,16 @@ void Core::loadProductionSettings()
     Out_maxValue = settings.value("Production/Out_max", 4095).toDouble();
     OutSV_minValue = settings.value("Production/OutSV_min", 0).toDouble();
     OutSV_maxValue = settings.value("Production/OutSV_max", 4095).toDouble();
+    m_inWaterPressureScale = settings.value("Production/InWaterPressureScale", 1.0).toDouble();
+    m_inWaterPressureOffset = settings.value("Production/InWaterPressureOffset", 0.0).toDouble();
+    m_outWaterPressureScale = settings.value("Production/OutWaterPressureScale", 1.0).toDouble();
+    m_outWaterPressureOffset = settings.value("Production/OutWaterPressureOffset", 0.0).toDouble();
+    m_returnWaterPressureScale = settings.value("Production/ReturnWaterPressureScale", 1.0).toDouble();
+    m_returnWaterPressureOffset = settings.value("Production/ReturnWaterPressureOffset", 0.0).toDouble();
+    m_manager->setPressureCalibration(
+        m_inWaterPressureScale, m_inWaterPressureOffset,
+        m_outWaterPressureScale, m_outWaterPressureOffset,
+        m_returnWaterPressureScale, m_returnWaterPressureOffset);
     set_DifferentialPressure(settings.value("Production/new_DP", true).toBool());
     m_manager->set_dryTime(settings.value("Production/Dry_time", 3600).toInt());
     m_manager->set_dryValue(settings.value("Production/Dry_value", 55).toInt());

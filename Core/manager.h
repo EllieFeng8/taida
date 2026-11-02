@@ -68,6 +68,9 @@ public:
     void set_dry(bool v);
     void set_dryTime(int v);
     void set_dryValue(int v);
+    void setPressureCalibration(double inWaterScale, double inWaterOffset,
+        double outWaterScale, double outWaterOffset,
+        double returnWaterScale, double returnWaterOffset);
 
 signals:
     void server_on();
@@ -100,6 +103,7 @@ private:
     void queueServerCoil(int startAddr, bool data);
     bool readServerHoldingRegister(int address, quint16 *value) const;
     QVector<quint16> serverSaveData() const;
+    quint16 calibratedPressureRegister(quint16 value, double scale, double offset) const;
     bool _FAN_STOP = false;
     bool _motor_STO = false;
     bool server_OK = false;
@@ -124,12 +128,18 @@ private:
     QThread* m_ms300Thread = nullptr;
     quint16 version_num1 = 1;
     quint16 version_num2 = 2; 
-    quint16 version_num3 = 34;
+    quint16 version_num3 = 38;
     quint16 version_year = 2026;
-    quint16 version_date = 930;
+    quint16 version_date = 1029;
     quint16 openValveP1 = 60;
     quint16 openValveP2 = 60;
     QElapsedTimer timer;
     bool dry_Over = false;
+    double m_inWaterPressureScale = 1.0;
+    double m_inWaterPressureOffset = 0.0;
+    double m_outWaterPressureScale = 1.0;
+    double m_outWaterPressureOffset = 0.0;
+    double m_returnWaterPressureScale = 1.0;
+    double m_returnWaterPressureOffset = 0.0;
 
 };

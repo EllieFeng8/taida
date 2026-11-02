@@ -27,6 +27,24 @@ Manager::~Manager()
 	}
 }
 
+void Manager::setPressureCalibration(double inWaterScale, double inWaterOffset,
+	 double outWaterScale, double outWaterOffset,
+	 double returnWaterScale, double returnWaterOffset)
+{
+	m_inWaterPressureScale = inWaterScale;
+	m_inWaterPressureOffset = inWaterOffset;
+	m_outWaterPressureScale = outWaterScale;
+	m_outWaterPressureOffset = outWaterOffset;
+	m_returnWaterPressureScale = returnWaterScale;
+	m_returnWaterPressureOffset = returnWaterOffset;
+}
+
+quint16 Manager::calibratedPressureRegister(quint16 value, double scale, double offset) const
+{
+	const double calibratedValue = (value / 65.535) * scale + offset;
+	return static_cast<quint16>(qBound(0, qRound(calibratedValue * 65.535), 65535));
+}
+
 void Manager::queueServerHoldingRegisters(int startAddr, const QVector<quint16>& data)
 {
     if (!m_serverWorker) {
@@ -605,7 +623,13 @@ void Manager::init()
 				queueServerInputRegister(8, data.DI_204[0]);//����8���`
 				queueServerInputRegister(9, data.DI_204[1]);//����9���`
 				queueServerInputRegister(10, data.DI_204[2]);//�������`
-				queueServerInputRegisters(11, data.AI_202);
+				QVector<quint16> serverAi202 = data.AI_202;
+				if (serverAi202.size() > 5) {
+					serverAi202[1] = calibratedPressureRegister(serverAi202[1], m_inWaterPressureScale, m_inWaterPressureOffset);
+					serverAi202[3] = calibratedPressureRegister(serverAi202[3], m_outWaterPressureScale, m_outWaterPressureOffset);
+					serverAi202[5] = calibratedPressureRegister(serverAi202[5], m_returnWaterPressureScale, m_returnWaterPressureOffset);
+				}
+				queueServerInputRegisters(11, serverAi202);
 				queueServerInputRegisters(19, data.AI_203);
 				emit senserData(data, serverSaveData());
 			}
